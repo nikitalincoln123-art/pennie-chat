@@ -555,7 +555,7 @@ function clientIdFor(prefix, room, side){
   return prefix+"_"+room.slice(0,4)+"_"+side+"_"+id;
 }
 
-const MAX_MSG_RETRY=4, RETRY_BASE=2600;
+const MAX_MSG_RETRY=8, RETRY_BASE=2000;
 const pendingMap={};              // msgId -> {tries, timer, payload}
 
 function connect(room, side){
@@ -569,7 +569,7 @@ function connect(room, side){
     const sub=window.mqtt.connect(HOST,{clientId:clientIdFor("sn",room,side),
       clean:true, keepalive:30, connectTimeout:15000, reconnectPeriod:2000, resubscribe:true});
     sub.on("connect",()=>{
-      ["presence","msg","typing","react","control","ack"].forEach(k=>sub.subscribe(NS+"/"+room+"/"+k,{qos:k==="presence"||k==="typing"?0:1}));
+      ["presence","msg","typing","react","control","ack"].forEach(k=>sub.subscribe(NS+"/"+room+"/"+k,{qos:k==="typing"?0:1}));
       state.sub=sub;
       sub.on("message",(t,p)=>onMessage(t,p));
     });
@@ -594,7 +594,7 @@ function connect(room, side){
   });
 }
 
-function send(topic,obj){ try{ if(state.client&&state.client.connected){ state.client.publish(NS+"/"+state.room+"/"+topic,JSON.stringify(obj),{qos:topic==="presence"||topic==="typing"?0:1}); } }catch(e){} }
+function send(topic,obj){ try{ if(state.client&&state.client.connected){ state.client.publish(NS+"/"+state.room+"/"+topic,JSON.stringify(obj),{qos:topic==="typing"?0:1}); } }catch(e){} }
 
 function announcePresence(){
   send("presence",{side:state.role,ts:Date.now(),online:true});
