@@ -86,7 +86,7 @@
     padding:18px;box-shadow:0 20px 60px rgba(0,0,0,.7),var(--glow-soft);max-width:340px;margin:0 auto;backdrop-filter:blur(8px)}
   .phone .bar{display:flex;align-items:center;gap:10px;padding-bottom:16px;border-bottom:1px solid var(--line)}
   .phone .bar .av{width:34px;height:34px;border-radius:11px;background:linear-gradient(135deg,#ffffff,#d9d6ff);
-    display:flex;align-items:center;justify-content:center;font-size:17px;color:#0a0a10}
+    display:flex;align-items:center;justify-content:center;font-size:18px;line-height:1;color:#0a0a10}
   .phone .bar .tt{flex:1}
   .phone .bar .tt .n{font-size:14px;font-weight:700;text-shadow:var(--glow-soft)}
   .phone .bar .tt .s{font-size:11px;color:#6bffb0;text-shadow:0 0 8px rgba(107,255,176,.6)}
@@ -105,8 +105,9 @@
   .feats h2{font-size:30px;font-weight:800;text-align:center;margin-bottom:40px;text-shadow:var(--glow-soft)}
   .grid{display:grid;grid-template-columns:repeat(3,1fr);gap:18px}
   .card{background:linear-gradient(180deg,var(--surface2),var(--surface));border:1px solid var(--line);border-radius:20px;padding:26px;box-shadow:var(--glow-soft)}
-  .card .ic{width:48px;height:48px;border-radius:14px;display:flex;align-items:center;justify-content:center;font-size:22px;margin-bottom:16px;
+  .card .ic{width:48px;height:48px;border-radius:14px;display:flex;align-items:center;justify-content:center;margin-bottom:16px;
     background:var(--surface2);border:1px solid var(--line);filter:drop-shadow(0 0 10px rgba(255,255,255,.25))}
+  .card .ic svg{width:26px;height:26px;stroke:#fff;fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round;display:block}
   .card h3{font-size:17px;font-weight:700;margin-bottom:8px;text-shadow:var(--glow-soft)}
   .card p{font-size:14px;color:var(--ink-faint);line-height:1.55}
 
@@ -117,7 +118,8 @@
   .steps{display:grid;grid-template-columns:repeat(3,1fr);gap:18px}
   .step{background:var(--surface2);border:1px solid var(--line);border-radius:20px;padding:26px;position:relative;box-shadow:var(--glow-soft)}
   .step .num{width:40px;height:40px;border-radius:12px;background:linear-gradient(135deg,#ffffff,#c9c4ff);color:#0a0a10;
-    font-weight:800;display:flex;align-items:center;justify-content:center;margin-bottom:16px;font-size:16px;box-shadow:0 0 22px rgba(255,255,255,.25)}
+    font-weight:800;display:flex;align-items:center;justify-content:center;margin-bottom:16px;font-size:16px;line-height:1;
+    box-shadow:0 0 22px rgba(255,255,255,.25)}
   .step h3{font-size:16px;font-weight:700;margin-bottom:8px;text-shadow:var(--glow-soft)}
   .step p{font-size:14px;color:var(--ink-faint);line-height:1.55}
   .step .act{display:inline-block;margin-top:12px;font-size:12.5px;color:#e6e4ff;background:var(--surface);border:1px solid var(--line);
@@ -215,12 +217,12 @@
   <div class="wrap">
     <h2>Всё для уютного общения</h2>
     <div class="grid">
-      <div class="card"><div class="ic">💬</div><h3>Чат в реальном времени</h3><p>Сообщения, «печатает…» и индикатор «в сети» приходят мгновенно через защищённое соединение.</p></div>
-      <div class="card"><div class="ic">😊</div><h3>Эмодзи и стикеры</h3><p>Большая палитра эмодзи по категориям, любимые стикеры на быстрой панели и персонализация профиля.</p></div>
-      <div class="card"><div class="ic">🛠️</div><h3>Полный контроль</h3><p>Редактируйте и удаляйте свои сообщения, добавляйте реакции, меняйте цвет и аватар профиля.</p></div>
-      <div class="card"><div class="ic">🔒</div><h3>Приватность по ссылке</h3><p>Комната доступна только тем, у кого есть ссылка. Никаких аккаунтов и баз данных.</p></div>
-      <div class="card"><div class="ic">🌙</div><h3>Тьма и сияние</h3><p>Почти чёрный фон с летящими лепестками сакуры и светящимися значками — атмосфера уюта.</p></div>
-      <div class="card"><div class="ic">📲</div><h3>Работает везде</h3><p>Адаптирован под телефон и компьютер. Откройте страницу — и общайтесь откуда угодно.</p></div>
+      <div class="card"><div class="ic"><svg viewBox="0 0 24 24"><path d="M21 11.5a8.4 8.4 0 0 1-9 8.4 8.6 8.6 0 0 1-3.6-.7L3 21l1.8-5.2A8.4 8.4 0 1 1 21 11.5z"/></svg></div><h3>Чат в реальном времени</h3><p>Сообщения, «печатает…» и индикатор «в сети» приходят мгновенно через защищённое соединение.</p></div>
+      <div class="card"><div class="ic"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M8.5 15s1 2 3.5 2 3.5-2 3.5-2"/><circle cx="9" cy="10" r="1"/><circle cx="15" cy="10" r="1"/></svg></div><h3>Эмодзи и стикеры</h3><p>Большая палитра эмодзи по категориям, любимые стикеры на быстрой панели и персонализация профиля.</p></div>
+      <div class="card"><div class="ic"><svg viewBox="0 0 24 24"><path d="M14.7 6.3 17 4.5a3 3 0 1 1 2.5 2.5L9.3 18 5 19l1-4.3z"/></svg></div><h3>Полный контроль</h3><p>Редактируйте и удаляйте свои сообщения, добавляйте реакции, меняйте цвет и аватар профиля.</p></div>
+      <div class="card"><div class="ic"><svg viewBox="0 0 24 24"><rect x="4.5" y="10.5" width="15" height="10" rx="2"/><path d="M8 10.5V7a4 4 0 0 1 8 0v3.5"/><circle cx="12" cy="15.5" r="1.3" fill="#fff" stroke="none"/></svg></div><h3>Приватность по ссылке</h3><p>Комната доступна только тем, у кого есть ссылка. Никаких аккаунтов и баз данных.</p></div>
+      <div class="card"><div class="ic"><svg viewBox="0 0 24 24"><path d="M20 13.5A8.5 8.5 0 1 1 10.5 4a7 7 0 0 0 9.5 9.5z"/></svg></div><h3>Тьма и сияние</h3><p>Почти чёрный фон с летящими лепестками сакуры и светящимися значками — атмосфера уюта.</p></div>
+      <div class="card"><div class="ic"><svg viewBox="0 0 24 24"><rect x="7" y="2.5" width="10" height="19" rx="2.5"/><path d="M11 18.5h2"/></svg></div><h3>Работает везде</h3><p>Адаптирован под телефон и компьютер. Откройте страницу — и общайтесь откуда угодно.</p></div>
     </div>
   </div>
 </section>
