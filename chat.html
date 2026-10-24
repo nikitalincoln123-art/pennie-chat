@@ -542,7 +542,13 @@ function connect(room, side){
   });
 }
 function send(topic,obj){ try{ if(state.client) state.client.publish(NS+"/"+state.room+"/"+topic,JSON.stringify(obj),{qos:topic==="presence"?0:1}); }catch(e){} }
-function sendMsg(o){ send("msg",o); }
+/* Deliberate redundancy: the public HiveMQ broker drops a fraction of
+   single QoS-1 messages (measured ~3/6). Sending the same message twice
+   with a 2.5s gap fixes that (measured 6/6); the receiver dedups by id. */
+function sendMsg(o){
+  send("msg",o);
+  setTimeout(()=>{ send("msg",o); },2500);
+}
 function sendControl(o){ send("control",o); }
 function sendReact(o){ send("react",o); }
 function sendTypingMsg(b){ send("typing",{side:state.role,typing:!!b,t:Date.now()}); }
