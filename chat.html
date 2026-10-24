@@ -153,6 +153,7 @@
   .hdr-btn{width:40px;height:40px;border-radius:12px;display:flex;align-items:center;justify-content:center;
     font-size:18px;background:var(--panel2);border:1px solid var(--line);transition:all .15s;flex:0 0 auto}
   .hdr-btn:hover{border-color:var(--accent);transform:translateY(-1px)}
+  .hdr-end:hover{border-color:var(--bad);color:var(--bad)}
 
   .chat-body{flex:1;overflow-y:auto;padding:22px 16px 6px;scroll-behavior:smooth;position:relative}
   .day-chip{display:flex;align-items:center;gap:10px;margin:8px 4px 22px;color:var(--ink-faint);font-size:11.5px}
@@ -473,6 +474,7 @@
     </div>
     <button class="hdr-btn" id="btnInfo" title="Ссылка на комнату">🔗</button>
     <button class="hdr-btn" id="btnOpenProfile" title="Ваш профиль">👤</button>
+    <button class="hdr-btn hdr-end" id="btnEndChat" title="Завершить чат">✕</button>
   </header>
   <div class="chat-body" id="chatBody">
     <div class="msgs" id="msgs"></div>
@@ -1172,6 +1174,44 @@ $("btnOpenProfile").addEventListener("click",()=>{
   if(state.profLocked){ toast("Профиль уже настроен — изменить его нельзя"); return; }
   populateEditProfile(); setScreen("sc-editprof");
 });
+
+/* ===== End chat (leave this device, clear local history) ===== */
+function endChatFlow(){
+  const ov=document.createElement("div"); ov.className="overlay open"; ov.id="endModal";
+  ov.innerHTML=`<div class="modal"><div class="modal-head"><div class="modal-title">Завершить чат?</div><button class="x-btn" aria-label="Закрыть" data-x>✕</button></div>
+    <p class="hint">Чат будет завершён на этом устройстве: локальная переписка и ссылка на эту комнату будут удалены. У собеседника ничего не изменится.</p>
+    <button type="button" class="btn primary block" data-go style="background:var(--bad)">Да, завершить чат</button>
+    <button type="button" class="btn ghost block" data-cancel style="margin-top:10px">Отмена</button></div>`;
+  document.body.appendChild(ov);
+  ov.addEventListener("click",e=>{
+    if(e.target===ov||e.target.closest("[data-x]")||e.target.closest("[data-cancel]")){ ov.remove(); return; }
+    if(e.target.closest("[data-go]")){ ov.remove(); doEndChat(); }
+  });
+}
+function doEndChat(){
+  // disconnect MQTT
+  try{ if(state.sub) state.sub.end(true); }catch(e){}
+  try{ if(state.client) state.client.end(true); }catch(e){}
+  try{ if(state.comm) state.comm.end(true); }catch(e){}
+  // clear local room + history
+  const room=state.room, side=state.role;
+  const keys=[];
+  if(room) keys.push(NS+"_cid_"+room+"_a", NS+"_cid_"+room+"_b");
+  keys.forEach(k=>{ try{ localStorage.removeItem(k); }catch(e){} });
+  // reset state
+  state.room=null; state.role=null; state.msgs=[]; state.peers={}; state.peerTyping=false;
+  state.peerName=null; state.username=""; state.profLocked=false;
+  state.sub=null; state.client=null;
+  // clear hash so room link is gone
+  try{ history.replaceState(null,"",location.pathname); }catch(e){}
+  $("chatText").value=""; autosize();
+  // clear UI
+  if($("msgs")) $("msgs").innerHTML="";
+  $("typingInd").classList.add("hidden");
+  toast("Чат завершён");
+  setScreen("sc-landing");
+}
+$("btnEndChat").addEventListener("click",endChatFlow);
 
 /* input */
 $("btnSend").addEventListener("click",()=>sendMessage($("chatText").value));
