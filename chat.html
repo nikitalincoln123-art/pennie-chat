@@ -109,6 +109,24 @@
   .mini-actions .btn{flex:1}
   .credit{text-align:center;color:var(--ink-faint);font-size:12px;margin-top:20px;padding-top:16px;border-top:1px solid var(--line)}
   .credit b{color:var(--ink);font-weight:600}
+
+  /* ===== Community ===== */
+  .user-list{display:flex;flex-direction:column;gap:8px;max-height:180px;overflow-y:auto;margin-bottom:4px}
+  .user-item{display:flex;align-items:center;gap:10px;padding:8px 10px;border-radius:12px;background:var(--panel2);border:1px solid var(--line)}
+  .user-item .user-ava{width:34px;height:34px;border-radius:50%;background:var(--me-soft);font-size:17px;display:flex;align-items:center;justify-content:center;flex:0 0 auto;cursor:pointer}
+  .user-item .user-ava:hover{border-color:var(--accent)}
+  .user-meta{min-width:0}
+  .user-name{font-size:14px;font-weight:700;color:var(--ink);display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .dev-star{color:#ffd76b;text-shadow:0 0 8px rgba(255,215,107,.6)}
+  .user-sub{font-size:12px;color:var(--ink-faint)}
+  .list{display:flex;flex-direction:column;gap:10px;margin-top:14px;max-height:280px;overflow-y:auto}
+  .comm-item{padding:11px 13px;border-radius:13px;background:var(--panel2);border:1px solid var(--line);animation:msgIn .2s}
+  .comm-head{display:flex;justify-content:space-between;gap:8px;font-size:12.5px;color:var(--ink-dim);margin-bottom:5px}
+  .comm-head b{color:var(--ink)}
+  .comm-text{font-size:14px;color:var(--ink);line-height:1.5;white-space:pre-wrap}
+  .comm-text.muted{color:var(--ink-faint);font-size:13px}
+  .qa-answer{margin-top:8px;padding:8px 11px;border-radius:10px;background:var(--me-soft);border:1px solid var(--line);font-size:13.5px;color:var(--ink);white-space:pre-wrap}
+  .qa-answer::before{content:"🙂 ";}
   .seg{display:flex;background:var(--bg2);border:1px solid var(--line);border-radius:14px;padding:4px;gap:4px;margin-bottom:14px}
   .seg button{flex:1;padding:10px 6px;border-radius:10px;font-size:13.5px;font-weight:600;color:var(--ink-dim);transition:all .18s;white-space:nowrap}
   .seg button.on{background:var(--standard);color:#0d0e16}
@@ -287,11 +305,71 @@
       <button class="btn primary block" id="btnCreate"><span id="btnCreateTxt">Создать персональную ссылку</span></button>
       <div class="divider">уже есть ссылка?</div>
       <button class="btn ghost block" id="btnOpenByLink">Вставить ссылку собеседника</button>
+      <button class="btn ghost block" id="btnCommunity" style="margin-top:10px">🌐 Сообщество · отзывы и вопросы</button>
       <div class="status-line" id="landStatus"></div>
       <div class="credit">Автор проекта: <b>Никита Линкольн</b></div>
     </div>
   </div>
 </section>
+
+<!-- COMMUNITY -->
+<section id="sc-community" class="screen">
+  <div class="center-wrap">
+    <div class="card big">
+      <div class="logo-row">
+        <div class="logo alt">🌐</div>
+        <div>
+          <div class="brand-name">Сообщество Pennie</div>
+          <div class="brand-sub">пользователи, отзывы и вопросы</div>
+        </div>
+        <button class="x-btn" id="btnCommunityClose" aria-label="Закрыть">✕</button>
+      </div>
+
+      <div class="field">
+        <label>Люди, которые пользовались сайтом</label>
+        <div class="user-list" id="userList"><p class="hint">Загрузка…</p></div>
+      </div>
+
+      <div class="seg" id="commSeg">
+        <button data-v="reviews" class="on">Отзывы</button>
+        <button data-v="qa">Вопросы</button>
+      </div>
+
+      <!-- Reviews -->
+      <div id="commReviews">
+        <div class="field">
+          <label>Оставить отзыв</label>
+          <textarea id="reviewText" aria-label="Ваш отзыв" class="input" rows="2" maxlength="500" placeholder="Напишите пару слов о Pennie…"></textarea>
+        </div>
+        <button class="btn primary block" id="btnAddReview">Оставить отзыв</button>
+        <div class="list" id="reviewList"></div>
+      </div>
+
+      <!-- Q&A -->
+      <div id="commQA" class="hidden">
+        <div class="field">
+          <label>Задать вопрос разработчику</label>
+          <textarea id="qaText" aria-label="Ваш вопрос" class="input" rows="2" maxlength="500" placeholder="Ваш вопрос к @Lincoln…"></textarea>
+        </div>
+        <button class="btn primary block" id="btnAsk">Задать вопрос</button>
+        <div class="list" id="qaList"></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- PROFILE VIEW MODAL -->
+<div class="overlay" id="profileOverlay">
+  <div class="modal">
+    <div class="modal-head"><div class="modal-title">Профиль</div><button class="x-btn" data-cp-close="">✕</button></div>
+    <div style="text-align:center;margin-bottom:16px">
+      <div id="pvAva" style="width:72px;height:72px;border-radius:50%;margin:0 auto 10px;display:flex;align-items:center;justify-content:center;font-size:34px;background:var(--me-soft)">👤</div>
+      <div id="pvName" style="font-size:20px;font-weight:800"></div>
+      <div id="pvRole" style="font-size:13px;color:var(--ink-faint);margin-top:4px"></div>
+    </div>
+    <div id="pvMeta" class="hint" style="text-align:center"></div>
+  </div>
+</div>
 
 <!-- JOIN -->
 <section id="sc-join" class="screen">
@@ -1113,6 +1191,173 @@ window.addEventListener("hashchange",()=>{
 });
 
 buildEmojiPanel(); buildStickerPanel();
+
+/* ===================== COMMUNITY (reviews, users, Q&A) =====================
+   Stored as retained MQTT topics so they survive reloads and are shared by
+   everyone (no backend needed):
+     _users/<name>   -> {name, role?, at, seal}  user directory
+     _reviews/<id>   -> {who, text, at}
+     _qa/<id>        -> {who, text, at, answer?, answeredAt?}
+   Lincoln is the developer: a special role 'dev' + a star in the list. */
+const DEV_USER = {username:"lincoln", display:"Lincoln", role:"dev"};
+function communityMaybe(){
+  return window.mqtt ? true : false;
+}
+function commConnect(){
+  if(state.comm) return state.comm;
+  return new Promise(resolve=>{
+    if(!window.mqtt){ resolve(false); return; }
+    const c=window.mqtt.connect(HOST,{clientId:"cm_"+Math.random().toString(36).slice(2,8),
+      clean:true, keepalive:30, connectTimeout:12000, reconnectPeriod:3000});
+    let subscribed=false;
+    c.on("connect",()=>{
+      ["_users/#","_reviews/#","_qa/#"].forEach(t=>c.subscribe(NS+"/"+t,{qos:1}));
+      subscribed=true;
+      c.on("message",(t,p)=>commOnMsg(t,p));
+      state.comm=c;
+      // seed developer's directory entry
+      c.publish(NS+"/_users/lincoln", JSON.stringify({name:"Lincoln",role:"dev",display:"Lincoln",at:Date.now()}), {qos:1,retain:true});
+      setTimeout(()=>resolve(true),600);
+    });
+    c.on("error",()=>resolve(false));
+    setTimeout(()=>resolve(!!state.comm),15000);
+  });
+}
+function commOnMsg(topic,payload){
+  const t=topic.replace(NS+"/","");
+  const d=(()=>{ try{ return JSON.parse(payload.toString()); }catch(e){ return null; } })();
+  if(!d) return;
+  try{
+    if(t.startsWith("_users/")){
+      const u=t.split("/")[1]; if(u==="lincoln"){ d.role="dev"; d.display="Lincoln"; }
+      state.commUsers=state.commUsers||{}; state.commUsers[u]=d;
+      if($("sc-community").classList.contains("active")) renderUsers();
+    } else if(t.startsWith("_reviews/")){
+      state.commReviews=state.commReviews||[]; if(!state.commReviews.some(r=>r.id===d.id)) state.commReviews.push({id:d.id,...d});
+      if($("sc-community").classList.contains("active")&&registerCommTab==="reviews") renderReviews();
+    } else if(t.startsWith("_qa/")){
+      state.commQA=state.commQA||[]; if(!state.commQA.some(q=>q.id===d.id)) state.commQA.push({id:d.id,...d});
+      if($("sc-community").classList.contains("active")&&registerCommTab==="qa") renderQA();
+    }
+  }catch(e){}
+}
+function currentDisplayName(){
+  return state.username ? state.username : (state.name||"Аноним");
+}
+function renderUsers(){
+  const box=$("userList"); if(!box) return;
+  const users=Object.values(state.commUsers||{}).sort((a,b)=>(a.role==="dev"?-1:0));
+  if(!users.length){ box.innerHTML='<p class="hint">Пока никого — станьте первым!</p>'; return; }
+  box.innerHTML="";
+  users.forEach(u=>{
+    const isDev=u.role==="dev";
+    const el=document.createElement("div"); el.className="user-item";
+    const who=u.username||u.display||u.name||"?";
+    el.innerHTML=`<button class="user-ava" data-user="${esc(who)}" title="Открыть профиль">${isDev?"👑":(u.ava||"👤")}</button>
+      <div class="user-meta"><span class="user-name">${esc(u.display||u.name||who)} ${isDev?"<span class='dev-star' title='Разработчик'>★</span>":""}</span>
+      <span class="user-sub">${isDev?"Разработчик":"Пользователь"}</span></div>`;
+    box.appendChild(el);
+  });
+}
+function renderReviews(){
+  const box=$("reviewList"); if(!box) return;
+  const list=(state.commReviews||[]).slice().sort((a,b)=>(b.at||0)-(a.at||0));
+  if(!list.length){ box.innerHTML='<p class="hint">Отзывов пока нет — будьте первым!</p>'; return; }
+  box.innerHTML="";
+  list.forEach(r=>{
+    const el=document.createElement("div"); el.className="comm-item";
+    el.innerHTML=`<div class="comm-head"><b>${esc(r.who||"Аноним")}</b><span>${fmtDay(r.at)}</span></div>
+      <div class="comm-text">${esc(r.text||"")}</div>`;
+    box.appendChild(el);
+  });
+}
+function renderQA(){
+  const box=$("qaList"); if(!box) return;
+  const list=(state.commQA||[]).slice().sort((a,b)=>(b.at||0)-(a.at||0));
+  if(!list.length){ box.innerHTML='<p class="hint">Вопросов пока нет — спросите первым!</p>'; return; }
+  box.innerHTML="";
+  list.forEach(q=>{
+    const el=document.createElement("div"); el.className="comm-item qa-item";
+    el.dataset.id=q.id;
+    el.innerHTML=`<div class="comm-head"><b>Вопрос от ${esc(q.who||"Аноним")}</b><span>${fmtDay(q.at)}</span></div>
+      <div class="comm-text">${esc(q.text||"")}</div>
+      ${q.answer?`<div class="qa-answer">Ответ разработчика: ${esc(q.answer)}</div>`
+        :(isDevUser()?`<button class="btn small ghost" data-ans="${q.id}">Ответить</button>`:`<div class="comm-text muted">Ждёт ответа разработчика…</div>`)}`;
+    box.appendChild(el);
+  });
+}
+function isDevUser(){
+  const u=String(currentDisplayName()).toLowerCase().replace(/^@+/,"");
+  return u==="lincoln";
+}
+let registerCommTab="reviews";
+function openCommunity(){
+  registerCommTab="reviews";
+  $("commReviews").classList.remove("hidden"); $("commQA").classList.add("hidden");
+  $("commSeg").querySelectorAll("button").forEach(b=>b.classList.toggle("on",b.dataset.v==="reviews"));
+  $("userList").innerHTML='<p class="hint">Загрузка…</p>';
+  setScreen("sc-community");
+  commConnect().then(ok=>{
+    if(!ok){ $("userList").innerHTML='<p class="hint">Нет связи с сервером сообщества</p>'; return; }
+    renderUsers(); renderReviews(); renderQA();
+  });
+}
+$("btnCommunity").addEventListener("click",openCommunity);
+$("btnCommunityClose").addEventListener("click",()=>{
+  if(state.phase==="chat"){ /* keep */ }
+  setScreen(state.room?"sc-chat":"sc-landing");
+});
+$("commSeg").addEventListener("click",e=>{
+  const b=e.target.closest("button"); if(!b) return;
+  registerCommTab=b.dataset.v;
+  $("commSeg").querySelectorAll("button").forEach(x=>x.classList.toggle("on",x===b));
+  $("commReviews").classList.toggle("hidden",b.dataset.v!=="reviews");
+  $("commQA").classList.toggle("hidden",b.dataset.v!=="qa");
+  if(b.dataset.v==="reviews") renderReviews(); else renderQA();
+});
+$("btnAddReview").addEventListener("click",()=>{
+  const text=$("reviewText").value.trim(); if(!text){ toast("Напишите отзыв"); return; }
+  commConnect().then(ok=>{
+    if(!ok){ toast("Нет связи с сервером"); return; }
+    const id=uid();
+    state.comm.publish(NS+"/_reviews/"+id, JSON.stringify({id,who:currentDisplayName(),text,t:Date.now(),at:Date.now()}), {qos:1,retain:true});
+    $("reviewText").value=""; toast("Спасибо за отзыв!");
+  });
+});
+$("btnAsk").addEventListener("click",()=>{
+  const text=$("qaText").value.trim(); if(!text){ toast("Напишите вопрос"); return; }
+  commConnect().then(ok=>{
+    if(!ok){ toast("Нет связи с сервером"); return; }
+    const id=uid();
+    state.comm.publish(NS+"/_qa/"+id, JSON.stringify({id,who:currentDisplayName(),text,t:Date.now(),at:Date.now()}), {qos:1,retain:true});
+    $("qaText").value=""; toast("Вопрос отправлен!");
+  });
+});
+/* view a user profile */
+function openUserProfile(username){
+  const u=state.commUsers&&state.commUsers[username];
+  const isDev=(username==="lincoln")||(u&&u.role==="dev");
+  $("pvName").textContent=(u&&(u.display||u.name))||username;
+  $("pvRole").textContent=isDev?"Разработчик ⭐":"Пользователь";
+  $("pvAva").textContent=isDev?"👑":((u&&u.ava)||"👤");
+  $("pvMeta").textContent="Юзернейм: @"+username;
+  $("profileOverlay").classList.add("open");
+}
+$("userList").addEventListener("click",e=>{
+  const b=e.target.closest("[data-user]"); if(!b) return;
+  openUserProfile(b.dataset.user);
+});
+document.querySelectorAll("[data-cp-close]").forEach(b=>b.addEventListener("click",()=>$("profileOverlay").classList.remove("open")));
+$("profileOverlay").addEventListener("click",e=>{ if(e.target===$("profileOverlay")) $("profileOverlay").classList.remove("open"); });
+
+$("qaList").addEventListener("click",e=>{
+  const b=e.target.closest("[data-ans]"); if(!b) return;
+  const id=b.dataset.ans; const q=(state.commQA||[]).find(x=>x.id===id); if(!q) return;
+  const ans=prompt("Ваш ответ как разработчика:", q.answer||"");
+  if(ans===null) return;
+  state.comm.publish(NS+"/_qa/"+id, JSON.stringify({...q,answer:ans.trim(),answeredAt:Date.now()}), {qos:1,retain:true});
+  toast("Ответ опубликован");
+});
 </script>
 </body>
 </html>
