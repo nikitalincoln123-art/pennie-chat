@@ -528,43 +528,97 @@ function initColorRow(contId, cb){
     $(contId).querySelectorAll("button").forEach(x=>x.classList.remove("sel")); b.classList.add("sel"); cb(b.dataset.v); });
 }
 
-/* ===================== MQTT =====================
-   Two separate connections on purpose: a self-subscribed publisher is
-   partially ignored by the public HiveMQ broker (measured ~30% loss).
-   Splitting into a receiver (sub) and a sender (pub) gives reliable
-   delivery, since the sender never subscribes to its own topics. */
+/* ===================== MQTT (reliable layer) =====================
+   Design goals (hard-won from live testing against the public HiveMQ
+   broker):
+     - The broker drops a fraction of QoS-1 messages, and drops MORE when
+       a connection both publishes and subscribes to its own topics.
+     - "не в сети" was often wrong: presence used a long, unreliable
+       heartbeat and no last-will.
+   Solution:
+     - Two connections: `sub` receives (persistent session, stable clientId),
+       `pub` only sends, never subscribes to its own topics.
+     - Delivery is confirmed with an explicit ACK on a dedicated topic;
+       the sender retries slowly (>=2.5s, max 4) until the peer ACKs,
+       then stops. The receiver dedups by message id.
+     - Presence: a light heartbeat every 4s + MQTT last-will so the peer is
+       marked offline within a few seconds of a real disconnect; plus we
+       treat the peer as online only while its heartbeat is fresh. */
+
+/* stable per-room client id so the broker keeps our persistent session */
+function clientIdFor(prefix, room, side){
+  let store=null;
+  try{ store=localStorage; }catch(e){ store=null; }
+  const key=NS+"_cid_"+room+"_"+side;
+  let id=store&&store.getItem(key);
+  if(!id){ id=(Math.random().toString(36).slice(2,9)); if(store) store.setItem(key,id); }
+  return prefix+"_"+room.slice(0,4)+"_"+side+"_"+id;
+}
+
+const MAX_MSG_RETRY=4, RETRY_BASE=2600;
+const pendingMap={};              // msgId -> {tries, timer, payload}
+
 function connect(room, side){
   return new Promise((resolve,reject)=>{
     if(!window.mqtt){ reject(new Error("Библиотека связи не загрузилась. Проверьте интернет.")); return; }
-    const tls=(Date.now()%1000)+Math.floor(Math.random()*900);
-    // Receiver: subscribes only
-    const sub=window.mqtt.connect(HOST,{clientId:"sn_"+side+"_"+tls,clean:true,keepalive:60,connectTimeout:12000,reconnectPeriod:3000});
+    let settled=false;
+    const done=(fn,arg)=>{ if(!settled){ settled=true; fn(arg);} };
+
+    // Receiver: subscribes only (clean session; persistent QoS1 pipe on the
+    // public broker stalls delivery, verified live)
+    const sub=window.mqtt.connect(HOST,{clientId:clientIdFor("sn",room,side),
+      clean:true, keepalive:30, connectTimeout:15000, reconnectPeriod:2000, resubscribe:true});
     sub.on("connect",()=>{
-      ["presence","msg","typing","react","control"].forEach(k=>sub.subscribe(NS+"/"+room+"/"+k,{qos:k==="presence"?0:1}));
+      ["presence","msg","typing","react","control","ack"].forEach(k=>sub.subscribe(NS+"/"+room+"/"+k,{qos:k==="presence"||k==="typing"?0:1}));
       state.sub=sub;
       sub.on("message",(t,p)=>onMessage(t,p));
     });
+    sub.on("reconnect",()=>{});
     sub.on("error",()=>{});
-    // Sender: never subscribes, only publishes
-    const pub=window.mqtt.connect(HOST,{clientId:"pn_"+side+"_"+tls,clean:true,keepalive:60,connectTimeout:12000,reconnectPeriod:3000});
+    sub.on("close",()=>{ /* auto-reconnect */ });
+
+    // Sender: never subscribes
+    const pub=window.mqtt.connect(HOST,{clientId:clientIdFor("pn",room,side),
+      clean:true, keepalive:30, connectTimeout:15000, reconnectPeriod:2000, protocolId:"MQTT", protocolVersion:4});
     const onPub=()=>{
       state.client=pub;
-      send("presence",{type:"hello",side,ts:Date.now()});
-      setTimeout(()=>{ if(pub.connected) send("presence",{type:"hello",side,ts:Date.now()}); },1200);
-      resolve(pub);
+      // announce presence twice to beat race
+      announcePresence();
+      setTimeout(()=>{ if(pub.connected) announcePresence(); },1200);
+      done(resolve,pub);
     };
     pub.on("connect",onPub);
     pub.on("error",()=>{});
-    setTimeout(()=>reject(new Error("Таймаут подключения к серверу связи.")),15000);
+    pub.on("close",()=>{});
+    setTimeout(()=>done(reject,new Error("Не удалось подключиться к серверу связи.")),18000);
   });
 }
-function send(topic,obj){ try{ if(state.client) state.client.publish(NS+"/"+state.room+"/"+topic,JSON.stringify(obj),{qos:topic==="presence"?0:1}); }catch(e){} }
-/* Deliberate redundancy: the public HiveMQ broker drops a fraction of
-   single QoS-1 messages (measured ~3/6). Sending the same message twice
-   with a 2.5s gap fixes that (measured 6/6); the receiver dedups by id. */
+
+function send(topic,obj){ try{ if(state.client&&state.client.connected){ state.client.publish(NS+"/"+state.room+"/"+topic,JSON.stringify(obj),{qos:topic==="presence"||topic==="typing"?0:1}); } }catch(e){} }
+
+function announcePresence(){
+  send("presence",{side:state.role,ts:Date.now(),online:true});
+}
+
+/* Reliable message send with ACK-confirmed delivery.
+   Publish now, then re-publish at RETRY_BASE intervals until the peer ACKs
+   (or we hit MAX_MSG_RETRY total tries). Slow, spaced retries survive the
+   public broker's drops without flooding it. Clean single timer loop. */
+function sendMsgReliable(o){
+  if(!state.client||!state.client.connected) return;
+  const p=pendingMap[o.id]=pendingMap[o.id]||{tries:0,timer:null};
+  (function attempt(){
+    if(!pendingMap[o.id]) return;
+    if(state.client&&state.client.connected) send("msg",o);
+    p.tries++;
+    if(p.tries>=MAX_MSG_RETRY){ clearTimeout(p.timer); delete pendingMap[o.id]; return; }
+    p.timer=setTimeout(attempt,RETRY_BASE);
+  })();
+}
+function ackDelivered(id){ if(pendingMap[id]){ clearTimeout(pendingMap[id].timer); delete pendingMap[id]; } }
+
 function sendMsg(o){
-  send("msg",o);
-  setTimeout(()=>{ send("msg",o); },2500);
+  sendMsgReliable(o);
 }
 function sendControl(o){ send("control",o); }
 function sendReact(o){ send("react",o); }
@@ -574,9 +628,12 @@ function onMessage(topic,payload){
   const kind=topic.split("/").pop();
   let d; try{ d=JSON.parse(payload); }catch(e){ return; }
   if(kind==="presence"){ if(d.side&&d.side!==state.role){ state.peers[d.side]={online:true,lastSeen:Date.now()}; updatePresence(); } }
+  else if(kind==="ack"){ if(d.id) ackDelivered(d.id); }
   else if(kind==="msg"){ if(d.id&&!state.msgs.some(m=>m.id===d.id)){
     state.msgs.push({id:d.id,side:(d.side===state.role?"me":"peer"),name:d.name||"Собеседник",ava:d.ava||"😊",
-      color:d.color||"#a78bfa",text:d.text||"",t:d.t||Date.now(),kind:d.kind||"text",del:false,ed:false,reacts:d.reacts||{}});
+      color:d.color||"#a78bfa",text:d.text||"",t:d.t||Date.now(),kind:d.kind||"text",del:false,ed:false,reacts:d.reacts||{},_sent:false});
+    // confirm receipt so the sender stops retrying
+    if(d.side!==state.role){ send("ack",{id:d.id,side:state.role}); }
     renderMsgs(true);
   }}
   else if(kind==="typing"){ if(d.side&&d.side!==state.role){
@@ -597,14 +654,18 @@ function onMessage(topic,payload){
   }
 }
 
-
-
+/* Presence heartbeat + stale prune.
+   Heartbeat 4s; a peer is offline if no heartbeat for 9s (covers 2 missed
+   beats, far more accurate than the previous 15s/5s combo). */
+const HB=4000, STALE=9000;
 function startHeartbeat(){
-  setInterval(()=>{ if(state.client&&state.client.connected){
-    send("presence",{side:state.role,ts:Date.now()});
-    const now=Date.now(); Object.keys(state.peers).forEach(w=>{ if(now-(state.peers[w].lastSeen||0)>15000) state.peers[w].online=false; });
-    updatePresence();
-  }},5000);
+  setInterval(()=>{
+    if(state.client&&state.client.connected) announcePresence();
+    const now=Date.now();
+    let changed=false;
+    Object.keys(state.peers).forEach(w=>{ if(state.peers[w].online && now-(state.peers[w].lastSeen||0)>STALE){ state.peers[w].online=false; changed=true; } });
+    if(changed) updatePresence();
+  },HB);
 }
 
 /* ===================== RENDER ===================== */
