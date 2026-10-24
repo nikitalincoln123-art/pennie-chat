@@ -573,13 +573,25 @@ function clientIdFor(prefix, room, side){
    publishing a retained message -> resolve true. */
 function claimUsername(username){
   return new Promise(resolve=>{
-    if(!window.mqtt){ resolve(true); return; }
+    if(!window.mqtt){ resolve({ok:true,owner:null,isOwner:false}); return; }
     const low=String(username||"").toLowerCase();
-    const clean=low.replace(/[^a-z0-9_а-яё ]/gi,"").trim().slice(0,20).replace(/ /g,"_");
-    if(!clean){ resolve(true); return; }
+    // allow a leading '@' (kept in display name but normalized for the topic)
+    const clean=low.replace(/^@+/,"").replace(/[^a-z0-9_а-яё ]/gi,"").trim().slice(0,20).replace(/ /g,"_");
+    if(!clean){ resolve({ok:true,owner:null,isOwner:false}); return; }
     const tpc=NS+"/_users/"+clean;
+    // owner secret persisted on THIS device from a previous successful claim.
+    // The device that first claimed a username remembers it, so a returning
+    // owner is recognized without ever touching the broker (reliable even
+    // when the public broker is slow to replay retained topics).
+    let mySecret=null;
+    try{ mySecret=localStorage.getItem(NS+"_seal_"+clean); }catch(e){}
+    if(mySecret){
+      // This device already owns the name: allow (returning owner).
+      resolve({ok:true, owner:mySecret, isOwner:true});
+      return;
+    }
     const owner="u_"+Math.random().toString(36).slice(2,9);
-    let gotPayload=false, done=false, timer=null;
+    let gotRecord=null, done=false, timer=null;
     const c=window.mqtt.connect(HOST,{clientId:"uc_"+Math.random().toString(36).slice(2,8),
       clean:true, keepalive:20, connectTimeout:8000});
     const finish=(res)=>{ if(!done){ done=true; clearTimeout(timer); clearTimeout(timer2); try{c.end(true);}catch(e){} resolve(res); } };
@@ -587,24 +599,25 @@ function claimUsername(username){
     c.on("connect",()=>{
       c.subscribe(tpc,{qos:1},(err)=>{
         if(err) return;
-        // window to receive any retained message; generous because the
-        // public broker can be slow to replay retained topics under load
         timer=setTimeout(()=>{
-          if(gotPayload){ finish(false); return; } // occupied
-          // free -> claim via retained publish; wait for ack before finishing
-          c.publish(tpc, JSON.stringify({owner:owner,at:Date.now()}), {qos:1, retain:true}, (err2)=>{
-            // brief pause lets the broker commit the retained record
-            setTimeout(()=>finish(!err2),500);
+          if(gotRecord){
+            // occupied by someone else -> deny
+            const record=(()=>{ try{ return JSON.parse(gotRecord); }catch(e){ return null; } })();
+            const recordedOwner=record&&record.owner;
+            finish({ok:false, owner:recordedOwner, isOwner:false});
+            return;
+          }
+          // free -> claim and remember that THIS device owns it
+          try{ localStorage.setItem(NS+"_seal_"+clean, owner); }catch(e){}
+          c.publish(tpc, JSON.stringify({owner:owner,at:Date.now(),seal:owner}), {qos:1, retain:true}, (err2)=>{
+            setTimeout(()=>finish({ok:!err2, owner:owner, isOwner:false}),500);
           });
         },3500);
       });
     });
-    c.on("message",(t,p)=>{
-      const raw=String(p.toString()||"").trim();
-      if(raw.length>0) gotPayload=true;
-    });
-    c.on("error",()=>finish(true));
-    timer2=setTimeout(()=>finish(false),16000); // hard safety
+    c.on("message",(t,p)=>{ const raw=String(p.toString()||"").trim(); if(raw.length>0) gotRecord=raw; });
+    c.on("error",()=>finish({ok:true,owner:null,isOwner:false}));
+    timer2=setTimeout(()=>finish({ok:false,owner:null,isOwner:false}),16000);
   });
 }
 
@@ -985,9 +998,12 @@ $("btnProfDone").addEventListener("click",()=>{
       $("infoOverlay").classList.add("open"); toast("Ваша персональная ссылка готова!"); },700);
   };
   $("btnProfDone").disabled=true;
-  claimUsername(uname).then(ok=>{
+  claimUsername(uname).then(res=>{
     $("btnProfDone").disabled=false;
-    if(!ok){ $("landStatus").textContent="Этот юзернейм уже занят. Выберите другой"; $("landStatus").className="status-line err"; return; }
+    if(!res || !res.ok){
+      $("landStatus").textContent="Этот юзернейм занят другим человеком. Выберите другой";
+      $("landStatus").className="status-line err"; return;
+    }
     $("landStatus").innerHTML=""; done();
   });
 });
