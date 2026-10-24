@@ -971,6 +971,7 @@ function openDeleteModal(id){
 /* ===================== SEND ===================== */
 function sendMessage(text){
   const t=String(text||"").trim(); if(!t||!state.room) return;
+  if(isBanned(state.username||state.name)){ toast("Вы забанены — сообщения недоступны"); return; }
   const o={id:uid(),side:state.role,name:state.name,ava:state.ava,color:state.color,text:t,t:Date.now(),kind:"text"};
   state.msgs.push({id:o.id,side:"me",name:state.name,ava:state.ava,color:state.color,text:t,t:o.t,kind:"text",del:false,ed:false,reacts:{}});
   renderMsgs(true);
@@ -978,6 +979,7 @@ function sendMessage(text){
   $("chatText").value=""; autosize(); sendTypingMsg(false);
 }
 function sendSticker(s){
+  if(isBanned(state.username||state.name)){ toast("Вы забанены — сообщения недоступны"); return; }
   const o={id:uid(),side:state.role,name:state.name,ava:state.ava,color:state.color,text:s,t:Date.now(),kind:"sticker"};
   state.msgs.push({id:o.id,side:"me",name:state.name,ava:state.ava,color:state.color,text:s,t:o.t,kind:"sticker",del:false,ed:false,reacts:{}});
   renderMsgs(true);
@@ -1099,7 +1101,17 @@ $("btnProfDone").addEventListener("click",()=>{
       $("landStatus").textContent="Этот юзернейм занят другим человеком. Выберите другой";
       $("landStatus").className="status-line err"; return;
     }
-    $("landStatus").innerHTML=""; done();
+    // ban check: confirm the name isn't banned before entering
+    commConnect().then(ok=>{
+      if(!ok){ $("landStatus").innerHTML=""; done(); return; }
+      setTimeout(()=>{
+        if(isBanned(uname)){
+          $("landStatus").textContent="Этот аккаунт забанен. Обратитесь к разработчику";
+          $("landStatus").className="status-line err"; return;
+        }
+        $("landStatus").innerHTML=""; done();
+      },1200);
+    });
   });
 });
 $("btnOpenByLink").addEventListener("click",()=>{ $("joinInput").value=""; setJoinStatus("",""); setScreen("sc-join"); });
@@ -1266,7 +1278,7 @@ function commConnect(){
       clean:true, keepalive:30, connectTimeout:12000, reconnectPeriod:3000});
     let subscribed=false;
     c.on("connect",()=>{
-      ["_users/#","_reviews/#","_qa/#"].forEach(t=>c.subscribe(NS+"/"+t,{qos:1}));
+      ["_users/#","_reviews/#","_qa/#","_bans/#"].forEach(t=>c.subscribe(NS+"/"+t,{qos:1}));
       subscribed=true;
       c.on("message",(t,p)=>commOnMsg(t,p));
       state.comm=c;
@@ -1287,6 +1299,11 @@ function commOnMsg(topic,payload){
       const u=t.split("/")[1]; if(u==="lincoln"){ d.role="dev"; d.display="Lincoln"; }
       state.commUsers=state.commUsers||{}; state.commUsers[u]=d;
       if($("sc-community").classList.contains("active")) renderUsers();
+    } else if(t.startsWith("_bans/")){
+      const u=t.split("/")[1];
+      state.bans=state.bans||{};
+      if(d.unban){ delete state.bans[u]; } else { state.bans[u]=d; }
+      if($("sc-community").classList.contains("active")) renderUsers();
     } else if(t.startsWith("_reviews/")){
       state.commReviews=state.commReviews||[]; if(!state.commReviews.some(r=>r.id===d.id)) state.commReviews.push({id:d.id,...d});
       if($("sc-community").classList.contains("active")&&registerCommTab==="reviews") renderReviews();
@@ -1299,6 +1316,11 @@ function commOnMsg(topic,payload){
 function currentDisplayName(){
   return state.username ? state.username : (state.name||"Аноним");
 }
+function isBanned(name){
+  const u=String(name||"").toLowerCase().replace(/^@+/,"");
+  if(!u) return false;
+  return !!(state.bans&&state.bans[u]);
+}
 function renderUsers(){
   const box=$("userList"); if(!box) return;
   const users=Object.values(state.commUsers||{}).sort((a,b)=>(a.role==="dev"?-1:0));
@@ -1308,9 +1330,11 @@ function renderUsers(){
     const isDev=u.role==="dev";
     const el=document.createElement("div"); el.className="user-item";
     const who=u.username||u.display||u.name||"?";
+    const banned=isBanned(who);
     el.innerHTML=`<button class="user-ava" data-user="${esc(who)}" title="Открыть профиль">${isDev?"👑":(u.ava||"👤")}</button>
       <div class="user-meta"><span class="user-name">${esc(u.display||u.name||who)} ${isDev?"<span class='dev-star' title='Разработчик'>★</span>":""}</span>
-      <span class="user-sub">${isDev?"Разработчик":"Пользователь"}</span></div>`;
+      <span class="user-sub">${isDev?"Разработчик":(banned?"Забанен ⛔":"Пользователь")}</span></div>
+      ${(!isDev && isDevUser())?`<button class="btn small ${banned?'unban':'ban'}" data-ban="${esc(who)}">${banned?"Разбан":"Бан"}</button>`:""}`;
     box.appendChild(el);
   });
 }
@@ -1409,6 +1433,24 @@ function openUserProfile(username){
   $("profileOverlay").classList.add("open");
 }
 $("userList").addEventListener("click",e=>{
+  const banBtn=e.target.closest("[data-ban]");
+  if(banBtn){
+    if(!isDevUser()){ toast("Только разработчик может выдавать баны"); return; }
+    const who=banBtn.dataset.ban;
+    const bannedNow=isBanned(who);
+    const target=String(who).toLowerCase().replace(/^@+/,"");
+    commConnect().then(ok=>{
+      if(!ok){ toast("Нет связи с сервером"); return; }
+      if(!bannedNow){
+        state.comm.publish(NS+"/_bans/"+target, JSON.stringify({name:target,banned:true,by:"lincoln",at:Date.now()}), {qos:1,retain:true});
+        toast("@"+target+" забанен");
+      } else {
+        state.comm.publish(NS+"/_bans/"+target, JSON.stringify({unban:true,by:"lincoln",at:Date.now()}), {qos:1,retain:true});
+        toast("@"+target+" разбанен");
+      }
+    });
+    return;
+  }
   const b=e.target.closest("[data-user]"); if(!b) return;
   openUserProfile(b.dataset.user);
 });
