@@ -1446,7 +1446,7 @@ function isDevUser(){
   return u===DEV;
 }
 let registerCommTab="reviews";
-function openCommunity(){
+const openCommunity=()=>{
   registerCommTab="reviews";
   $("commReviews").classList.remove("hidden"); $("commQA").classList.add("hidden"); $("commStats").classList.add("hidden");
   $("commSeg").querySelectorAll("button").forEach(b=>b.classList.toggle("on",b.dataset.v==="reviews"));
@@ -1454,11 +1454,13 @@ function openCommunity(){
   $("statsTabBtn").classList.toggle("hidden",!isDevUser());
   $("userList").innerHTML='<p class="hint">Загрузка…</p>';
   setScreen("sc-community");
-  commConnect().then(ok=>{
+  const afterConn=ok=>{
     if(!ok){ $("userList").innerHTML='<p class="hint">Нет связи с сервером сообщества</p>'; return; }
     renderUsers(); renderReviews(); renderQA();
-  });
-}
+  };
+  if(state.comm&&state.comm.connected){ afterConn(true); }
+  else { commConnect().then(afterConn); }
+};
 $("btnCommunity").addEventListener("click",openCommunity);
 $("btnCommunityClose").addEventListener("click",()=>{
   if(state.phase==="chat"){ /* keep */ }
