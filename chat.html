@@ -598,7 +598,11 @@
 "use strict";
 /* ===================== SETUP ===================== */
 const $ = id => document.getElementById(id);
-const HOST = "wss://broker.hivemq.com:8884/mqtt";
+const HOST = "wss://q21e2d03.cla.eu-central-1.emqxsl.com:8084/mqtt";
+/* Stable broker credentials (set when using HiveMQ Cloud / EMQX Cloud).
+   Leave empty to connect anonymously to the public broker. */
+const MQTT_USER = "pennie";
+const MQTT_PASS = "Lincoln";
 const NS = "pennie2chat";
 const DEFAULT_AVAS = ["😊","😎","🥰","🤠","🐱","🐼","🦊","👻","🦋","🌙","⚡","🍀","🔥","🍩","🎧","🌸"];
 const DEFAULT_COLORS = ["#8b86f5","#f96b96","#3fd6a2","#f0c25f","#6aa7f0","#f472b6","#4ade80","#fb923c"];
@@ -730,7 +734,7 @@ function claimUsername(username){
     const owner="u_"+Math.random().toString(36).slice(2,9);
     let gotRecord=null, done=false, timer=null;
     const c=window.mqtt.connect(HOST,{clientId:"uc_"+Math.random().toString(36).slice(2,8),
-      clean:true, keepalive:20, connectTimeout:8000});
+      clean:true, keepalive:20, connectTimeout:8000, username:MQTT_USER||undefined, password:MQTT_PASS||undefined});
     const finish=(res)=>{ if(!done){ done=true; clearTimeout(timer); clearTimeout(timer2); try{c.end(true);}catch(e){} resolve(res); } };
     let timer2=null;
     c.on("connect",()=>{
@@ -771,7 +775,7 @@ function connect(room, side){
     // stable clientId reconnects. Live test: persistent sessions delivered
     // 24/24, clean:true dropped roughly half.
     const sub=window.mqtt.connect(HOST,{clientId:clientIdFor("sn",room,side),
-      clean:false, keepalive:30, connectTimeout:15000, reconnectPeriod:2000, resubscribe:true});
+      clean:false, keepalive:30, connectTimeout:15000, reconnectPeriod:2000, resubscribe:true, username:MQTT_USER||undefined, password:MQTT_PASS||undefined});
     sub.on("connect",()=>{
       ["presence","msg","typing","react","control"].forEach(k=>sub.subscribe(NS+"/"+room+"/"+k,{qos:k==="typing"?0:1}));
       state.sub=sub;
@@ -783,7 +787,8 @@ function connect(room, side){
 
     // Sender: never subscribes
     const pub=window.mqtt.connect(HOST,{clientId:clientIdFor("pn",room,side),
-      clean:false, keepalive:30, connectTimeout:15000, reconnectPeriod:2000, protocolId:"MQTT", protocolVersion:4});
+      clean:false, keepalive:30, connectTimeout:15000, reconnectPeriod:2000, protocolId:"MQTT", protocolVersion:4,
+      username:MQTT_USER||undefined, password:MQTT_PASS||undefined});
     const onPub=()=>{
       state.client=pub;
       // announce presence twice to beat race
@@ -1388,7 +1393,7 @@ function commConnect(){
   return new Promise(resolve=>{
     if(!window.mqtt){ resolve(false); return; }
     const c=window.mqtt.connect(HOST,{clientId:"cm_"+Math.random().toString(36).slice(2,8),
-      clean:true, keepalive:30, connectTimeout:12000, reconnectPeriod:3000});
+      clean:true, keepalive:30, connectTimeout:12000, reconnectPeriod:3000, username:MQTT_USER||undefined, password:MQTT_PASS||undefined});
     let subscribed=false;
     c.on("connect",()=>{
       ["_users/#","_reviews/#","_qa/#","_bans/#","_mutes/#"].forEach(t=>c.subscribe(NS+"/"+t,{qos:1}));
