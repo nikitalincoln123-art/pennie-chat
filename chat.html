@@ -789,7 +789,10 @@ function connect(room, side){
     const pub=window.mqtt.connect(HOST,{clientId:clientIdFor("pn",room,side),
       clean:false, keepalive:30, connectTimeout:15000, reconnectPeriod:2000, protocolId:"MQTT", protocolVersion:4,
       username:MQTT_USER||undefined, password:MQTT_PASS||undefined});
+    let pubConnected=false;
     const onPub=()=>{
+      if(pubConnected) return;
+      pubConnected=true;
       state.client=pub;
       // announce presence twice to beat race
       announcePresence();
@@ -799,7 +802,17 @@ function connect(room, side){
     pub.on("connect",onPub);
     pub.on("error",()=>{});
     pub.on("close",()=>{});
-    setTimeout(()=>done(reject,new Error("Не удалось подключиться к серверу связи.")),18000);
+    // Wait longer so reconnectPeriod can repair a transient CONNECT failure.
+    // Only reject if the publisher truly never connected; once it connected
+    // (even if it later drops), reconnectPeriod keeps it alive and we keep the chat open.
+    const failAt=Date.now()+30000;
+    const pt=setInterval(()=>{
+      if(pubConnected){ clearInterval(pt); return; }
+      if(Date.now()>failAt){
+        clearInterval(pt);
+        done(reject,new Error("Не удалось подключиться к серверу связи."));
+      }
+    },2000);
   });
 }
 
