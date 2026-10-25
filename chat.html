@@ -88,6 +88,11 @@
   .badge{display:inline-flex;align-items:center;gap:6px;background:var(--panel2);border:1px solid var(--line);
     color:var(--ink-dim);font-size:11.5px;padding:5px 9px;border-radius:999px;margin-left:auto;white-space:nowrap;flex:0 0 auto}
   .badge .dot{width:6px;height:6px;border-radius:50%;background:var(--ok)}
+  .beta-note{display:flex;align-items:flex-start;gap:10px;margin:0 0 16px;padding:11px 13px;
+    background:rgba(240,194,95,.08);border:1px solid rgba(240,194,95,.45);border-radius:14px;color:var(--warn)}
+  .beta-note .bn-tag{font-size:11px;font-weight:800;letter-spacing:.5px;text-transform:uppercase;
+    background:var(--warn);color:#0d0e16;border-radius:8px;padding:3px 7px;white-space:nowrap;flex:0 0 auto}
+  .beta-note .bn-txt{font-size:12.5px;line-height:1.5;color:var(--ink-dim)}
 
   .field{margin-bottom:18px}
   .field label{display:block;font-size:12.5px;color:var(--ink-dim);font-weight:600;margin-bottom:8px;letter-spacing:.2px}
@@ -320,6 +325,10 @@
           <div class="brand-sub">приватный чат на двоих</div>
         </div>
         <div class="badge"><span class="dot"></span> связь защищена</div>
+      </div>
+      <div class="beta-note" id="betaNote">
+        <span class="bn-tag">Beta-Test</span>
+        <span class="bn-txt">Возможны ошибки, вылеты, недочёты</span>
       </div>
       <div class="seg" id="newRoleSeg">
         <button data-v="c1" class="on">Создать ссылку</button>
