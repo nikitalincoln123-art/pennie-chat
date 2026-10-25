@@ -146,6 +146,10 @@
   .seg button.on{background:var(--standard);color:#0d0e16}
 
   .ava-pick{display:flex;gap:8px;flex-wrap:wrap;margin-top:6px}
+  .ava-pick button{overflow:hidden}
+  .ava-pick button img,.photo-ava img,img.photo-ava{width:100%;height:100%;object-fit:cover;display:block}
+  .ava-photo-btn{width:44px;height:44px;border-radius:14px;display:flex;align-items:center;justify-content:center;
+    background:var(--me-grad);font-size:18px;color:#0d0e16;border:1px solid var(--line)}
   .ava-pick button{width:44px;height:44px;border-radius:14px;display:flex;align-items:center;justify-content:center;
     font-size:21px;background:var(--bg2);border:1px solid var(--line);transition:all .15s}
   .ava-pick button.sel{border-color:var(--accent);box-shadow:0 0 0 3px rgba(139,134,245,.22);transform:translateY(-2px)}
@@ -460,6 +464,8 @@
       <div class="field">
         <label>Аватар</label>
         <div class="ava-pick" id="profAvas"></div>
+      <button class="ava-photo-btn" id="btnProfPhoto" type="button" style="margin-top:8px">📷 Загрузить фото</button>
+      <input type="file" id="photoInputProf" accept="image/*" style="display:none">
       </div>
       <button class="btn primary block" id="btnProfDone">Продолжить</button>
       <button class="btn ghost block" id="btnProfBack" style="margin-top:10px">← Назад</button>
@@ -490,6 +496,8 @@
       <div class="field">
         <label>Аватар</label>
         <div class="ava-pick" id="editAvas"></div>
+      <button class="ava-photo-btn" id="btnEditPhoto" type="button" style="margin-top:8px">📷 Загрузить фото</button>
+      <input type="file" id="photoInputEdit" accept="image/*" style="display:none">
       </div>
       <div class="field">
         <label>Любимые стикеры</label>
@@ -907,13 +915,18 @@ $("chatBody").addEventListener("scroll",()=>{
   state.scrollAtBottom=cb.scrollHeight-cb.scrollTop-cb.clientHeight<140;
 });
 
+function avaHtml(ava,cls){
+  // returns inline content for an avatar: an <img> when it's a data-URL photo, else the emoji text
+  if(ava && /^data:image\//.test(ava)) return `<img class="photo-ava ${cls||''}" src="${ava}" alt="">`;
+  return esc(ava||"👤");
+}
 function msgEl(m){
   const row=document.createElement("div");
   row.className="msg "+m.side+(m.del?" deleted":"");
   row.dataset.id=m.id;
   const me=m.side==="me";
   let inner="";
-  if(!me) inner+=`<div class="m-ava" style="background:${esc(m.color)}">${esc(m.ava)}</div>`;
+  if(!me) inner+=`<div class="m-ava" style="background:${esc(m.color)}">${avaHtml(m.ava)}</div>`;
   const time=`<span >${timeHM(m.t)}</span>${m.ed?`<span>изменено</span>`:""}`;
   if(m.del){
     inner+=`<div class="bubble"><span class="mtxt">Сообщение удалено</span></div>`;
@@ -1098,7 +1111,7 @@ function enterChat({room,side},isCreator){
   renderMsgs(false);
   setScreen("sc-chat");
   buildEmojiPanel(); buildStickerPanel(); buildQuickbar(); closePanels();
-  $("hdrAva").textContent=state.ava; $("hdrAva").style.background=state.color;
+  $("hdrAva").innerHTML=avaHtml(state.ava); $("hdrAva").style.background=state.color;
   updatePresence();
   connect(room,side)
     .then(()=>{ toast("Подключено"); updatePresence(); })
@@ -1186,11 +1199,53 @@ $("editStickers").addEventListener("click",e=>{ const b=e.target.closest("button
   else toast("Максимум 8 любимых стикеров");
 });
 
+/* ---- upload photo from gallery as avatar ---- */
+function photoToAvatar(file, cb){
+  if(!file || !/^image\//.test(file.type)){ toast("Выберите изображение"); return; }
+  const reader=new FileReader();
+  reader.onload=e=>{
+    const img=new Image();
+    img.onload=()=>{
+      // shrink to 96x96 JPEG so it fits easily in MQTT messages and stored profiles
+      const S=96;
+      const canvas=document.createElement("canvas");
+      const r=Math.min(1,S/img.width, S/img.height);
+      canvas.width=Math.round(img.width*r); canvas.height=Math.round(img.height*r);
+      canvas.getContext("2d").drawImage(img,0,0,canvas.width,canvas.height);
+      let dataURL;
+      try{ dataURL=canvas.toDataURL("image/jpeg",0.7); }catch(err){ try{ dataURL=canvas.toDataURL(); }catch(e2){ dataURL=img.src; } }
+      cb(dataURL);
+    };
+    img.onerror=()=>toast("Не удалось прочитать изображение");
+    img.src=e.target.result;
+  };
+  reader.onerror=()=>toast("Не удалось прочитать файл");
+  reader.readAsDataURL(file);
+}
+$("btnProfPhoto").addEventListener("click",()=>$("photoInputProf").click());
+$("photoInputProf").addEventListener("change",e=>{
+  const f=e.target.files&&e.target.files[0]; if(!f) return;
+  photoToAvatar(f,d=>{ state.pendingAva=d; highlightPhotoAva($("profAvas"),d); toast("Фото выбрано как аватар"); });
+});
+$("btnEditPhoto").addEventListener("click",()=>$("photoInputEdit").click());
+$("photoInputEdit").addEventListener("change",e=>{
+  const f=e.target.files&&e.target.files[0]; if(!f) return;
+  photoToAvatar(f,d=>{ state.ava=d; highlightPhotoAva($("editAvas"),d); toast("Фото выбрано как аватар"); });
+});
+function highlightPhotoAva(container,d){
+  container.querySelectorAll("button").forEach(x=>x.classList.remove("sel"));
+  let phButton=container.querySelector(".ava-photo-inline");
+  if(d){
+    if(!phButton){ phButton=document.createElement("button"); phButton.type="button"; phButton.className="ava-photo-inline sel"; phButton.title="Фото-аватар"; container.prepend(phButton); }
+    phButton.innerHTML='<img src="'+d+'" alt="">';
+  }
+}
+
 /* edit profile save */
 $("btnEditProfSave").addEventListener("click",()=>{
   state.name=$("editName").value.trim()||state.name;
   buildQuickbar();
-  $("hdrAva").textContent=state.ava; $("hdrAva").style.background=state.color;
+  $("hdrAva").innerHTML=avaHtml(state.ava); $("hdrAva").style.background=state.color;
   toast("Профиль сохранён");
   setScreen("sc-chat");
 });
@@ -1387,7 +1442,7 @@ function renderSideLast(){
   const nameTxt=disp||(who?"@"+cleanU:"");
   box.innerHTML = who
     ? `<div class="sl-user">
-        <div class="sl-ava" style="background:${color||'var(--me-soft)'}">${ava||'👤'}</div>
+        <div class="sl-ava" style="background:${color||'var(--me-soft)'}">${avaHtml(ava)}</div>
         <div class="sl-meta">
           <div class="sl-name">${esc(nameTxt)} ${dev?'<span class="dev-star" title="Разработчик">★</span>':''}</div>
           <div class="sl-un">@${cleanU}${dev?' · разработчик':''}</div>
@@ -1435,7 +1490,7 @@ function renderUsers(){
       act+=`<button class="btn small ghost ${muted?'unmute':'mute'}" data-mute="${esc(who)}">${muted?"Снять мут":"Мут"}</button>`;
       act+=`</div>`;
     }
-    el.innerHTML=`<button class="user-ava" data-user="${esc(who)}" title="Открыть профиль">${isDev?"👑":(u.ava||"👤")}</button>
+    el.innerHTML=`<button class="user-ava" data-user="${esc(who)}" title="Открыть профиль">${isDev?"👑":avaHtml(u&&u.ava)}</button>
       <div class="user-meta"><span class="user-name">${esc(u.display||u.name||who)} ${isDev?"<span class='dev-star' title='Разработчик'>★</span>":""}</span>
       <span class="user-sub">${subTxt}</span></div>${act}`;
     box.appendChild(el);
@@ -1566,7 +1621,7 @@ function openUserProfile(username){
   const isDev=(username===DEV)||(u&&u.role==="dev");
   $("pvName").textContent=(u&&(u.display||u.name))||username;
   $("pvRole").textContent=isDev?"Разработчик ⭐":"Пользователь";
-  $("pvAva").textContent=isDev?"👑":((u&&u.ava)||"👤");
+  $("pvAva").innerHTML=isDev?"👑":avaHtml((u&&u.ava));
   $("pvMeta").textContent="Юзернейм: @"+username;
   const modBox=$("pvMod");
   // Founder can view details + moderate any non-dev profile
