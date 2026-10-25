@@ -70,6 +70,19 @@
   #sc-landing .divider{margin:20px 0}
   #sc-landing #btnOpenByLink{margin-top:0}
   #sc-landing .credit{margin-top:22px}
+  .side-last{position:fixed;top:18px;right:18px;z-index:40;width:250px;max-width:calc(100vw - 36px);
+    background:linear-gradient(180deg,var(--panel),var(--bg2));border:1px solid var(--line);border-radius:18px;
+    box-shadow:var(--shadow);padding:14px;display:flex;flex-direction:column;gap:10px}
+  .side-last .sl-title{font-size:11px;font-weight:700;letter-spacing:.4px;color:var(--ink-faint);text-transform:uppercase;text-align:center}
+  .side-last .sl-user{display:flex;align-items:center;gap:12px;padding:10px;border-radius:14px;background:var(--panel2);border:1px solid var(--line)}
+  .side-last .sl-ava{width:46px;height:46px;border-radius:14px;display:flex;align-items:center;justify-content:center;font-size:22px;flex:0 0 auto}
+  .side-last .sl-meta{min-width:0}
+  .side-last .sl-name{font-size:14px;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .side-last .sl-un{font-size:11.5px;color:var(--ink-dim);margin-top:2px}
+  .side-last .sl-empty{text-align:center;font-size:12.5px;color:var(--ink-faint);padding:8px 4px}
+  .side-last .sl-switch{font-size:12px;font-weight:600;color:var(--ink-dim);text-align:center;padding:6px;border-radius:10px;background:var(--bg2);border:1px solid var(--line);cursor:pointer;transition:all .15s}
+  .side-last .sl-switch:hover{color:var(--ink);border-color:var(--me-soft)}
+  @media (max-width:640px){ .side-last{position:static;margin:0 auto -14px;width:100%;max-width:420px;order:-1} }
   .brand-name{font-size:20px;font-weight:700;letter-spacing:.2px;white-space:nowrap}
   .brand-sub{font-size:12.5px;color:var(--ink-dim);margin-top:2px;white-space:nowrap}
   .badge{display:inline-flex;align-items:center;gap:6px;background:var(--panel2);border:1px solid var(--line);
@@ -290,6 +303,11 @@
 <!-- LANDING -->
 <section id="sc-landing" class="screen active">
   <div class="center-wrap">
+    <aside class="side-last" id="sideLast">
+      <div class="sl-title">Вы вошли как</div>
+      <div id="slUser"></div>
+      <button class="sl-switch" id="slSwitch" style="display:none">Сменить аккаунт</button>
+    </aside>
     <div class="card">
       <div class="logo-row">
         <div class="logo">♡</div>
@@ -1104,6 +1122,13 @@ $("btnProfDone").addEventListener("click",()=>{
   state.color=state.pendingColor; state.ava=state.pendingAva;
   const done=()=>{
     state.username=uname; state.profLocked=true;
+    // remember this as the last logged-in account on this device
+    try{
+      const cleanU=String(uname).toLowerCase().replace(/^@+/,"");
+      localStorage.setItem(NS+"_lastuser", cleanU);
+      localStorage.setItem(NS+"_face_"+cleanU, JSON.stringify({display:(state.name||uname),ava:state.ava,color:state.color,t:Date.now()}));
+      renderSideLast();
+    }catch(e){}
     if(pendingRoom && pendingSide){
       const r=pendingRoom, s=pendingSide;
       pendingRoom=null; pendingSide=null;
@@ -1342,6 +1367,38 @@ function commOnMsg(topic,payload){
 }
 function currentDisplayName(){
   return state.username ? state.username : (state.name||"Аноним");
+}
+function renderSideLast(){
+  const box=$("slUser"); if(!box) return;
+  let uname=null, face=null;
+  try{
+    uname=localStorage.getItem(NS+"_lastuser");
+    const rawFace=localStorage.getItem(NS+"_face_"+(uname||""));
+    if(rawFace){ try{ face=JSON.parse(rawFace); }catch(e){ face=null; } }
+  }catch(e){}
+  let who=uname, disp=face&&face.display, ava=face&&face.ava, color=face&&face.color;
+  if(state.username){
+    who=state.username; disp=state.name||state.username; ava=state.ava; color=state.color;
+  }
+  const cleanU=String(who||"").toLowerCase().replace(/^@+/,"");
+  // resolve display from community directory if face missing
+  if(!disp && state.commUsers&&state.commUsers[cleanU]) disp=state.commUsers[cleanU].display||cleanU;
+  const dev= (cleanU===DEV) || (state.commUsers&&state.commUsers[cleanU]&&state.commUsers[cleanU].role==="dev");
+  const nameTxt=disp||(who?"@"+cleanU:"");
+  box.innerHTML = who
+    ? `<div class="sl-user">
+        <div class="sl-ava" style="background:${color||'var(--me-soft)'}">${ava||'👤'}</div>
+        <div class="sl-meta">
+          <div class="sl-name">${esc(nameTxt)} ${dev?'<span class="dev-star" title="Разработчик">★</span>':''}</div>
+          <div class="sl-un">@${cleanU}${dev?' · разработчик':''}</div>
+        </div>
+      </div>`
+    : `<div class="sl-empty">Вы ещё не входили в аккаунт</div>`;
+  $("slSwitch").style.display = uname ? "" : "none";
+}
+function resetLastUser(){
+  try{ localStorage.removeItem(NS+"_lastuser"); }catch(e){}
+  renderSideLast();
 }
 function isBanned(name){
   const u=String(name||"").toLowerCase().replace(/^@+/,"");
@@ -1623,9 +1680,11 @@ $("qaList").addEventListener("click",e=>{
   const id=b.dataset.ans; const q=(state.commQA||[]).find(x=>x.id===id); if(!q) return;
   const ans=prompt("Ваш ответ как разработчика:", q.answer||"");
   if(ans===null) return;
-  state.comm.publish(NS+"/_qa/"+id, JSON.stringify({...q,answer:ans.trim(),answeredAt:Date.now()}), {qos:1,retain:true});
+state.comm.publish(NS+"/_qa/"+id, JSON.stringify({...q,answer:ans.trim(),answeredAt:Date.now()}), {qos:1,retain:true});
   toast("Ответ опубликован");
 });
+$("slSwitch")&&$("slSwitch").addEventListener("click",()=>{ resetLastUser(); toast("Смена аккаунта: нажмите «Создать ссылку» и впишите новый юзернейм"); });
+renderSideLast();
 </script>
 </body>
 </html>
