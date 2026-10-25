@@ -335,6 +335,7 @@
       <div class="seg" id="commSeg">
         <button data-v="reviews" class="on">Отзывы</button>
         <button data-v="qa">Вопросы</button>
+        <button data-v="stats" id="statsTabBtn" class="hidden">Статистика</button>
       </div>
 
       <!-- Reviews -->
@@ -351,10 +352,18 @@
       <div id="commQA" class="hidden">
         <div class="field">
           <label>Задать вопрос разработчику</label>
-          <textarea id="qaText" aria-label="Ваш вопрос" class="input" rows="2" maxlength="500" placeholder="Ваш вопрос к @Lincoln…"></textarea>
+          <textarea id="qaText" aria-label="Ваш вопрос" class="input" rows="2" maxlength="500" placeholder="Ваш вопрос к @DevLincoln…"></textarea>
         </div>
         <button class="btn primary block" id="btnAsk">Задать вопрос</button>
         <div class="list" id="qaList"></div>
+      </div>
+
+      <!-- Stats (founder only) -->
+      <div id="commStats" class="hidden">
+        <div class="field">
+          <label>Статистика сообщества</label>
+          <div id="statsBox"><p class="hint">Загрузка…</p></div>
+        </div>
       </div>
     </div>
   </div>
@@ -370,6 +379,16 @@
       <div id="pvRole" style="font-size:13px;color:var(--ink-faint);margin-top:4px"></div>
     </div>
     <div id="pvMeta" class="hint" style="text-align:center"></div>
+    <div id="pvMod" style="display:none;margin-top:14px;border-top:1px solid var(--line);padding-top:12px">
+      <div id="pvStatus" style="font-size:13px;color:var(--ink-faint);margin-bottom:10px;text-align:center"></div>
+      <div style="display:flex;gap:8px;justify-content:center;flex-wrap:wrap">
+        <button class="btn small" id="pvBan">Бан</button>
+        <button class="btn small ghost" id="pvUnban" style="display:none">Разбан</button>
+        <button class="btn small" id="pvMute">Мут (1 час)</button>
+        <button class="btn small ghost" id="pvUnmute" style="display:none">Снять мут</button>
+        <button class="btn small ghost" id="pvEdit" style="width:100%;margin-top:6px">Редактировать профиль</button>
+      </div>
+    </div>
   </div>
 </div>
 
@@ -409,7 +428,7 @@
       </div>
       <div class="field">
         <label>Ваш юзернейм (уникальный)</label>
-        <input id="profUsername" aria-label="Юзернейм" class="input" type="text" maxlength="20" placeholder="Пример: @LincolnWasted" autocomplete="off">
+        <input id="profUsername" aria-label="Юзернейм" class="input" type="text" maxlength="20" placeholder="Пример: @DevLincoln" autocomplete="off">
         <p class="hint">Его нельзя будет сменить. Другой человек не сможет занять это имя, пока занято вами.</p>
       </div>
       <div class="field">
@@ -972,6 +991,7 @@ function openDeleteModal(id){
 function sendMessage(text){
   const t=String(text||"").trim(); if(!t||!state.room) return;
   if(isBanned(state.username||state.name)){ toast("Вы забанены — сообщения недоступны"); return; }
+  if(isMuted(state.username||state.name)){ toast("Вы замучены — сейчас нельзя писать"); return; }
   const o={id:uid(),side:state.role,name:state.name,ava:state.ava,color:state.color,text:t,t:Date.now(),kind:"text"};
   state.msgs.push({id:o.id,side:"me",name:state.name,ava:state.ava,color:state.color,text:t,t:o.t,kind:"text",del:false,ed:false,reacts:{}});
   renderMsgs(true);
@@ -980,6 +1000,7 @@ function sendMessage(text){
 }
 function sendSticker(s){
   if(isBanned(state.username||state.name)){ toast("Вы забанены — сообщения недоступны"); return; }
+  if(isMuted(state.username||state.name)){ toast("Вы замучены — сейчас нельзя писать"); return; }
   const o={id:uid(),side:state.role,name:state.name,ava:state.ava,color:state.color,text:s,t:Date.now(),kind:"sticker"};
   state.msgs.push({id:o.id,side:"me",name:state.name,ava:state.ava,color:state.color,text:s,t:o.t,kind:"sticker",del:false,ed:false,reacts:{}});
   renderMsgs(true);
@@ -1265,8 +1286,9 @@ buildEmojiPanel(); buildStickerPanel();
      _users/<name>   -> {name, role?, at, seal}  user directory
      _reviews/<id>   -> {who, text, at}
      _qa/<id>        -> {who, text, at, answer?, answeredAt?}
-   Lincoln is the developer: a special role 'dev' + a star in the list. */
-const DEV_USER = {username:"lincoln", display:"Lincoln", role:"dev"};
+   DevLincoln is the developer: a special role 'dev' + a star in the list. */
+const DEV_USER = {username:"DevLincoln", display:"DevLincoln", role:"dev"};
+const DEV = "devlincoln";
 function communityMaybe(){
   return window.mqtt ? true : false;
 }
@@ -1278,12 +1300,12 @@ function commConnect(){
       clean:true, keepalive:30, connectTimeout:12000, reconnectPeriod:3000});
     let subscribed=false;
     c.on("connect",()=>{
-      ["_users/#","_reviews/#","_qa/#","_bans/#"].forEach(t=>c.subscribe(NS+"/"+t,{qos:1}));
+      ["_users/#","_reviews/#","_qa/#","_bans/#","_mutes/#"].forEach(t=>c.subscribe(NS+"/"+t,{qos:1}));
       subscribed=true;
       c.on("message",(t,p)=>commOnMsg(t,p));
       state.comm=c;
       // seed developer's directory entry
-      c.publish(NS+"/_users/lincoln", JSON.stringify({name:"Lincoln",role:"dev",display:"Lincoln",at:Date.now()}), {qos:1,retain:true});
+      c.publish(NS+"/_users/"+DEV, JSON.stringify({name:"DevLincoln",role:"dev",display:"DevLincoln",at:Date.now()}), {qos:1,retain:true});
       setTimeout(()=>resolve(true),600);
     });
     c.on("error",()=>resolve(false));
@@ -1296,13 +1318,18 @@ function commOnMsg(topic,payload){
   if(!d) return;
   try{
     if(t.startsWith("_users/")){
-      const u=t.split("/")[1]; if(u==="lincoln"){ d.role="dev"; d.display="Lincoln"; }
+      const u=t.split("/")[1]; if(u===DEV){ d.role="dev"; d.display="DevLincoln"; }
       state.commUsers=state.commUsers||{}; state.commUsers[u]=d;
       if($("sc-community").classList.contains("active")) renderUsers();
     } else if(t.startsWith("_bans/")){
       const u=t.split("/")[1];
       state.bans=state.bans||{};
       if(d.unban){ delete state.bans[u]; } else { state.bans[u]=d; }
+      if($("sc-community").classList.contains("active")) renderUsers();
+    } else if(t.startsWith("_mutes/")){
+      const u=t.split("/")[1];
+      state.mutes=state.mutes||{};
+      if(d.unmute){ delete state.mutes[u]; } else { state.mutes[u]=d; }
       if($("sc-community").classList.contains("active")) renderUsers();
     } else if(t.startsWith("_reviews/")){
       state.commReviews=state.commReviews||[]; if(!state.commReviews.some(r=>r.id===d.id)) state.commReviews.push({id:d.id,...d});
@@ -1321,6 +1348,17 @@ function isBanned(name){
   if(!u) return false;
   return !!(state.bans&&state.bans[u]);
 }
+function isMuted(name){
+  const u=String(name||"").toLowerCase().replace(/^@+/,"");
+  if(!u||!state.mutes||!state.mutes[u]) return false;
+  const m=state.mutes[u];
+  if(m.until && m.until<=Date.now()){
+    // expired mute: drop it locally
+    if(u&&u!==DEV){ delete state.mutes[u]; if($("sc-community").classList.contains("active")) renderUsers(); }
+    return false;
+  }
+  return true;
+}
 function renderUsers(){
   const box=$("userList"); if(!box) return;
   const users=Object.values(state.commUsers||{}).sort((a,b)=>(a.role==="dev"?-1:0));
@@ -1331,10 +1369,18 @@ function renderUsers(){
     const el=document.createElement("div"); el.className="user-item";
     const who=u.username||u.display||u.name||"?";
     const banned=isBanned(who);
+    const muted=isMuted(who);
+    const subTxt=isDev?"Разработчик":(banned?"Забанен ⛔":(muted?"Замучен 🔇":"Пользователь"));
+    let act="";
+    if(!isDev && isDevUser()){
+      act=`<div class="mod-actions">`;
+      act+=`<button class="btn small ${banned?'unban':'ban'}" data-ban="${esc(who)}">${banned?"Разбан":"Бан"}</button>`;
+      act+=`<button class="btn small ghost ${muted?'unmute':'mute'}" data-mute="${esc(who)}">${muted?"Снять мут":"Мут"}</button>`;
+      act+=`</div>`;
+    }
     el.innerHTML=`<button class="user-ava" data-user="${esc(who)}" title="Открыть профиль">${isDev?"👑":(u.ava||"👤")}</button>
       <div class="user-meta"><span class="user-name">${esc(u.display||u.name||who)} ${isDev?"<span class='dev-star' title='Разработчик'>★</span>":""}</span>
-      <span class="user-sub">${isDev?"Разработчик":(banned?"Забанен ⛔":"Пользователь")}</span></div>
-      ${(!isDev && isDevUser())?`<button class="btn small ${banned?'unban':'ban'}" data-ban="${esc(who)}">${banned?"Разбан":"Бан"}</button>`:""}`;
+      <span class="user-sub">${subTxt}</span></div>${act}`;
     box.appendChild(el);
   });
 }
@@ -1368,15 +1414,44 @@ function renderQA(){
     box.appendChild(el);
   });
 }
+function renderStats(){
+  const box=$("statsBox"); if(!box) return;
+  if(!isDevUser()){ box.innerHTML='<p class="hint">Доступно только разработчику</p>'; return; }
+  const users=Object.values(state.commUsers||{});
+  const now=Date.now();
+  let active=0, banned=0, muted=0, oldest=Infinity;
+  users.forEach(u=>{
+    const who=u.username||u.display||u.name||"";
+    if(isBanned(who)) banned++; else active++;
+    if(isMuted(who)) muted++;
+    if(u.at&&u.at<oldest) oldest=u.at;
+  });
+  const reviews=state.commReviews||[];
+  const qa=state.commQA||[];
+  const answeredQA=qa.filter(q=>q.answer).length;
+  const rows=[
+    ["Всего пользователей", String(users.length)],
+    ["Активных", String(active)],
+    ["Забаненных", String(banned)],
+    ["Замученных", String(muted)],
+    ["Вопросов всего", String(qa.length)],
+    ["Вопросов с ответом", String(answeredQA)],
+    ["Отзывов", String(reviews.length)],
+    ["Сообществу с", oldest===Infinity?"—":new Date(oldest).toLocaleDateString()]
+  ];
+  box.innerHTML=rows.map(r=>`<div style="display:flex;justify-content:space-between;padding:7px 0;border-bottom:1px solid var(--line)"><span style="color:var(--ink-faint)">${esc(r[0])}</span><b>${esc(r[1])}</b></div>`).join("");
+}
 function isDevUser(){
   const u=String(currentDisplayName()).toLowerCase().replace(/^@+/,"");
-  return u==="lincoln";
+  return u===DEV;
 }
 let registerCommTab="reviews";
 function openCommunity(){
   registerCommTab="reviews";
-  $("commReviews").classList.remove("hidden"); $("commQA").classList.add("hidden");
+  $("commReviews").classList.remove("hidden"); $("commQA").classList.add("hidden"); $("commStats").classList.add("hidden");
   $("commSeg").querySelectorAll("button").forEach(b=>b.classList.toggle("on",b.dataset.v==="reviews"));
+  // founder-only stats tab
+  $("statsTabBtn").classList.toggle("hidden",!isDevUser());
   $("userList").innerHTML='<p class="hint">Загрузка…</p>';
   setScreen("sc-community");
   commConnect().then(ok=>{
@@ -1392,10 +1467,14 @@ $("btnCommunityClose").addEventListener("click",()=>{
 $("commSeg").addEventListener("click",e=>{
   const b=e.target.closest("button"); if(!b) return;
   registerCommTab=b.dataset.v;
+  if(b.dataset.v==="stats" && !isDevUser()){ toast("Только разработчик"); return; }
   $("commSeg").querySelectorAll("button").forEach(x=>x.classList.toggle("on",x===b));
   $("commReviews").classList.toggle("hidden",b.dataset.v!=="reviews");
   $("commQA").classList.toggle("hidden",b.dataset.v!=="qa");
-  if(b.dataset.v==="reviews") renderReviews(); else renderQA();
+  $("commStats").classList.toggle("hidden",b.dataset.v!=="stats");
+  if(b.dataset.v==="reviews") renderReviews();
+  else if(b.dataset.v==="qa") renderQA();
+  else renderStats();
   // proactively re-read retained topics so the opened tab is never blank
   soulHaystackRefresh();
 });
@@ -1425,13 +1504,75 @@ $("btnAsk").addEventListener("click",()=>{
 /* view a user profile */
 function openUserProfile(username){
   const u=state.commUsers&&state.commUsers[username];
-  const isDev=(username==="lincoln")||(u&&u.role==="dev");
+  const isDev=(username===DEV)||(u&&u.role==="dev");
   $("pvName").textContent=(u&&(u.display||u.name))||username;
   $("pvRole").textContent=isDev?"Разработчик ⭐":"Пользователь";
   $("pvAva").textContent=isDev?"👑":((u&&u.ava)||"👤");
   $("pvMeta").textContent="Юзернейм: @"+username;
+  const modBox=$("pvMod");
+  // Founder can view details + moderate any non-dev profile
+  if(isDevUser()&&!isDev){
+    const banned=isBanned(username), muted=isMuted(username);
+    let st=[];
+    if(banned) st.push("⛔ Забанен");
+    const m=state.mutes&&state.mutes[String(username).toLowerCase().replace(/^@+/,"")];
+    if(muted) st.push("🔇 Замучен"+(m&&m.until?(" до "+new Date(m.until).toLocaleString()):""));
+    if(!st.length) st.push("Нет ограничений");
+    $("pvStatus").textContent=st.join(" · ");
+    $("pvBan").style.display=banned?"none":"";
+    $("pvUnban").style.display=banned?"":"none";
+    $("pvMute").style.display=muted?"none":"";
+    $("pvUnmute").style.display=muted?"":"none";
+    modBox.dataset.user=username;
+    modBox.style.display="";
+  } else {
+    modBox.style.display="none";
+    delete modBox.dataset.user;
+  }
   $("profileOverlay").classList.add("open");
 }
+$("pvBan").addEventListener("click",()=>{ const who=$("pvMod").dataset.user; if(!who)return; modAction("ban",who); });
+$("pvUnban").addEventListener("click",()=>{ const who=$("pvMod").dataset.user; if(!who)return; modAction("unban",who); });
+$("pvMute").addEventListener("click",()=>{ const who=$("pvMod").dataset.user; if(!who)return; modAction("mute",who); });
+$("pvUnmute").addEventListener("click",()=>{ const who=$("pvMod").dataset.user; if(!who)return; modAction("unmute",who); });
+function modAction(kind,who){
+  if(!isDevUser()){ toast("Только разработчик может модерировать"); return; }
+  const target=String(who).toLowerCase().replace(/^@+/,"");
+  commConnect().then(ok=>{
+    if(!ok){ toast("Нет связи с сервером"); return; }
+    if(kind==="ban"){
+      state.comm.publish(NS+"/_bans/"+target, JSON.stringify({name:target,banned:true,by:DEV,at:Date.now()}), {qos:1,retain:true});
+      toast("@"+target+" забанен");
+    } else if(kind==="unban"){
+      state.comm.publish(NS+"/_bans/"+target, JSON.stringify({unban:true,by:DEV,at:Date.now()}), {qos:1,retain:true});
+      toast("@"+target+" разбанен");
+    } else if(kind==="mute"){
+      state.comm.publish(NS+"/_mutes/"+target, JSON.stringify({name:target,until:Date.now()+3600*1000,by:DEV,at:Date.now()}), {qos:1,retain:true});
+      toast("@"+target+" замучен на 1 час");
+    } else if(kind==="unmute"){
+      state.comm.publish(NS+"/_mutes/"+target, JSON.stringify({unmute:true,by:DEV,at:Date.now()}), {qos:1,retain:true});
+      toast("@"+target+" — мут снят");
+    }
+  });
+}
+$("pvEdit").addEventListener("click",()=>{
+  const who=$("pvMod").dataset.user; if(!who)return;
+  if(!isDevUser()){ toast("Только разработчик может редактировать профили"); return; }
+  const target=String(who).toLowerCase().replace(/^@+/,"");
+  const cur=state.commUsers&&state.commUsers[who];
+  const dName=prompt("Новое имя (nickname):", (cur&&cur.display)||cur&&cur.name||who)||"";
+  if(dName===null) return;
+  const ava=prompt("Эмодзи-аватар:", (cur&&cur.ava)||"👤")||"👤";
+  commConnect().then(ok=>{
+    if(!ok){ toast("Нет связи с сервером"); return; }
+    const upd={name:target, display:dName.trim(), ava:ava.trim()||"👤", at:Date.now(), editedBy:DEV};
+    if(cur&&cur.role==="dev") upd.role="dev";
+    if(cur&&cur.seal) upd.seal=cur.seal;
+    state.comm.publish(NS+"/_users/"+target, JSON.stringify(upd), {qos:1,retain:true});
+    toast("Профиль @"+target+" обновлён");
+    openUserProfile(who);
+  });
+});
 $("userList").addEventListener("click",e=>{
   const banBtn=e.target.closest("[data-ban]");
   if(banBtn){
@@ -1442,11 +1583,29 @@ $("userList").addEventListener("click",e=>{
     commConnect().then(ok=>{
       if(!ok){ toast("Нет связи с сервером"); return; }
       if(!bannedNow){
-        state.comm.publish(NS+"/_bans/"+target, JSON.stringify({name:target,banned:true,by:"lincoln",at:Date.now()}), {qos:1,retain:true});
+        state.comm.publish(NS+"/_bans/"+target, JSON.stringify({name:target,banned:true,by:DEV,at:Date.now()}), {qos:1,retain:true});
         toast("@"+target+" забанен");
       } else {
-        state.comm.publish(NS+"/_bans/"+target, JSON.stringify({unban:true,by:"lincoln",at:Date.now()}), {qos:1,retain:true});
+        state.comm.publish(NS+"/_bans/"+target, JSON.stringify({unban:true,by:DEV,at:Date.now()}), {qos:1,retain:true});
         toast("@"+target+" разбанен");
+      }
+    });
+    return;
+  }
+  const muteBtn=e.target.closest("[data-mute]");
+  if(muteBtn){
+    if(!isDevUser()){ toast("Только разработчик может выдавать муты"); return; }
+    const who=muteBtn.dataset.mute;
+    const target=String(who).toLowerCase().replace(/^@+/,"");
+    const mutedNow=isMuted(who);
+    commConnect().then(ok=>{
+      if(!ok){ toast("Нет связи с сервером"); return; }
+      if(mutedNow){
+        state.comm.publish(NS+"/_mutes/"+target, JSON.stringify({unmute:true,by:DEV,at:Date.now()}), {qos:1,retain:true});
+        toast("@"+target+" — мут снят");
+      } else {
+        state.comm.publish(NS+"/_mutes/"+target, JSON.stringify({name:target,until:Date.now()+3600*1000,by:DEV,at:Date.now()}), {qos:1,retain:true});
+        toast("@"+target+" замучен на 1 час");
       }
     });
     return;
