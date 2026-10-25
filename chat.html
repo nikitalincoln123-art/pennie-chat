@@ -751,9 +751,9 @@ function claimUsername(username){
           // free -> claim and remember that THIS device owns it
           try{ localStorage.setItem(NS+"_seal_"+clean, owner); }catch(e){}
           c.publish(tpc, JSON.stringify({owner:owner,at:Date.now(),seal:owner}), {qos:1, retain:true}, (err2)=>{
-            setTimeout(()=>finish({ok:!err2, owner:owner, isOwner:false}),500);
+            setTimeout(()=>finish({ok:!err2, owner:owner, isOwner:false}),150);
           });
-        },3500);
+        },2000);
       });
     });
     c.on("message",(t,p)=>{ const raw=String(p.toString()||"").trim(); if(raw.length>0) gotRecord=raw; });
@@ -1228,16 +1228,25 @@ $("btnProfDone").addEventListener("click",()=>{
       $("landStatus").textContent="Этот юзернейм занят другим человеком. Выберите другой";
       $("landStatus").className="status-line err"; return;
     }
-    // ban check: confirm the name isn't banned before entering
+    // enter immediately; ban check runs in the background so it never blocks the button
+    const cleanU=String(uname).toLowerCase().replace(/^@+/,"");
+    const wasAllowed = !(state.bans && state.bans[cleanU]);
+    if(!wasAllowed){
+      $("landStatus").textContent="Этот аккаунт забанен. Обратитесь к разработчику";
+      $("landStatus").className="status-line err"; return;
+    }
+    done();
+    // background: confirm via community before allowing messaging, but do not block entry
     commConnect().then(ok=>{
-      if(!ok){ $("landStatus").innerHTML=""; done(); return; }
-      setTimeout(()=>{
-        if(isBanned(uname)){
-          $("landStatus").textContent="Этот аккаунт забанен. Обратитесь к разработчику";
-          $("landStatus").className="status-line err"; return;
-        }
-        $("landStatus").innerHTML=""; done();
-      },1200);
+      if(ok){
+        setTimeout(()=>{
+          if(isBanned(uname)){
+            $("landStatus").textContent="Этот аккаунт забанен. Обратитесь к разработчику";
+            $("landStatus").className="status-line err";
+            try{ window.setTimeout(()=>{ if($("sc-chat").classList.contains("active")) setScreen("sc-landing"); },1500);}catch(e){}
+          }
+        },400);
+      }
     });
   });
 });
