@@ -777,7 +777,7 @@ function connect(room, side){
     const sub=window.mqtt.connect(HOST,{clientId:clientIdFor("sn",room,side),
       clean:false, keepalive:30, connectTimeout:15000, reconnectPeriod:2000, resubscribe:true, username:MQTT_USER||undefined, password:MQTT_PASS||undefined});
     sub.on("connect",()=>{
-      ["presence","msg","typing","react","control"].forEach(k=>sub.subscribe(NS+"/"+room+"/"+k,{qos:k==="typing"?0:1}));
+      ["presence","msg","typing","react","control","ack"].forEach(k=>sub.subscribe(NS+"/"+room+"/"+k,{qos:k==="typing"?0:1}));
       state.sub=sub;
       sub.on("message",(t,p)=>onMessage(t,p));
     });
@@ -805,18 +805,67 @@ function connect(room, side){
 
 function send(topic,obj){ try{ if(state.client&&state.client.connected){ state.client.publish(NS+"/"+state.room+"/"+topic,JSON.stringify(obj),{qos:topic==="typing"?0:1}); } }catch(e){} }
 
+/* ===== Reliable delivery layer (ACK-based, no flooding).
+   We keep an outbox of sent messages. A message is considered delivered
+   only after the peer answers with an ACK (topic "ack"). If no ACK within
+   ACK_WAIT, we re-send that single id (a gentle interval, never a burst of
+   many messages) up to MAX_RETRY times. The receiver already dedups by id,
+   so duplicates are harmless. ACKs themselves are fire-and-forget QoS1.
+
+   NOTE (learned earlier on this broker): blasting multiple messages at once
+   hurt delivery, so we retry one message at a time with spacing.
+======================================================================== */
+const ACK_WAIT=1400, MAX_RETRY=5, RETRY_GAP=2200;
+state.outbox={};      // id -> {payload, tries, timer}
+state.ackActive=false;
+
+function ackPump(){
+  // send due retries one at a time (guard against flooding)
+  if(state.ackActive) return;
+  const now=Date.now();
+  const due=Object.values(state.outbox).filter(x=>!x.sentAt || x.sentAt+ACK_WAIT<=now);
+  if(!due.length){ state.ackActive=false; return; }
+  state.ackActive=true;
+  const it=due[0];
+  it.tries=(it.tries||0)+1;
+  it.sentAt=now;
+  try{ if(state.client&&state.client.connected){ state.client.publish(NS+"/"+state.room+"/msg",it.payload,{qos:1}); } }catch(e){}
+  if(it.tries>=MAX_RETRY){ // give up after max retries
+    clearTimeout(it.timer); delete state.outbox[it.id];
+  } else {
+    it.timer=setTimeout(ackPump,RETRY_GAP);
+  }
+  state.ackActive=false;
+  // if more pending, schedule next
+  if(Object.values(state.outbox).some(x=>x.sentAt+ACK_WAIT<=now)) setTimeout(ackPump,ACK_WAIT);
+}
+
+function onAck(d){
+  if(!d||!d.id) return;
+  const it=state.outbox[d.id];
+  if(it){ clearTimeout(it.timer); delete state.outbox[d.id]; }
+  // also mark our own bubble as delivered
+  const m=state.msgs.find(x=>x.id===d.id);
+  if(m){ m._delivered=Date.now(); }
+}
+
+function sendReliable(topic,o){
+  if(topic!=="msg"){ send(topic,o); return; }
+  const id=o.id;
+  const payload=JSON.stringify({...o,_rel:"ack"});
+  const entry={id:id,payload:payload,tries:0,sentAt:0,timer:null};
+  state.outbox[id]=entry;
+  // send immediately
+  entry.tries=1; entry.sentAt=Date.now();
+  try{ if(state.client&&state.client.connected){ state.client.publish(NS+"/"+state.room+"/msg",payload,{qos:1}); } }catch(e){}
+  entry.timer=setTimeout(ackPump,ACK_WAIT);
+}
+
 function announcePresence(){
   send("presence",{side:state.role,name:state.name,ts:Date.now(),online:true});
 }
 
-/* Message delivery: single QoS1 publish. Delivery reliability comes from
-   the persistent session (clean:false): the broker queues an undelivered
-   QoS1 message and delivers it once our stable clientId is online again.
-   Tested live: persistent sessions gave 24/24 delivery; clean:true and
-   multi-send bursts both lost messages. Receiver dedups by id. */
-function sendMsg(o){
-  send("msg",o);
-}
+function sendMsg(o){ sendReliable("msg",o); }
 function sendControl(o){ send("control",o); }
 function sendReact(o){ send("react",o); }
 function sendTypingMsg(b){ send("typing",{side:state.role,typing:!!b,t:Date.now()}); }
@@ -835,6 +884,8 @@ function onMessage(topic,payload){
       color:d.color||"#8b86f5",text:d.text||"",t:d.t||Date.now(),kind:d.kind||"text",del:false,ed:false,reacts:d.reacts||{},_sent:false};
     state.msgs.push(m);
     renderAppend(m); // fast: only append the new bubble, no full re-render
+    // tell the sender we received it (delivery proof)
+    try{ if(state.client&&state.client.connected) state.client.publish(NS+"/"+state.room+"/ack",JSON.stringify({id:d.id,side:state.role}),{qos:1}); }catch(e){}
   }}
   else if(kind==="typing"){ if(d.side&&d.side!==state.role){
     state.peerTyping=!!d.typing; clearTimeout(state.typingTO);
@@ -852,6 +903,7 @@ function onMessage(topic,payload){
     else if(d.type==="del"){ const m=state.msgs.find(x=>x.id===d.id); if(m){ m.del=true; renderMsgs(false); } }
     else if(d.type==="delall"){ state.msgs=[]; renderMsgs(false); }
   }
+  else if(kind==="ack"){ onAck(d); }
 }
 
 /* Presence heartbeat + stale prune.
