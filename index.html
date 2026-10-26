@@ -80,6 +80,13 @@
     background:var(--surface);border:1px solid var(--line);color:var(--ink-dim);font-size:13.5px;line-height:1.5;box-shadow:var(--glow-soft)}
   .assurance .shi{font-size:20px;filter:drop-shadow(0 0 8px rgba(255,255,255,.5))}
 
+  /* ===== server warning banner ===== */
+  .warnbar{margin:18px 0 0;padding:13px 18px;border-radius:16px;display:flex;align-items:flex-start;gap:12px;
+    background:rgba(255,199,105,.07);border:1px solid rgba(255,199,105,.35);color:var(--ink-dim);
+    font-size:13.5px;line-height:1.5;box-shadow:var(--glow-soft)}
+  .warnbar .wico{font-size:18px;flex:0 0 auto;filter:drop-shadow(0 0 8px rgba(255,215,130,.6))}
+  .warnbar b{color:#fff}
+
   /* ===== hero visual ===== */
   .hero-visual{position:relative}
   .phone{background:linear-gradient(180deg,var(--surface2),var(--surface));border:1px solid var(--line);border-radius:30px;
@@ -183,6 +190,12 @@
     </nav>
   </div>
 </header>
+
+<div class="wrap">
+  <div class="warnbar"><span class="wico">⚠️</span>
+    <span>Возможна плохая отправка сообщений из-за слабого сервера, который блокирует РФ. В скором времени исправим.</span>
+  </div>
+</div>
 
 <section class="hero">
   <div class="wrap hero-in">
