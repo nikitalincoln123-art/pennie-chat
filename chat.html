@@ -48,6 +48,17 @@
     min-height:100dvh;
     -webkit-font-smoothing:antialiased;
   }
+  /* ===== Animated aurora field (like the site landing) ===== */
+  #aurora{position:fixed;inset:0;z-index:0;overflow:hidden;pointer-events:none;filter:blur(70px)}
+  .aura{position:absolute;border-radius:50%;opacity:.5;mix-blend-mode:screen;will-change:transform}
+  .aura1{width:520px;height:520px;left:-120px;top:-80px;background:radial-gradient(circle at 40% 40%,#ff9ec2,rgba(255,120,170,0));animation:auraFloat1 26s ease-in-out infinite}
+  .aura2{width:600px;height:600px;right:-160px;top:8%;background:radial-gradient(circle at 60% 40%,#9d8cff,rgba(150,120,255,0));animation:auraFloat2 32s ease-in-out infinite}
+  .aura3{width:560px;height:560px;left:22%;top:58%;background:radial-gradient(circle at 50% 50%,#5ec8ff,rgba(90,200,255,0));animation:auraFloat3 38s ease-in-out infinite}
+  .aura4{width:380px;height:380px;right:16%;bottom:-90px;background:radial-gradient(circle at 50% 50%,#ffce7a,rgba(255,206,122,0));animation:auraFloat4 44s ease-in-out infinite}
+  @keyframes auraFloat1{0%,100%{transform:translate(0,0) scale(1)}33%{transform:translate(70px,50px) scale(1.15)}66%{transform:translate(-40px,80px) scale(.95)}}
+  @keyframes auraFloat2{0%,100%{transform:translate(0,0) scale(1)}40%{transform:translate(-90px,60px) scale(1.1)}70%{transform:translate(40px,-50px) scale(.9)}}
+  @keyframes auraFloat3{0%,100%{transform:translate(0,0) scale(1)}30%{transform:translate(60px,-70px) scale(1.12)}65%{transform:translate(-70px,40px) scale(.97)}}
+  @keyframes auraFloat4{0%,100%{transform:translate(0,0) scale(1)}35%{transform:translate(-70px,-60px) scale(1.2)}70%{transform:translate(50px,30px) scale(.9)}}
   button{font-family:inherit;cursor:pointer;border:none;background:none;color:inherit}
   input,textarea{font-family:inherit;color:inherit}
   ::selection{background:rgba(255,255,255,.25)}
@@ -59,7 +70,7 @@
   .center-wrap{height:100dvh;width:100%;display:flex;align-items:center;justify-content:center;padding:20px;overflow:auto}
 .card{
     width:100%;max-width:420px;background:linear-gradient(180deg,var(--panel),var(--bg2));
-    border:1px solid var(--line);border-radius:30px;padding:32px 28px;box-shadow:var(--shadow);position:relative;
+    border:1px solid var(--line);border-radius:30px;padding:32px 28px;box-shadow:var(--shadow);position:relative;z-index:2;
   }
   .card.big{max-width:460px}
   .logo-row{display:flex;align-items:center;gap:14px;margin-bottom:22px;min-width:0}
@@ -322,6 +333,14 @@
 </head>
 <body>
 
+<div id="aurora" aria-hidden="true">
+  <div class="aura aura1"></div>
+  <div class="aura aura2"></div>
+  <div class="aura aura3"></div>
+  <div class="aura aura4"></div>
+</div>
+
+
 <!-- LANDING -->
 <section id="sc-landing" class="screen active">
   <div class="center-wrap">
@@ -332,7 +351,6 @@
           <div class="sl-title">Вы вошли как</div>
           <div id="slUser"><div class="sl-empty">Вы ещё не входили в аккаунт</div></div>
         </div>
-        <button class="sl-switch" id="slSwitch" style="display:none">Сменить</button>
       </div>
       <div class="logo-row">
         <div class="logo"><img src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAxMjggMTI4Ij4KICA8cmVjdCB3aWR0aD0iMTI4IiBoZWlnaHQ9IjEyOCIgcng9IjMwIiBmaWxsPSIjMGUwZTE2Ii8+CiAgPHBhdGggdHJhbnNmb3JtPSJ0cmFuc2xhdGUoMjQgMzApIHNjYWxlKDIuNCkiIGQ9Ik0wIDIzLjNDLTMuNiAxNy41LTcuOCAxMy44LTguNyA5LjRjLTEuMy02LjYgMi44LTExLjIgOC4yLTEwLjIgMy4xLjYgNS41IDIuMyA2LjkgNC42IDEuNC0yLjMgMy44LTQgNi45LTQuNiA1LjQtMSA5LjUgMy42IDguMiAxMC4yLS45IDQuNC01LjEgOC4xLTguNyAxMy45TDYuNCAyOC40IDAgMjMuM3oiIGZpbGw9IiNGRjY0QjUiLz4KICA8cGF0aCB0cmFuc2Zvcm09InRyYW5zbGF0ZSg0NiA0Mikgc2NhbGUoMS41KSIgZD0iTTAgMjMuM0MtMy42IDE3LjUtNy44IDEzLjgtOC43IDkuNGMtMS4zLTYuNiAyLjgtMTEuMiA4LjItMTAuMiAzLjEuNiA1LjUgMi4zIDYuOSA0LjYgMS40LTIuMyAzLjgtNCA2LjktNC42IDUuNC0xIDkuNSAzLjYgOC4yIDEwLjItLjkgNC40LTUuMSA4LjEtOC43IDEzLjlMNi40IDI4LjQgMCAyMy4zeiIgZmlsbD0iI0E3OEFGQSIgb3BhY2l0eT0iMC45Ii8+Cjwvc3ZnPg==" alt="Pennie" width="52" height="52"></div>
@@ -1566,11 +1584,6 @@ function renderSideLast(){
     ? `<div class="sl-name">${esc(nameTxt)} ${dev?'<span class="dev-star" title="Разработчик">★</span>':''}</div>
        <div class="sl-un">@${cleanU}${dev?' · разработчик':''}</div>`
     : `<div class="sl-empty">Вы ещё не входили в аккаунт</div>`;
-  if($("slSwitch")) $("slSwitch").style.display = uname ? "" : "none";
-}
-function resetLastUser(){
-  try{ localStorage.removeItem(NS+"_lastuser"); }catch(e){}
-  renderSideLast();
 }
 function isBanned(name){
   const u=String(name||"").toLowerCase().replace(/^@+/,"");
@@ -1891,7 +1904,6 @@ $("qaList").addEventListener("click",e=>{
 state.comm.publish(NS+"/_qa/"+id, JSON.stringify({...q,answer:ans.trim(),answeredAt:Date.now()}), {qos:1,retain:true});
   toast("Ответ опубликован");
 });
-$("slSwitch")&&$("slSwitch").addEventListener("click",()=>{ resetLastUser(); toast("Смена аккаунта: нажмите «Создать ссылку» и впишите новый юзернейм"); });
 renderSideLast();
 </script>
 </body>
