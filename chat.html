@@ -33,7 +33,7 @@
     --scale:linear-gradient(135deg,#ffffff,#e7e8f4);
   }
   *{box-sizing:border-box;margin:0;padding:0}
-  .card,.btn,.input,.seg button,.user-item,.comm-item,.chatbox .cb-m,.qbtn,.hdr-btn,.sl-switch,.sl-block{transition:all .22s cubic-bezier(.2,.7,.3,1)}
+  .card,.btn,.input,.seg button,.user-item,.comm-item,.chatbox .cb-m,.qbtn,.hdr-btn{transition:all .22s cubic-bezier(.2,.7,.3,1)}
   .btn:hover{transform:translateY(-1px)}
   .btn.primary:hover{transform:translateY(-1px) scale(1.01)}
   .field,.status-line{animation:fadeUp .3s cubic-bezier(.2,.7,.3,1)}
@@ -88,18 +88,6 @@
   #sc-landing .divider{margin:20px 0}
   #sc-landing #btnOpenByLink{margin-top:0}
   #sc-landing .credit{margin-top:22px}
-  .side-last{margin-bottom:16px;padding:12px;border-radius:16px;background:var(--bg2);border:1px solid var(--line);
-    display:flex;align-items:center;gap:12px}
-  .side-last .sl-ava{width:44px;height:44px;border-radius:13px;display:flex;align-items:center;justify-content:center;font-size:21px;flex:0 0 auto;
-    background:var(--me-soft);border:1px solid var(--line)}
-  .side-last .sl-meta{flex:1;min-width:0}
-  .side-last .sl-title{font-size:10.5px;font-weight:700;letter-spacing:.4px;color:var(--ink-faint);text-transform:uppercase}
-  .side-last .sl-name{font-size:14.5px;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-top:1px}
-  .side-last .sl-un{font-size:11px;color:var(--ink-dim);margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-  .side-last .sl-empty{font-size:13px;color:var(--ink-faint);flex:1}
-  .side-last .sl-switch{font-size:12px;font-weight:600;color:var(--ink-dim);padding:7px 12px;border-radius:11px;background:var(--bg2);
-    border:1px solid var(--line);cursor:pointer;transition:all .2s;flex:0 0 auto;white-space:nowrap}
-  .side-last .sl-switch:hover{color:var(--ink);border-color:var(--accent)}
   .brand-name{font-size:20px;font-weight:700;letter-spacing:.2px;white-space:nowrap}
   .brand-sub{font-size:12.5px;color:var(--ink-dim);margin-top:2px;white-space:nowrap}
   .badge{display:inline-flex;align-items:center;gap:6px;background:var(--panel2);border:1px solid var(--line);
@@ -345,13 +333,6 @@
 <section id="sc-landing" class="screen active">
   <div class="center-wrap">
     <div class="card">
-      <div class="sl-block" id="sideLast">
-        <div class="sl-ava" id="slAva">👤</div>
-        <div class="sl-meta">
-          <div class="sl-title">Вы вошли как</div>
-          <div id="slUser"><div class="sl-empty">Вы ещё не входили в аккаунт</div></div>
-        </div>
-      </div>
       <div class="logo-row">
         <div class="logo"><img src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAxMjggMTI4Ij4KICA8cmVjdCB3aWR0aD0iMTI4IiBoZWlnaHQ9IjEyOCIgcng9IjMwIiBmaWxsPSIjMGUwZTE2Ii8+CiAgPHBhdGggdHJhbnNmb3JtPSJ0cmFuc2xhdGUoMjQgMzApIHNjYWxlKDIuNCkiIGQ9Ik0wIDIzLjNDLTMuNiAxNy41LTcuOCAxMy44LTguNyA5LjRjLTEuMy02LjYgMi44LTExLjIgOC4yLTEwLjIgMy4xLjYgNS41IDIuMyA2LjkgNC42IDEuNC0yLjMgMy44LTQgNi45LTQuNiA1LjQtMSA5LjUgMy42IDguMiAxMC4yLS45IDQuNC01LjEgOC4xLTguNyAxMy45TDYuNCAyOC40IDAgMjMuM3oiIGZpbGw9IiNGRjY0QjUiLz4KICA8cGF0aCB0cmFuc2Zvcm09InRyYW5zbGF0ZSg0NiA0Mikgc2NhbGUoMS41KSIgZD0iTTAgMjMuM0MtMy42IDE3LjUtNy44IDEzLjgtOC43IDkuNGMtMS4zLTYuNiAyLjgtMTEuMiA4LjItMTAuMiAzLjEuNiA1LjUgMi4zIDYuOSA0LjYgMS40LTIuMyAzLjgtNCA2LjktNC42IDUuNC0xIDkuNSAzLjYgOC4yIDEwLjItLjkgNC40LTUuMSA4LjEtOC43IDEzLjlMNi40IDI4LjQgMCAyMy4zeiIgZmlsbD0iI0E3OEFGQSIgb3BhY2l0eT0iMC45Ii8+Cjwvc3ZnPg==" alt="Pennie" width="52" height="52"></div>
         <div>
@@ -1266,7 +1247,6 @@ $("btnProfDone").addEventListener("click",()=>{
       const cleanU=String(uname).toLowerCase().replace(/^@+/,"");
       localStorage.setItem(NS+"_lastuser", cleanU);
       localStorage.setItem(NS+"_face_"+cleanU, JSON.stringify({display:(state.name||uname),ava:state.ava,color:state.color,t:Date.now()}));
-      renderSideLast();
     }catch(e){}
     if(pendingRoom && pendingSide){
       const r=pendingRoom, s=pendingSide;
@@ -1560,30 +1540,6 @@ function commOnMsg(topic,payload){
 }
 function currentDisplayName(){
   return state.username ? state.username : (state.name||"Аноним");
-}
-function renderSideLast(){
-  const box=$("slUser"); if(!box) return;
-  let uname=null, face=null;
-  try{
-    uname=localStorage.getItem(NS+"_lastuser");
-    const rawFace=localStorage.getItem(NS+"_face_"+(uname||""));
-    if(rawFace){ try{ face=JSON.parse(rawFace); }catch(e){ face=null; } }
-  }catch(e){}
-  let who=uname, disp=face&&face.display, ava=face&&face.ava, color=face&&face.color;
-  if(state.username){
-    who=state.username; disp=state.name||state.username; ava=state.ava; color=state.color;
-  }
-  const cleanU=String(who||"").toLowerCase().replace(/^@+/,"");
-  // resolve display from community directory if face missing
-  if(!disp && state.commUsers&&state.commUsers[cleanU]) disp=state.commUsers[cleanU].display||cleanU;
-  const dev= (cleanU===DEV) || (state.commUsers&&state.commUsers[cleanU]&&state.commUsers[cleanU].role==="dev");
-  const nameTxt=disp||(who?"@"+cleanU:"");
-  if($("slAva")) $("slAva").innerHTML=avaHtml(ava)||"👤";
-  if($("slAva")) $("slAva").style.background=color||"var(--me-soft)";
-  box.innerHTML = who
-    ? `<div class="sl-name">${esc(nameTxt)} ${dev?'<span class="dev-star" title="Разработчик">★</span>':''}</div>
-       <div class="sl-un">@${cleanU}${dev?' · разработчик':''}</div>`
-    : `<div class="sl-empty">Вы ещё не входили в аккаунт</div>`;
 }
 function isBanned(name){
   const u=String(name||"").toLowerCase().replace(/^@+/,"");
@@ -1904,7 +1860,6 @@ $("qaList").addEventListener("click",e=>{
 state.comm.publish(NS+"/_qa/"+id, JSON.stringify({...q,answer:ans.trim(),answeredAt:Date.now()}), {qos:1,retain:true});
   toast("Ответ опубликован");
 });
-renderSideLast();
 </script>
 </body>
 </html>
