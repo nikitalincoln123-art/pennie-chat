@@ -711,9 +711,9 @@ let dialogs={}, dialogRefs=[];
 function openChats(){
   showView("vChats");
   applyMyStyle();
-  $("meAva").innerHTML=avaHtml(me.ava,me.name);
-  $("meName").textContent=me.name||me.handle.slice(1);
-  $("meLogin").textContent=me.handle;
+  const a=$("meAva"); if(a) a.innerHTML=avaHtml(me.ava,me.name);
+  const n=$("meName"); if(n) n.textContent=me.name||me.handle.slice(1);
+  const l=$("meLogin"); if(l) l.textContent=me.handle;
   $("searchUser").value="";
   $("searchResult").innerHTML="";
   loadDialogs();
@@ -1228,8 +1228,8 @@ $("btnSaveSettings").addEventListener("click",()=>{
   me.bio=($("editBio").value||"").trim();
   me.pat=draftPat; me.theme=draftTheme; me.ava=draftAva;
   applyMyStyle();
-  $("meAva").innerHTML=avaHtml(me.ava);
-  $("meName").textContent=me.name;
+  const mav=$("meAva"); if(mav) mav.innerHTML=avaHtml(me.ava,me.name);
+  const mnm=$("meName"); if(mnm) mnm.textContent=me.name;
   // persist profile to Firebase user record
   try{
     FB.db.ref("users/"+me.handle.slice(1)).update({ pat:me.pat, theme:me.theme, ava:me.ava||"" , name:me.name, first:me.first, last:me.last, bio:me.bio }).then(()=>{ saveSession(); }).catch(()=>{ saveSession(); });
