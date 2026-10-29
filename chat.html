@@ -283,9 +283,11 @@
   .panel-tabs button.on{color:var(--ink);background:var(--panel2)}
   .panel-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(40px,1fr));gap:4px;padding:8px;max-height:200px;overflow-y:auto}
   .panel-grid.big{grid-template-columns:repeat(auto-fill,minmax(52px,1fr))}
-  .panel-grid button{border-radius:10px;padding:6px;font-size:22px;transition:background .12s}
+  .panel-grid button{border-radius:10px;padding:6px;font-size:22px;transition:background .12s,transform .15s cubic-bezier(.2,.7,.3,1)}
   .panel-grid.big button{font-size:30px}
-  .panel-grid button:hover{background:var(--panel2)}
+  .panel-grid button:hover{background:var(--panel2);transform:translateY(-2px)}
+  .emoji3d{width:24px;height:24px;display:inline-block;vertical-align:middle;object-fit:contain;pointer-events:none;filter:drop-shadow(0 2px 3px rgba(0,0,0,.3))}
+  .panel-grid.big .emoji3d{width:32px;height:32px}
 
   .picker{position:fixed;z-index:80;background:var(--panel2);border:1px solid var(--line);border-radius:14px;
     padding:6px;display:flex;gap:4px;box-shadow:var(--shadow);animation:pop .15s}
@@ -1119,6 +1121,20 @@ const EMOJI_GROUPS={
 "Транспорт":["🚗","🚕","🚙","🚌","🚎","🏎️","🚓","🚑","🚒","🚐","🚚","🚛","🚜","🏍️","🛵","🚲","🛴","🚁","🛸","🚀","🛫","🛬","✈️","🚂","🚆","🚇","🚊","🚉","🚢","⛵"],
 "Флаги":["🇷🇺","🏳️","🏴","🏁","🚩","⭐","🌟"]
 };
+/* Map an emoji character to a colorful glossy image URL (Twemoji via jsDelivr).
+   Falls back to the char if it cannot be encoded. */
+const TWEMOJI_BASE="https://cdn.jsdelivr.net/gh/jdecked/twemoji@15.0.3/assets/svg";
+function emojiImg(e){
+  try{
+    const rune=e.codePointAt(0).toString(16);
+    return TWEMOJI_BASE+"/"+rune+".svg";
+  }catch(err){ return null; }
+}
+function emojiInline(e, cls){
+  const u=emojiImg(e);
+  if(u) return `<img class="${cls||'emoji3d'}" src="${u}" alt="${esc(e)}" draggable="false">`;
+  return esc(e);
+}
 function buildEmojiPanel(){
   const p=$("emojiPanel");
   p.innerHTML=`<div class="panel-tabs"></div><div class="panel-grid"></div>`;
@@ -1127,10 +1143,14 @@ function buildEmojiPanel(){
   keys.forEach((g,i)=>{ const b=document.createElement("button"); b.textContent=g; b.dataset.g=g; b.type="button"; b.setAttribute("aria-label","Категория "+g);
     if(i===0)b.classList.add("on");
     b.addEventListener("click",()=>{ tabs.querySelectorAll("button").forEach(x=>x.classList.remove("on")); b.classList.add("on");
-      grid.innerHTML=""; EMOJI_GROUPS[g].forEach(e=>{ const q=document.createElement("button"); q.dataset.e=e; q.textContent=e; q.type="button"; q.setAttribute("aria-label","Эмодзи "+e); grid.appendChild(q); }); });
+      grid.innerHTML=""; EMOJI_GROUPS[g].forEach(e=>{ const q=document.createElement("button"); q.dataset.e=e; q.innerHTML=emojiInline(e,"emoji3d"); q.type="button"; q.setAttribute("aria-label","Эмодзи "+e); grid.appendChild(q); }); });
     tabs.appendChild(b);
   });
-  grid.innerHTML=""; EMOJI_GROUPS[keys[0]].forEach(e=>{ const q=document.createElement("button"); q.dataset.e=e; q.textContent=e; q.type="button"; q.setAttribute("aria-label","Эмодзи "+e); grid.appendChild(q); });
+  grid.innerHTML=""; EMOJI_GROUPS[keys[0]].forEach(e=>{ const q=document.createElement("button"); q.dataset.e=e; q.innerHTML=emojiInline(e,"emoji3d"); q.type="button"; q.setAttribute("aria-label","Эмодзи "+e); grid.appendChild(q); });
+}
+/* single bound emoji insert listener (avoid duplicate insertions) */
+function bindEmojiPanel(){
+  const p=$("emojiPanel");
   p.addEventListener("click",e=>{ const b=e.target.closest("[data-e]"); if(!b) return;
     const ta=$("chatText"), s=ta.selectionStart||ta.value.length, en=ta.selectionEnd||ta.value.length;
     ta.value=ta.value.slice(0,s)+b.dataset.e+ta.value.slice(en);
@@ -1181,6 +1201,7 @@ function enterChat({room,side},isCreator){
   renderMsgs(false);
   setScreen("sc-chat");
   buildEmojiPanel(); buildStickerPanel(); buildQuickbar(); closePanels();
+  bindEmojiPanel();
   $("hdrAva").innerHTML=avaHtml(state.ava); $("hdrAva").style.background=state.color;
   updatePresence();
   connect(room,side)
@@ -1436,6 +1457,7 @@ window.addEventListener("hashchange",()=>{
 });
 
 buildEmojiPanel(); buildStickerPanel();
+bindEmojiPanel();
 
 /* ===================== COMMUNITY (reviews, users, Q&A) =====================
    Stored as retained MQTT topics so they survive reloads and are shared by
