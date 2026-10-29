@@ -148,7 +148,8 @@ input{font-family:inherit;color:var(--ink)}
 #vChat .topbar .peer-name .n{font-weight:700;font-size:15px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 #vChat .topbar .peer-name .s{font-size:12px;color:var(--ink-dim)}
 .msgs{flex:1;overflow-y:auto;padding:14px;display:flex;flex-direction:column;gap:4px;background:var(--bg)}
-.bubble{max-width:78%;padding:9px 13px;border-radius:14px;font-size:15px;line-height:1.45;word-wrap:break-word;overflow-wrap:anywhere;position:relative;white-space:pre-wrap;animation:msgIn .22s ease}
+.bubble{max-width:78%;padding:9px 13px;border-radius:14px;font-size:15px;line-height:1.45;position:relative;white-space:pre-wrap;overflow-wrap:break-word;word-break:normal;animation:msgIn .22s ease}
+.bubble .mtxt{color:inherit}
 @keyframes msgIn{from{opacity:0;transform:translateY(6px) scale(.98)}to{opacity:1;transform:none}}
 .bubble.m{background:var(--mine);color:#fff;align-self:flex-end;border-bottom-right-radius:5px}
 .bubble.p{background:var(--panel2);align-self:flex-start;border-bottom-left-radius:5px}
@@ -205,7 +206,14 @@ input{font-family:inherit;color:var(--ink)}
 
 /* ============ profile view ============ */
 .profile-scroll{flex:1;overflow-y:auto}
-.profile-hero{padding:28px 20px 16px;text-align:center;border-bottom:1px solid var(--line)}
+.profile-hero{padding:28px 20px 16px;text-align:center;border-bottom:1px solid var(--line);position:relative;background:var(--panel)}
+.profile-hero[data-pbg="black"]{background:radial-gradient(circle at 30% 20%,#223,transparent 70%),#000}
+.profile-hero[data-pbg="white"]{background:#fff;color:#111}
+.profile-hero[data-pbg="gold"]{background:radial-gradient(circle at 50% -20%,#6b4f1a,transparent 70%),#2a2310;color:#ffe9b8}
+.profile-hero[data-pbg="marsh"]{background:radial-gradient(circle at 50% -20%,#3a5a26,transparent 70%),#141b0c;color:#e8f4d6}
+.profile-hero[data-pbg="sky"]{background:radial-gradient(circle at 50% -20%,#155e8f,transparent 70%),#0a1826;color:#dff2ff}
+.profile-hero[data-pbg="violet"]{background:radial-gradient(circle at 50% -20%,#5a2ea8,transparent 70%),#170e28;color:#f0e6ff}
+.profile-hero[data-pbg="dark"]{background:linear-gradient(180deg,#24364a,#17212b)}
 .profile-hero .big-ava{width:110px;height:110px;border-radius:50%;margin:0 auto 14px;background:var(--chip);display:flex;align-items:center;justify-content:center;overflow:hidden;font-size:40px;border:3px solid var(--accent);box-shadow:0 0 30px rgba(84,183,233,.3)}
 .profile-hero .big-ava img{width:100%;height:100%;object-fit:cover}
 .profile-hero .p-name{font-size:22px;font-weight:800}
@@ -242,6 +250,13 @@ input{font-family:inherit;color:var(--ink)}
 .upload-btn:hover{filter:brightness(1.08)}
 .upload-btn.ghost{background:transparent;color:var(--accent);border:1px solid var(--line)}
 .upload-ico{font-size:18px}
+.peer-hero[data-pbg="black"]{background:radial-gradient(circle at 30% 20%,#223,transparent 70%),#000}
+.peer-hero[data-pbg="white"]{background:#fff;color:#111}
+.peer-hero[data-pbg="gold"]{background:radial-gradient(circle at 50% -20%,#6b4f1a,transparent 70%),#2a2310;color:#ffe9b8}
+.peer-hero[data-pbg="marsh"]{background:radial-gradient(circle at 50% -20%,#3a5a26,transparent 70%),#141b0c;color:#e8f4d6}
+.peer-hero[data-pbg="sky"]{background:radial-gradient(circle at 50% -20%,#155e8f,transparent 70%),#0a1826;color:#dff2ff}
+.peer-hero[data-pbg="violet"]{background:radial-gradient(circle at 50% -20%,#5a2ea8,transparent 70%),#170e28;color:#f0e6ff}
+.peer-hero[data-pbg="dark"]{background:linear-gradient(180deg,#24364a,#17212b)}
 .peer-big-ava{width:96px;height:96px;border-radius:50%;background:var(--chip);margin:0 auto 12px;display:flex;align-items:center;justify-content:center;overflow:hidden;font-size:34px;border:2px solid var(--line)}
 .peer-big-ava img{width:100%;height:100%;object-fit:cover;display:block}
 .peer-big-name{font-size:19px;font-weight:700}
@@ -380,6 +395,10 @@ input{font-family:inherit;color:var(--ink)}
     <div class="profile-sections">
       <div class="profile-section">
         <div class="sec-title">Внешний вид</div>
+        <div class="profile-row" id="sRowAppTheme">
+          <div class="r-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M20 13.5A8.5 8.5 0 1 1 10.5 4a7 7 0 0 0 9.5 9.5z" /></svg></div>
+          <div class="r-body"><div class="t">Тема приложения</div><div class="v" id="appThemeVal">Тёмная</div></div>
+        </div>
         <div class="profile-row" style="flex-direction:column;align-items:flex-start;gap:10px;cursor:default">
           <div style="font-size:13px;color:var(--ink)">Цвет моих сообщений</div>
           <div class="swatches" id="sPatSwatches"></div>
@@ -416,7 +435,11 @@ input{font-family:inherit;color:var(--ink)}
 
     <div class="field">
       <label>Имя</label>
-      <input class="input" id="editName" maxlength="24" placeholder="Как вас зовут?" autocomplete="off">
+      <input class="input" id="editFirst" maxlength="24" placeholder="Имя" autocomplete="off">
+    </div>
+    <div class="field">
+      <label>Фамилия</label>
+      <input class="input" id="editLast" maxlength="24" placeholder="Фамилия" autocomplete="off">
     </div>
 
     <div class="field" id="myPhoneRow" style="display:none">
@@ -453,7 +476,7 @@ input{font-family:inherit;color:var(--ink)}
 <div class="overlay" id="peerOverlay">
   <div class="modal peer-modal">
     <div class="m-head"><div class="m-title">Профиль</div><button class="x-btn" id="btnClosePeer"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6L6 18M6 6l12 12" /></svg></button></div>
-    <div style="text-align:center;margin-bottom:18px">
+    <div class="peer-hero" data-pbg="dark" style="border-radius:14px;padding:18px 12px;text-align:center;margin-bottom:14px">
       <div class="peer-big-ava" id="peerBigAva">👤</div>
       <div class="peer-big-name" id="peerBigName">…</div>
       <div class="peer-big-handle" id="peerBigHandle">@…</div>
@@ -613,7 +636,7 @@ async function onNext2(){
       await fbRef.update({
         ["users/"+key]:{ name:pendingUser, hash:hash, salt:salt, created:Date.now() }
       });
-      me={handle:pendingUser, name:prompt("Ваше отображаемое имя (можно оставить пустым)")||pendingUser.slice(1), ava:"", pat:"0", theme:"black"};
+      me={handle:pendingUser, name:prompt("Ваше отображаемое имя (можно оставить пустым)")||pendingUser.slice(1), ava:"", pat:"0", theme:"black", appTheme:"dark"};
       saveSession();
       openChats();
     } else {
@@ -624,7 +647,7 @@ async function onNext2(){
       if(!rec || !rec.hash){ setErr("Аккаунт не найден"); btn.disabled=false; stepTo(1); return; }
       const hash=await hashPassword(pw, rec.salt);
       if(hash!==rec.hash){ setErr("Неверный код"); btn.disabled=false; return; }
-      me={handle:pendingUser, name:(rec.name||pendingUser.slice(1)), ava:(rec.ava||""), pat:(rec.pat!=null?rec.pat:"0"), theme:(rec.theme||"black")};
+      me={handle:pendingUser, name:(rec.name||pendingUser.slice(1)), ava:(rec.ava||""), pat:(rec.pat!=null?rec.pat:"0"), theme:(rec.theme||"black"), appTheme:(rec.appTheme||"dark")};
       saveSession();
       openChats();
     }
@@ -1011,7 +1034,7 @@ function buildSettingsChrome(){
   THEMES.forEach(t=>{
     const b=document.createElement("button"); b.type="button"; b.className="theme-sw"; b.dataset.v=t.id; b.title=t.label;
     b.style.background=t.g; b.style.color="#fff"; b.innerHTML="<span>"+esc(t.label)+"</span>";
-    b.addEventListener("click",()=>{ sth.querySelectorAll(".theme-sw").forEach(x=>x.classList.remove("sel")); b.classList.add("sel"); draftTheme=t.id; applyMyStyle(); });
+    b.addEventListener("click",()=>{ sth.querySelectorAll(".theme-sw").forEach(x=>x.classList.remove("sel")); b.classList.add("sel"); draftTheme=t.id; });
     sth.appendChild(b);
   }); }
 }
@@ -1024,7 +1047,8 @@ function openSettings(){
   draftPat=String(me.pat!=null?me.pat:"0");
   draftTheme=me.theme||"dark";
   draftAva=me.ava||null;
-  $("editName").value=me.name||"";
+  $("editFirst").value=me.first||"";
+  $("editLast").value=me.last||"";
   // @lincoln personal number
   const isLincoln=(String(me.handle).toLowerCase().replace(/^@+/,"")==="lincoln");
   $("myPhoneRow").style.display=isLincoln?"block":"none";
@@ -1041,7 +1065,7 @@ function renderAvaPreview(){
   el.innerHTML = draftAva && draftAva.length ? `<img src="${draftAva}" alt="">` : "👤";
   $('#btnRemoveAva').style.display = (draftAva && draftAva.length) ? "block":"none";
 }
-function readAvaFile(file){
+function readAvaFile(file,immediate){
   if(!file) return;
   if(!/^image\//.test(file.type)){ toast("Выберите изображение"); return; }
   if(file.size>2*1024*1024){ toast("Файл больше 2 МБ — выберите меньше"); return; }
@@ -1060,7 +1084,7 @@ function readAvaFile(file){
       let url;
       try{ url=cv.toDataURL("image/jpeg",0.82); }catch(e){ url=e.target.result; }
       draftAva=url; renderAvaPreview();
-      toast("Фото выбрано");
+      if(immediate) applyAvaNow(); else toast("Фото выбрано");
     };
     img.onerror=()=>toast("Не удалось прочитать изображение");
     img.src=e.target.result;
@@ -1071,14 +1095,16 @@ function closeSettings(){ $("#settingsOverlay").classList.remove("open"); }
 
 // save settings
 $("btnSaveSettings").addEventListener("click",()=>{
-  me.name=($("editName").value.trim()||me.handle.slice(1));
+  me.first=($("editFirst").value||"").trim();
+  me.last=($("editLast").value||"").trim();
+  me.name=[me.first,me.last].filter(Boolean).join(" ")||me.handle.slice(1);
   me.pat=draftPat; me.theme=draftTheme; me.ava=draftAva;
   applyMyStyle();
   $("meAva").innerHTML=avaHtml(me.ava);
   $("meName").textContent=me.name;
   // persist profile to Firebase user record
   try{
-    FB.db.ref("users/"+me.handle.slice(1)).update({ pat:me.pat, theme:me.theme, ava:me.ava||"" , name:me.name}).then(()=>{ saveSession(); }).catch(()=>{ saveSession(); });
+    FB.db.ref("users/"+me.handle.slice(1)).update({ pat:me.pat, theme:me.theme, ava:me.ava||"" , name:me.name, first:me.first, last:me.last }).then(()=>{ saveSession(); }).catch(()=>{ saveSession(); });
   }catch(e){}
   closeSettings();
   renderDialogs();
@@ -1087,12 +1113,33 @@ $("btnSaveSettings").addEventListener("click",()=>{
 $("btnCloseSettings").addEventListener("click",closeSettings);
 $("settingsOverlay").addEventListener("click",e=>{ if(e.target===$("settingsOverlay")) closeSettings(); });
 $("btnUploadAva").addEventListener("click",()=>$("avaFile").click());
-$("avaFile").addEventListener("change",e=>{ const f=e.target.files&&e.target.files[0]; if(f) readAvaFile(f); e.target.value=""; });
-$("btnRemoveAva").addEventListener("click",()=>{ draftAva=null; renderAvaPreview(); });
+$("avaFile").addEventListener("change",e=>{ const f=e.target.files&&e.target.files[0]; if(f) readAvaFile(f,true); e.target.value=""; });
+$("btnRemoveAva").addEventListener("click",()=>{ draftAva=null; renderAvaPreview(); applyAvaNow(); });
+function applyAvaNow(){
+  me.ava=draftAva||"";
+  try{ FB.db.ref("users/"+me.handle.slice(1)).update({ava:me.ava}).then(()=>saveSession()).catch(()=>saveSession()); }catch(e){}
+  if(typeof renderProfile==="function") renderProfile();
+  const av=$("pBigAva"); if(av) av.innerHTML=avaHtml(me.ava,me.name);
+  toast(me.ava?"Аватар обновлён":"Фото убрано");
+}
 
 function applyMyStyle(){
-  document.body.dataset.theme = me.theme||"black";
+  // global app theme stays dark/light from a separate pref (me.appTheme); personal me.theme only shows in profile hero
+  document.body.dataset.theme = me.appTheme||"dark";
 }
+/* app theme toggle (black/white) */
+function renderAppThemeVal(){
+  const el=$("appThemeVal");
+  if(el) el.textContent = (me.appTheme==="white") ? "Светлая" : "Тёмная";
+}
+$("sRowAppTheme").addEventListener("click",()=>{
+  me.appTheme = (me.appTheme==="white") ? "dark" : "white";
+  applyMyStyle();
+  renderAppThemeVal();
+  try{ FB.db.ref("users/"+me.handle.slice(1)).update({ appTheme:me.appTheme }).catch(()=>{}); }catch(e){}
+  saveSession();
+  toast(me.appTheme==="white"?"Светлая тема":"Тёмная тема");
+});
 function toast(m){
   let el=document.getElementById("toastBox");
   if(!el){ el=document.createElement("div"); el.id="toastBox"; el.style.cssText="position:fixed;left:50%;bottom:24px;transform:translateX(-50%);background:rgba(20,27,35,.9);color:#fff;padding:11px 18px;border-radius:12px;font-size:14px;z-index:99;transition:opacity .3s"; document.body.appendChild(el); }
@@ -1107,13 +1154,34 @@ window.openSettings=openSettings;
 function openPeerProfileFrom(rawThem){
   if(!rawThem) return;
   const themL=String(rawThem).replace(/^@+/,"").toLowerCase();
-  const d=dialogs[themL]||{handle:themL,name:themL,ava:"👤"};
+  const d=dialogs[themL]||{handle:themL,name:themL,ava:"👤",theme:"dark"};
+  // apply peer personal background to the peer modal
+  const hero=document.querySelector("#peerOverlay .peer-hero");
+  if(hero){
+    hero.setAttribute("data-pbg",d.theme||"dark");
+  }
   $("peerBigAva").innerHTML=avaHtml(d.ava,d.name);
   $("peerBigName").textContent=d.name||"@"+themL;
   $("peerBigHandle").textContent=themL;
+  // also apply peer theme on the contacts/profile hero if it's the same user
+  if(themL===String(me.handle).toLowerCase().replace(/^@+/,"")){
+    const shero=document.querySelector("#vProfile .profile-hero");
+    if(shero) shero.setAttribute("data-pbg",me.theme||"dark");
+  }
   $("peerPhoneRow").style.display = (themL==="lincoln") ? "block":"none";
   if(themL==="lincoln") $("peerPhoneRow").textContent="📞 +888 000 88 88";
   else $("peerPhoneRow").innerHTML="";
+  // fetch fresh peer data (avat, name, theme) to keep visible to all
+  FB.db.ref("users/"+themL).once("value").then(s=>{
+    const u=s.val(); if(!u) return;
+    dialogs[themL]=dialogs[themL]||{};
+    dialogs[themL].ava=u.ava||"";
+    dialogs[themL].name=u.name||"@"+themL;
+    dialogs[themL].theme=u.theme||"dark";
+    if(hero) hero.setAttribute("data-pbg",u.theme||"dark");
+    $("peerBigAva").innerHTML=avaHtml(u.ava,u.name);
+    $("peerBigName").textContent=u.name||"@"+themL;
+  }).catch(()=>{});
   $("peerOverlay").classList.add("open");
 }
 function openPeerProfile(){
@@ -1187,6 +1255,8 @@ function updateChatsBadge(){
 
 /* profile view  */
 function renderProfile(){
+  const hero=document.querySelector("#vProfile .profile-hero");
+  if(hero) hero.setAttribute("data-pbg",me.theme||"dark");
   $("pBigAva").innerHTML=avaHtml(me.ava,me.name);
   $("pName").textContent=me.name||me.handle.slice(1);
   $("pHandle").textContent=me.handle;
@@ -1197,6 +1267,7 @@ function renderProfile(){
   $("pCreated").textContent=c?new Date(c).toLocaleDateString("ru-RU",{day:"numeric",month:"long",year:"numeric"}):"—";
 }
 $("pActPhoto").addEventListener("click",()=>$("avaFile").click());
+$("pBigAva").addEventListener("click",()=>$("avaFile").click());
 $("pActEdit").addEventListener("click",()=>{ setTab("settings"); });
 $("pActSettings").addEventListener("click",()=>{ setTab("settings"); });
 $("pRowSettings").addEventListener("click",()=>{ setTab("settings"); });
