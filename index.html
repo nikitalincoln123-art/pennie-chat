@@ -1093,10 +1093,21 @@ function sendPhoto(url){
   if(me.blocked && me.blocked[peer]){ toast("Нельзя отправлять заблокированному"); return; }
   const key=dialogKeyOf(me.handle,openChatPeer);
   const msg={from:me.handle, kind:"photo", img:url, t:Date.now()};
+  const baseUrl="https://pennie-chat-default-rtdb.firebaseio.com/msgs/"+key+".json";
+  const doRest=()=>{
+    const pushKey=FB.db.ref("msgs/"+key).push().key;
+    try{
+      fetch(baseUrl.replace(/\.json$/,"/"+pushKey+".json"),{method:"PUT",headers:{"Content-Type":"application/json"},body:JSON.stringify(msg)})
+        .then(r=>{ if(!r.ok) throw new Error("http"+r.status); })
+        .catch(()=>{ toast("Фото не отправилось. Проверьте интернет."); });
+    }catch(e){ toast("Фото не отправилось. Проверьте интернет."); }
+  };
+  let used=false;
   try{
     const pr=FB.db.ref("msgs/"+key).push(msg);
-    if(pr&&pr.then){ pr.catch(()=>{ toast("Фото не отправилось. Проверьте интернет."); }); }
-  }catch(e){ toast("Фото не отправилось. Проверьте интернет."); return; }
+    if(pr&&pr.then){ pr.catch(()=>{ if(!used){ used=true; doRest(); } }); }
+    else used=true;
+  }catch(e){ used=true; doRest(); }
   updateDialogFromMessages(openChatPeer,{x:{from:me.handle,kind:"photo",token:"📷 Фото",t:msg.t}});
   toast("Фото отправлено");
 }
@@ -1123,15 +1134,28 @@ function sendNow(){
   const msg={from:me.handle,text:t,t:Date.now(),glow:glowOn?true:undefined};
   // clear field FIRST so a failing write never leaves text stuck
   el.value="";
-  function onFail(){
+  function onFail(fbErr){
     // restore the text so the user can retry / doesn't lose it
     if(el && t && !el.value){ el.value=t; }
-    toast("Не удалось отправить. Проверьте интернет.");
+    toast("Не удалось отправить"+(fbErr&&fbErr.code?" ("+fbErr.code+")":"")+". Проверьте интернет.");
   }
+  const failAll=(fbErr)=>{ onFail(fbErr); };
+  // 1) try REST fetch first (reliable where Firebase SDK websocket drops)
+  const pushKey=FB.db.ref("msgs/"+key).push().key;
+  const baseUrl="https://pennie-chat-default-rtdb.firebaseio.com/msgs/"+key+"/"+pushKey+".json";
+  let sent=false;
   try{
-    const pr=FB.db.ref("msgs/"+key).push(msg);
-    if(pr&&pr.then){ pr.catch(onFail); }
-  }catch(e){ onFail(); }
+    fetch(baseUrl,{method:"PUT",headers:{"Content-Type":"application/json"},body:JSON.stringify(msg)})
+      .then(r=>{ if(r.ok){ sent=true; return; } throw new Error("http"+r.status); })
+      .catch(()=>{
+        // 2) fallback to SDK push (if REST failed, websocket may still work)
+        try{
+          const pr=FB.db.ref("msgs/"+key).push(msg);
+          if(pr&&pr.then){ pr.catch(e=>{ if(!sent) failAll(e); }); }
+          else failAll(null);
+        }catch(e){ if(!sent) failAll(e); }
+      });
+  }catch(e){ failAll(e); }
   updateDialogFromMessages(openChatPeer,{x:{from:me.handle,text:t,t:msg.t}});
 }
 $("btnSend").addEventListener("click",sendNow);
