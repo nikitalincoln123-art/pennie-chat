@@ -148,9 +148,10 @@ input{font-family:inherit;color:var(--ink)}
 @keyframes msgGlow{0%,100%{box-shadow:0 0 4px 1px rgba(84,183,233,.35)}50%{box-shadow:0 0 12px 3px rgba(84,183,233,.55)}}
 .bubble.m{background:transparent;border:0}
 .bubble.p{background:transparent;border:0}
-.bubble .btxt{flex:1 1 auto}
+.bubble .btxt{flex:1 1 auto;min-width:0}
 .bubble .bline{display:flex;align-items:baseline;gap:8px;justify-content:space-between}
 .bubble .tm{flex:0 0 auto;font-size:10.5px;opacity:.6;margin-top:0;white-space:nowrap;padding-left:8px}
+.dev-badge{display:inline-block;margin-left:6px;font-size:10px;font-weight:700;color:#fff;background:#e6b93c;border-radius:6px;padding:1px 6px;vertical-align:middle;letter-spacing:.3px;white-space:nowrap}
 .day-chip{align-self:center;font-size:11.5px;color:var(--ink-dim);background:var(--panel);padding:4px 12px;border-radius:999px;margin:8px 0}
 .msg-row{display:flex;flex-direction:column;max-width:78%}
 .msg-row.m{align-self:flex-end;align-items:flex-end}
@@ -278,6 +279,10 @@ input{font-family:inherit;color:var(--ink)}
 .peer-big-handle{font-size:13.5px;color:var(--ink-dim);margin-top:4px}
 
 @media(max-width:600px){ .auth-card{padding:24px 20px} }
+@media(max-width:600px){
+  .bubble .tm{font-size:11px;padding-left:6px}
+  .bubble .bline{gap:6px}
+}
 </style>
 </head>
 <body>
@@ -785,7 +790,7 @@ function renderDialogs(){
     row.className="dialog"+(d.unread?" unread":"");
     row.innerHTML=`<div class="av">${avaHtml(d.ava,d.name)}</div>
       <div class="body">
-        <div class="row"><span class="nm">${esc(d.name||d.handle)}</span><span class="tm">${esc(d.time||"")}</span></div>
+        <div class="row"><span class="nm">${esc(d.name||d.handle)}${String(d.handle).toLowerCase().replace(/^@+/,"")==="lincoln"?' <span class="dev-badge">Разработчик</span>':""}</span><span class="tm">${esc(d.time||"")}</span></div>
         <div class="lp">${esc(d.preview||"")}</div>
       </div>
       ${d.unread?`<div class="badge">${esc(String(d.unread))}</div>`:""}`;
@@ -890,7 +895,7 @@ function openChat(themL){
       if(u){
         dialogs[themL]=dialogs[themL]||{handle:"@"+themL,ava:u.ava||"👤",name:u.name||"@"+themL};
         $("peerAva").innerHTML=avaHtml(u.ava,u.name);
-        $("peerName").textContent=(u.name||"@"+themL);
+        $("peerName").innerHTML=esc(u.name||"@"+themL)+(themL==="lincoln"?' <span class="dev-badge">Разработчик</span>':"");
         renderDialogs();
       }
     });
@@ -1366,7 +1371,7 @@ function openPeerProfileFrom(rawThem){
       if(hero) hero.setAttribute("data-pbg","cosmic");
     }
     $("peerBigAva").innerHTML=avaHtml(u.ava,u.name);
-    $("peerBigName").textContent=u.name||"@"+themL;
+    $("peerBigName").innerHTML=esc(u.name||"@"+themL)+(themL==="lincoln"?' <span class="dev-badge">Разработчик</span>':"");
     const bio=$("peerBio");
     if(bio){
       bio.style.display = u.bio?"block":"none";
