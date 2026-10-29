@@ -393,6 +393,7 @@ input{font-family:inherit;color:var(--ink)}
         <div class="profile-row"><div class="r-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.9v3a2 2 0 0 1-2.2 2 19.8 19.8 0 0 1-8.6-3 19.5 19.5 0 0 1-6-6 19.8 19.8 0 0 1-3-8.6A2 2 0 0 1 4.1 2h3a2 2 0 0 1 2 1.7c.1 1 .4 2 .7 2.8a2 2 0 0 1-.5 2.1L8.1 9.9a16 16 0 0 0 6 6l1.3-1.2a2 2 0 0 1 2.1-.5c.9.3 1.9.6 2.9.7a2 2 0 0 1 1.7 2z" /></svg></div><div class="r-body"><div class="t">Персональный номер</div><div class="v" id="pPhone">—</div></div></div>
         <div class="profile-row"><div class="r-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" /><circle cx="12" cy="7" r="4" /></svg></div><div class="r-body"><div class="t">Юзернейм</div><div class="v" id="pHandle2">@…</div></div></div>
         <div class="profile-row"><div class="r-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M4 6h16M4 12h16M4 18h10" /></svg></div><div class="r-body"><div class="t">О себе</div><div class="v" id="pBio" style="white-space:pre-wrap">—</div></div></div>
+        <div class="profile-row"><div class="r-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" /><path d="M8 2v4M16 2v4M3 10h18" /></svg></div><div class="r-body"><div class="t">День рождения</div><div class="v" id="pBirth">—</div></div></div>
         <div class="profile-row"><div class="r-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10" /><path d="M12 6v6l4 2" /></svg></div><div class="r-body"><div class="t">Зарегистрирован</div><div class="v" id="pCreated">—</div></div></div>
       </div>
       <div class="profile-section">
@@ -439,6 +440,12 @@ input{font-family:inherit;color:var(--ink)}
         </div>
       </div>
       <div class="profile-section">
+        <div class="sec-title">Приватность</div>
+        <div class="profile-row" id="sRowHideSeen"><div class="r-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7-10-7-10-7z" /><circle cx="12" cy="12" r="3" /></svg></div><div class="r-body"><div class="t">Скрывать «в сети»</div><div class="v" id="sHideSeenVal">Нет</div></div></div>
+        <div class="profile-row" id="sRowHideAva"><div class="r-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" /><circle cx="12" cy="7" r="4" /></svg></div><div class="r-body"><div class="t">Скрывать аватарку</div><div class="v" id="sHideAvaVal">Нет</div></div></div>
+        <div class="profile-row" id="sRowHidePhone"><div class="r-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.9v3a2 2 0 0 1-2.2 2 19.8 19.8 0 0 1-8.6-3 19.5 19.5 0 0 1-6-6 19.8 19.8 0 0 1-3-8.6A2 2 0 0 1 4.1 2h3a2 2 0 0 1 2 1.7c.1 1 .4 2 .7 2.8a2 2 0 0 1-.5 2.1L8.1 9.9a16 16 0 0 0 6 6l1.3-1.2a2 2 0 0 1 2.1-.5c.9.3 1.9.6 2.9.7a2 2 0 0 1 1.7 2z" /></svg></div><div class="r-body"><div class="t">Скрыть номер телефона</div><div class="v" id="sHidePhoneVal">Нет</div></div></div>
+      </div>
+      <div class="profile-section">
         <div class="sec-title">Аккаунт</div>
         <div class="profile-row" id="sRowLogout"><div class="r-ic" style="color:var(--bad,#f8708e)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" /><path d="M16 17l5-5-5-5M21 12H9" /></svg></div><div class="r-body"><div class="t" style="color:var(--bad,#f8708e)">Выйти из аккаунта</div></div></div>
       </div>
@@ -482,6 +489,11 @@ input{font-family:inherit;color:var(--ink)}
     </div>
 
     <div class="field">
+      <label>Дата рождения</label>
+      <input class="input" id="editBirth" type="date">
+    </div>
+
+    <div class="field">
       <label>Аватар</label>
       <div class="ava-zone">
         <div class="ava-preview" id="avaPreview">👤</div>
@@ -512,6 +524,7 @@ input{font-family:inherit;color:var(--ink)}
     </div>
     <div class="code-hint" id="peerPhoneRow" style="display:none;text-align:center;font-size:17px;color:var(--ink);margin-bottom:14px"></div>
     <div class="peer-bio" id="peerBio" style="display:none;font-size:13.5px;color:var(--ink-dim);text-align:center;white-space:pre-wrap;margin-bottom:12px;padding:10px 12px;background:var(--bg-in);border-radius:12px"></div>
+    <div class="peer-meta" id="peerMeta" style="font-size:13px;color:var(--ink-dim);text-align:center;margin-bottom:12px;line-height:1.6"></div>
     <div class="field" style="text-align:center;color:var(--ink-dim);font-size:13.5px;line-height:1.6">
       Вы переписываетесь с этим собеседником один на один. Ваши сообщения видны только вам двоим.
     </div>
@@ -575,6 +588,15 @@ function normHandle(raw){
 function hex(b){return Array.from(new Uint8Array(b)).map(x=>x.toString(16).padStart(2,"0")).join("");}
 function unhex(s){const a=new Uint8Array(s.length/2);for(let i=0;i<a.length;i++)a[i]=parseInt(s.substr(i*2,2),16);return a;}
 const enc=new TextEncoder();
+function lastSeenText(ts){
+  if(!ts) return "";
+  const diff=Date.now()-ts;
+  if(diff<60*1000) return "Был(а) в сети только что";
+  if(diff<3600*1000){ const m=Math.floor(diff/60000); return "Был(а) в сети "+m+" мин назад"; }
+  if(diff<24*3600*1000){ const h=Math.floor(diff/3600000); return "Был(а) в сети "+h+" ч назад"; }
+  const d=new Date(ts);
+  return "Был(а) в сети "+d.toLocaleDateString("ru-RU",{day:"numeric",month:"long"});
+}
 
 async function hashPassword(pw,saltHex){
   const key=await crypto.subtle.importKey("raw",enc.encode(pw),"PBKDF2",false,["deriveBits"]);
@@ -667,7 +689,7 @@ async function onNext2(){
       await fbRef.update({
         ["users/"+key]:{ name:pendingUser, hash:hash, salt:salt, created:Date.now() }
       });
-      me={handle:pendingUser, name:prompt("Ваше отображаемое имя (можно оставить пустым)")||pendingUser.slice(1), ava:"", pat:"0", theme:"black", appTheme:"dark"};
+      me={handle:pendingUser, name:prompt("Ваше отображаемое имя (можно оставить пустым)")||pendingUser.slice(1), ava:"", pat:"0", theme:"black", appTheme:"dark", created:Date.now(), bio:"", birth:""};
       saveSession();
       openChats();
     } else {
@@ -678,7 +700,12 @@ async function onNext2(){
       if(!rec || !rec.hash){ setErr("Аккаунт не найден"); btn.disabled=false; stepTo(1); return; }
       const hash=await hashPassword(pw, rec.salt);
       if(hash!==rec.hash){ setErr("Неверный код"); btn.disabled=false; return; }
-      me={handle:pendingUser, name:(rec.name||pendingUser.slice(1)), ava:(rec.ava||""), pat:(rec.pat!=null?rec.pat:"0"), theme:(rec.theme||"black"), appTheme:(rec.appTheme||"dark"), blocked:(rec.blocked||{}), bio:(rec.bio||"")};
+      me={handle:pendingUser, name:(rec.name||pendingUser.slice(1)), ava:(rec.ava||""), pat:(rec.pat!=null?rec.pat:"0"), theme:(rec.theme||"black"), appTheme:(rec.appTheme||"dark"), blocked:(rec.blocked||{}), bio:(rec.bio||""), created:(rec.created||Date.now()), birth:(rec.birth||"")};
+      // record lastSeen on login
+      try{ FB.db.ref("users/"+me.handle.slice(1)).update({lastSeen:Date.now(),on:true}).catch(()=>{}); }catch(e){}
+      // heartbeat keeps lastSeen fresh
+      setInterval(()=>{ try{ FB.db.ref("users/"+me.handle.slice(1)).update({lastSeen:Date.now(),on:true}).catch(()=>{}); }catch(e){} },30000);
+      window.addEventListener("beforeunload",()=>{ try{ FB.db.ref("users/"+me.handle.slice(1)).update({on:false,lastSeen:Date.now()}).catch(()=>{}); }catch(e){} });
       saveSession();
       openChats();
     }
@@ -1158,6 +1185,7 @@ function openSettings(){
   $("editFirst").value=me.first||"";
   $("editLast").value=me.last||"";
   const ebio=$("editBio"); if(ebio) ebio.value=me.bio||"";
+  const ebirth=$("editBirth"); if(ebirth) ebirth.value=me.birth||"";
   // @lincoln personal number
   const isLincoln=(String(me.handle).toLowerCase().replace(/^@+/,"")==="lincoln");
   $("myPhoneRow").style.display=isLincoln?"block":"none";
@@ -1207,13 +1235,14 @@ $("btnSaveSettings").addEventListener("click",()=>{
   me.last=($("editLast").value||"").trim();
   me.name=[me.first,me.last].filter(Boolean).join(" ")||me.handle.slice(1);
   me.bio=($("editBio").value||"").trim();
+  me.birth=$("editBirth").value||"";
   me.pat=draftPat; me.theme=draftTheme; me.ava=draftAva;
   applyMyStyle();
   const mav=$("meAva"); if(mav) mav.innerHTML=avaHtml(me.ava,me.name);
   const mnm=$("meName"); if(mnm) mnm.textContent=me.name;
   // persist profile to Firebase user record
   try{
-    FB.db.ref("users/"+me.handle.slice(1)).update({ pat:me.pat, theme:me.theme, ava:me.ava||"" , name:me.name, first:me.first, last:me.last, bio:me.bio }).then(()=>{ saveSession(); }).catch(()=>{ saveSession(); });
+    FB.db.ref("users/"+me.handle.slice(1)).update({ pat:me.pat, theme:me.theme, ava:me.ava||"" , name:me.name, first:me.first, last:me.last, bio:me.bio, birth:me.birth||"" }).then(()=>{ saveSession(); }).catch(()=>{ saveSession(); });
   }catch(e){}
   closeSettings();
   renderDialogs();
@@ -1289,16 +1318,25 @@ function openPeerProfileFrom(rawThem){
   $("peerPhoneRow").style.display = (themL==="lincoln") ? "block":"none";
   if(themL==="lincoln") $("peerPhoneRow").textContent="📞 +888 000 88 88";
   else $("peerPhoneRow").innerHTML="";
-  // fetch fresh peer data (ava, name, theme, bio) to keep visible to all
+  // fetch fresh peer data (ava, name, theme, bio, privacy) to keep visible to all
   FB.db.ref("users/"+themL).once("value").then(s=>{
     const u=s.val(); if(!u) return;
+    const priv=u.privacy||{seen:false,ava:false,phone:false};
     dialogs[themL]=dialogs[themL]||{};
     dialogs[themL].ava=u.ava||"";
     dialogs[themL].name=u.name||"@"+themL;
     dialogs[themL].theme=u.theme||"dark";
     dialogs[themL].bio=u.bio||"";
     if(hero) hero.setAttribute("data-pbg",u.theme||"dark");
-    // Lincoln always gets cosmic background + Pepe gifts (visible to all)
+    // privacy: hide avatar if peer disabled it
+    $("peerBigAva").innerHTML = priv.ava ? "🙂" : avaHtml(u.ava,u.name);
+    // privacy: hide phone/lincoln number if disabled
+    const ppr=$("peerPhoneRow");
+    if(ppr){
+      if(priv.phone){ ppr.style.display="none"; }
+      else if(themL==="lincoln"){ ppr.style.display="block"; ppr.textContent="📞 +888 000 88 88"; }
+      else ppr.style.display="none";
+    }
     if(themL==="lincoln"){
       if(hero) hero.setAttribute("data-pbg","cosmic");
       // inject Pepe gifts into peer hero
@@ -1318,6 +1356,16 @@ function openPeerProfileFrom(rawThem){
     if(bio){
       bio.style.display = u.bio?"block":"none";
       bio.textContent = u.bio||"";
+    }
+    const pm=$("peerMeta");
+    if(pm){
+      let txt="";
+      if(u.created) txt+="Регистрация: "+new Date(u.created).toLocaleDateString("ru-RU",{day:"numeric",month:"long",year:"numeric"})+"\n";
+      if(u.birth) txt+="День рождения: "+new Date(u.birth).toLocaleDateString("ru-RU",{day:"numeric",month:"long"})+"\n";
+      if(!priv.seen && u.lastSeen) txt+="Последний раз в сети: "+lastSeenText(u.lastSeen);
+      if(priv.seen) txt+="Онлайн-статус скрыт";
+      pm.style.whiteSpace="pre-wrap";
+      pm.textContent=txt;
     }
   }).catch(()=>{});
   $("peerOverlay").classList.add("open");
@@ -1379,6 +1427,25 @@ function setTab(tab){
   if(tab==="profile") renderProfile();
 }
 $("sRowLogout").addEventListener("click",()=>{ $("btnLogout").click(); });
+/* privacy toggles */
+me.privacy=me.privacy||{seen:false,ava:false,phone:false};
+function renderPrivacyVals(){
+  const f=(id,v)=> { const e=$(id); if(e) e.textContent = v?"Да":"Нет"; };
+  f("sHideSeenVal", !!(me.privacy&&me.privacy.seen));
+  f("sHideAvaVal", !!(me.privacy&&me.privacy.ava));
+  f("sHidePhoneVal", !!(me.privacy&&me.privacy.phone));
+}
+function togglePrivacy(key){
+  me.privacy=me.privacy||{seen:false,ava:false,phone:false};
+  me.privacy[key]=!me.privacy[key];
+  renderPrivacyVals();
+  saveSession();
+  try{ FB.db.ref("users/"+me.handle.slice(1)).update({privacy:me.privacy}).catch(()=>{}); }catch(e){}
+  toast("Настройка приватности обновлена");
+}
+$("sRowHideSeen").addEventListener("click",()=>togglePrivacy("seen"));
+$("sRowHideAva").addEventListener("click",()=>togglePrivacy("ava"));
+$("sRowHidePhone").addEventListener("click",()=>togglePrivacy("phone"));
 function saveSettingsView(){
   me.pat=draftPat; me.theme=draftTheme;
   applyMyStyle();
@@ -1416,10 +1483,18 @@ function renderProfile(){
   $("pName").textContent=me.name||me.handle.slice(1);
   $("pHandle").textContent=me.handle;
   $("pHandle2").textContent=me.handle;
-  $("pPhone").textContent=isLincoln?"+888 000 88 88":"—";
+  $("pPhone").textContent=(me.privacy&&me.privacy.phone)? "—":(isLincoln?"+888 000 88 88":"—");
   const c=me.created||null;
   $("pCreated").textContent=c?new Date(c).toLocaleDateString("ru-RU",{day:"numeric",month:"long",year:"numeric"}):"—";
   const pb=$("pBio"); if(pb) pb.textContent=me.bio||"—";
+  const pbr=$("pBirth");
+  if(pbr) pbr.textContent = me.birth ? new Date(me.birth).toLocaleDateString("ru-RU",{day:"numeric",month:"long",year:"numeric"}) : "—";
+  // status line in hero
+  const ps=$("pStatus");
+  if(ps){
+    if(me.privacy && me.privacy.seen) ps.textContent="● в сети (скрыт)";
+    else ps.textContent="● в сети";
+  }
 }
 $("pActPhoto").addEventListener("click",()=>$("pAvaFile").click());
 $("pBigAva").addEventListener("click",()=>$("pAvaFile").click());
@@ -1477,6 +1552,7 @@ function openSettingsFromView(){
   draftAva=me.ava||null;
   glowOn=!!me.glow;
   renderGlowVal();
+  renderPrivacyVals();
   const sp2=$("#sPatSwatches"); if(sp2) sp2.querySelectorAll(".swatch").forEach(x=>x.classList.toggle("sel",x.dataset.v===draftPat));
   const st2=$("#sThemeSwatches"); if(st2) st2.querySelectorAll(".theme-sw").forEach(x=>x.classList.toggle("sel",x.dataset.v===draftTheme));
 }
