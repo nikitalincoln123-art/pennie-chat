@@ -30,6 +30,23 @@ body[data-theme="marsh"]{--bg:#101609;--bg-in:#161f0e;--panel:#1c2713;--panel2:#
 body[data-theme="sky"]{--bg:#0a1420;--bg-in:#0e1c2e;--panel:#14283c;--panel2:#1a334d;--chip:#234a6b;--line:#22405e;--ink:#eaf6ff;--ink-dim:#9cc2e0;--accent:#4db6f0}
 body[data-theme="violet"]{--bg:#130a20;--bg-in:#1a0e2e;--panel:#221344;--panel2:#2c1a56;--chip:#3c256e;--line:#342056;--ink:#f4edff;--ink-dim:#c2a8ec;--accent:#a06bf0}
 
+/* ============ animated background ============ */
+#bgFx{position:fixed;inset:0;z-index:0;overflow:hidden;pointer-events:none}
+.view{position:relative;z-index:1}
+.overlay{z-index:50}
+.modal{z-index:51}
+#bgFx .orb{position:absolute;border-radius:50%;filter:blur(90px);opacity:.5;mix-blend-mode:screen;animation:orbFloat 22s ease-in-out infinite}
+#bgFx .orb1{width:420px;height:420px;left:-100px;top:-80px;background:radial-gradient(circle,#4f9bd4,transparent 70%)}
+#bgFx .orb2{width:380px;height:380px;right:-90px;top:25%;background:radial-gradient(circle,#a06bf0,transparent 70%);animation-delay:-6s}
+#bgFx .orb3{width:360px;height:360px;left:30%;bottom:-120px;background:radial-gradient(circle,#ff5e8a,transparent 70%);animation-delay:-12s}
+@keyframes orbFloat{0%,100%{transform:translate(0,0) scale(1)}33%{transform:translate(40px,30px) scale(1.15)}66%{transform:translate(-30px,50px) scale(.9)}}
+#bgFx .dust{position:absolute;width:3px;height:3px;border-radius:50%;background:#fff;opacity:0;animation:dustRise 8s linear infinite}
+@keyframes dustRise{0%{transform:translateY(110vh) translateX(0);opacity:0}12%{opacity:.7}90%{opacity:.2}100%{transform:translateY(-10vh) translateX(60px);opacity:0}}
+body[data-theme="black"] #bgFx .orb{display:block}
+/* default theme is black (animated) unless user picked another */
+body:not([data-theme]){ --bg:#000; }
+@media (prefers-reduced-motion:reduce){ #bgFx{display:none} }
+
 /* ============ patterned my-message colors ============ */
 .bubble.m,.bubble.patta,.bubble.patpa{
   color:#fff;background:var(--mine);
@@ -110,6 +127,9 @@ input{font-family:inherit;color:var(--ink)}
 .dialog .body .nm{font-weight:700;font-size:15px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .dialog .body .tm{font-size:11.5px;color:var(--ink-dim);margin-left:auto}
 .dialog .body .lp{font-size:13.5px;color:var(--ink-dim);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-top:2px}
+.dialog .badge{min-width:20px;height:20px;border-radius:10px;background:var(--accent);color:#0b141a;font-size:12px;font-weight:700;
+  display:flex;align-items:center;justify-content:center;padding:0 6px;flex:0 0 auto}
+.dialog.unread .nm{color:var(--accent)}
 .result-card{background:var(--panel);border:1px solid var(--line);border-radius:14px;margin:10px 14px;padding:16px;display:flex;align-items:center;gap:14px}
 .result-card .av{width:52px;height:52px;border-radius:50%;background:var(--chip);display:flex;align-items:center;justify-content:center;font-size:26px;flex:0 0 auto}
 .result-card .r-body{flex:1;min-width:0}
@@ -189,6 +209,12 @@ input{font-family:inherit;color:var(--ink)}
 </head>
 <body>
 
+<div id="bgFx" aria-hidden="true">
+  <div class="orb orb1"></div>
+  <div class="orb orb2"></div>
+  <div class="orb orb3"></div>
+</div>
+
 <!-- ============ AUTH VIEW ============ -->
 <div class="view active" id="vAuth">
   <div class="auth-card">
@@ -212,7 +238,9 @@ input{font-family:inherit;color:var(--ink)}
       <div class="code-hint" id="codeHint" style="display:none"></div>
       <button class="btn" id="authNext2">Продолжить</button>
       <div class="err-msg" id="authErr"></div>
-      <div class="auth-switch"><button id="authBack" type="button">← Назад</button></div>
+      <div class="auth-switch"><button id="authBack" type="button">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-3px;margin-right:6px"><path d="M19 12H5M12 19l-7-7 7-7" /></svg>
+          Назад</button></div>
     </div>
   </div>
 </div>
@@ -220,10 +248,16 @@ input{font-family:inherit;color:var(--ink)}
 <!-- ============ CHATS VIEW ============ -->
 <div class="view" id="vChats">
   <div class="topbar">
-    <div class="me-ava" id="meAva">😊</div>
-    <div class="me-name"><div class="n" id="meName">…</div><div class="s" id="meLogin">@…</div></div>
-    <button class="icon-btn" id="btnSettingsChats" title="Профиль и вид">🎨</button>
-    <button class="icon-btn" id="btnLogout" title="Выйти">⏻</button>
+    <button class="me-self" id="meSelf" style="border:none;background:none;padding:0;display:flex;align-items:center;gap:12px;flex:1;min-width:0;cursor:pointer;text-align:left">
+      <div class="me-ava" id="meAva">😊</div>
+      <div class="me-name"><div class="n" id="meName">…</div><div class="s" id="meLogin">@…</div></div>
+    </button>
+    <button class="icon-btn" id="btnSettingsChats" title="Профиль и вид">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3" /><path d="M12 2v3M12 19v3M2 12h3M19 12h3M4.9 4.9l2.1 2.1M17 17l2.1 2.1M19.1 4.9L17 7M7 17l-2.1 2.1" /></svg>
+    </button>
+    <button class="icon-btn" id="btnLogout" title="Выйти">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" /><path d="M16 17l5-5-5-5M21 12H9" /></svg>
+    </button>
   </div>
   <div class="searchbar">
     <input class="search-input" id="searchUser" placeholder="Найти собеседника по @юзернейму…" autocomplete="off" spellcheck="false">
@@ -235,7 +269,9 @@ input{font-family:inherit;color:var(--ink)}
 <!-- ============ CHAT VIEW ============ -->
 <div class="view" id="vChat">
   <div class="topbar">
-    <button class="icon-btn" id="btnBack" title="Назад">←</button>
+    <button class="icon-btn" id="btnBack" title="Назад">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6" /></svg>
+    </button>
     <button class="peer-click" id="peerClick" style="border:none;background:none;padding:0;display:flex;align-items:center;gap:11px;flex:1;min-width:0;cursor:pointer;text-align:left">
       <div class="peer-ava" id="peerAva">👤</div>
       <div class="peer-name"><div class="n" id="peerName">…</div></div>
@@ -245,18 +281,25 @@ input{font-family:inherit;color:var(--ink)}
   <div class="typing-ind" id="typingInd" style="display:none">собеседник печатает…</div>
   <div class="chat-input-bar">
     <textarea id="chatText" rows="1" placeholder="Сообщение…" maxlength="4000"></textarea>
-    <button class="send-btn" id="btnSend">➤</button>
+    <button class="send-btn" id="btnSend">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor"><path d="M3.4 20.4l17.9-7.6a1.3 1.3 0 0 0 0-2.4L3.4 2.8a1 1 0 0 0-1.36 1.28l2.1 6.3a1 1 0 0 0 .8.68l8.3 1.2-8.3 1.2a1 1 0 0 0-.8.68l-2.1 6.3a1 1 0 0 0 1.36 1.36z" /></svg>
+    </button>
   </div>
 </div>
 
 <!-- ============ SETTINGS MODAL ============ -->
 <div class="overlay" id="settingsOverlay">
   <div class="modal">
-    <div class="m-head"><div class="m-title">Мой профиль</div><button class="x-btn" id="btnCloseSettings">✕</button></div>
+    <div class="m-head"><div class="m-title">Мой профиль</div><button class="x-btn" id="btnCloseSettings"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6L6 18M6 6l12 12" /></svg></button></div>
 
     <div class="field">
       <label>Имя</label>
       <input class="input" id="editName" maxlength="24" placeholder="Как вас зовут?" autocomplete="off">
+    </div>
+
+    <div class="field" id="myPhoneRow" style="display:none">
+      <label>Персональный номер</label>
+      <div class="code-hint" id="myPhoneVal" style="text-align:left;margin-top:0;font-size:17px;color:var(--ink)"></div>
     </div>
 
     <div class="field">
@@ -287,12 +330,13 @@ input{font-family:inherit;color:var(--ink)}
 <!-- ============ PEER PROFILE MODAL ============ -->
 <div class="overlay" id="peerOverlay">
   <div class="modal peer-modal">
-    <div class="m-head"><div class="m-title">Профиль</div><button class="x-btn" id="btnClosePeer">✕</button></div>
+    <div class="m-head"><div class="m-title">Профиль</div><button class="x-btn" id="btnClosePeer"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6L6 18M6 6l12 12" /></svg></button></div>
     <div style="text-align:center;margin-bottom:18px">
       <div class="peer-big-ava" id="peerBigAva">👤</div>
       <div class="peer-big-name" id="peerBigName">…</div>
       <div class="peer-big-handle" id="peerBigHandle">@…</div>
     </div>
+    <div class="code-hint" id="peerPhoneRow" style="display:none;text-align:center;font-size:17px;color:var(--ink);margin-bottom:14px"></div>
     <div class="field" style="text-align:center;color:var(--ink-dim);font-size:13.5px;line-height:1.6">
       Вы переписываетесь с этим собеседником один на один. Ваши сообщения видны только вам двоим.
     </div>
@@ -333,16 +377,24 @@ const FB=(()=>{try{
 
 /* ---------- helpers ---------- */
 function esc(s){return String(s==null?"":s).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));}
-function avaHtml(a){
+function avaLetters(name){
+  const letters=["#4f9bd4","#a06bf0","#ff5e8a","#34d399","#f59e0b","#22d3ee"];
+  let n="";
+  const s=String(name||"?").trim();
+  if(s) n=s[0].toUpperCase();
+  let code=0; for(let i=0;i<s.length;i++) code+=s.charCodeAt(i);
+  return {ch:n, color:letters[code%letters.length]};
+}
+function avaHtml(a,name){
   if(a && /^data:image\//.test(a)) return `<img src="${a}" alt="" style="width:100%;height:100%;object-fit:cover;border-radius:50%">`;
-  return esc(a||"👤");
+  const L=avaLetters(name);
+  return `<span style="color:#fff;font-weight:700;display:flex;align-items:center;justify-content:center;width:100%;height:100%;border-radius:50%;background:${L.color}">${esc(L.ch||"?")}</span>`;
 }
 function normHandle(raw){
-  let s=String(raw||"").trim();
-  if(!s.startsWith("@")) return null;
-  const b=s.slice(1);
-  if(!/^[A-Za-z0-9_]{3,19}$/.test(b)) return null;
-  return "@"+b;
+  // strip leading @ and whitespace, keep a-z0-9_, require 1-19 chars
+  let s=String(raw||"").trim().replace(/^@+/,"");
+  if(!/^[A-Za-z0-9_]{1,19}$/.test(s)) return null;
+  return "@"+s;
 }
 function hex(b){return Array.from(new Uint8Array(b)).map(x=>x.toString(16).padStart(2,"0")).join("");}
 function unhex(s){const a=new Uint8Array(s.length/2);for(let i=0;i<a.length;i++)a[i]=parseInt(s.substr(i*2,2),16);return a;}
@@ -436,7 +488,7 @@ async function onNext2(){
       await fbRef.update({
         ["users/"+key]:{ name:pendingUser, hash:hash, salt:salt, created:Date.now() }
       });
-      me={handle:pendingUser, name:prompt("Ваше отображаемое имя (можно оставить пустым)")||pendingUser.slice(1), ava:"", pat:"0", theme:"dark"};
+      me={handle:pendingUser, name:prompt("Ваше отображаемое имя (можно оставить пустым)")||pendingUser.slice(1), ava:"", pat:"0", theme:"black"};
       saveSession();
       openChats();
     } else {
@@ -447,7 +499,7 @@ async function onNext2(){
       if(!rec || !rec.hash){ setErr("Аккаунт не найден"); btn.disabled=false; stepTo(1); return; }
       const hash=await hashPassword(pw, rec.salt);
       if(hash!==rec.hash){ setErr("Неверный код"); btn.disabled=false; return; }
-      me={handle:pendingUser, name:(rec.name||pendingUser.slice(1)), ava:(rec.ava||""), pat:(rec.pat!=null?rec.pat:"0"), theme:(rec.theme||"dark")};
+      me={handle:pendingUser, name:(rec.name||pendingUser.slice(1)), ava:(rec.ava||""), pat:(rec.pat!=null?rec.pat:"0"), theme:(rec.theme||"black")};
       saveSession();
       openChats();
     }
@@ -463,7 +515,7 @@ let dialogs={}, dialogRefs=[];
 function openChats(){
   showView("vChats");
   applyMyStyle();
-  $("meAva").innerHTML=avaHtml(me.ava);
+  $("meAva").innerHTML=avaHtml(me.ava,me.name);
   $("meName").textContent=me.name||me.handle.slice(1);
   $("meLogin").textContent=me.handle;
   $("searchUser").value="";
@@ -502,6 +554,16 @@ function loadDialogs(){
     const raw=localStorage.getItem("pennie_dialogs_"+me.handle);
     dialogs = raw?JSON.parse(raw):{};
   }catch(e){ dialogs={}; }
+  // normalize keys: strip stray @ and lowercase; dedupe
+  const clean={};
+  Object.keys(dialogs||{}).forEach(k=>{
+    const bare=String(k).replace(/^@+/,"").toLowerCase();
+    if(!bare) return;
+    const d=Object.assign({},dialogs[k]);
+    d.handle=bare;
+    if(!clean[bare] || (d.t||0) > (clean[bare].t||0)) clean[bare]=d;
+  });
+  dialogs=clean;
   renderDialogs();
   try{ Object.keys(dialogs).forEach(k=>attachMyListener(k)); }catch(e){}
 }
@@ -515,45 +577,71 @@ function renderDialogs(){
   }
   arr.forEach(d=>{
     const row=document.createElement("div");
-    row.className="dialog";
-    row.innerHTML=`<div class="av">${avaHtml(d.ava)}</div>
+    row.className="dialog"+(d.unread?" unread":"");
+    row.innerHTML=`<div class="av">${avaHtml(d.ava,d.name)}</div>
       <div class="body">
         <div class="row"><span class="nm">${esc(d.name||d.handle)}</span><span class="tm">${esc(d.time||"")}</span></div>
         <div class="lp">${esc(d.preview||"")}</div>
-      </div>`;
-    row.addEventListener("click",()=>openInstant(me.handle,d.handle));
+      </div>
+      ${d.unread?`<div class="badge">${esc(String(d.unread))}</div>`:""}`;
+    row.addEventListener("click",()=>{ clearUnread(d.handle); openInstant(me.handle,d.handle); });
     row.addEventListener("contextmenu",ev=>{ ev.preventDefault(); openPeerFromList(d.handle); });
     el.appendChild(row);
   });
 }
 
 function dialogKeyOf(a,b){
-  const x=a.toLowerCase(), y=b.toLowerCase();
+  const x=String(a).replace(/^@+/,"").toLowerCase();
+  const y=String(b).replace(/^@+/,"").toLowerCase();
   return x<y ? x+"__"+y : y+"__"+x;
 }
 function openInstant(meHandle,themFull){
-  const themL=String(themFull).toLowerCase();
-  const dlg=dialogs[themL]||{handle:themFull,name:themFull,ava:"👤"};
+  const themL=String(themFull).replace(/^@+/,"").toLowerCase();
+  const dlg=dialogs[themL]||{handle:themL,name:themL,ava:"👤"};
   openChat(themL);
 }
 function updateDialogFromMessages(themL,list){
+  themL=String(themL).replace(/^@+/,"").toLowerCase();
   const items=Object.values(list||{}).sort((a,b)=>(a.t||0)-(b.t||0));
   if(!items.length) return;
   const last=items[items.length-1];
   const mine=last.from===me.handle;
   const p=(last.text?((mine?"Вы: ":"")+String(last.text)):"📎");
   const t=last.t?fmtTime(last.t):"";
-  dialogs[themL]=dialogs[themL]||{handle:"@"+themL,name:"@"+themL,ava:"👤"};
+  dialogs[themL]=dialogs[themL]||{handle:themL,name:themL,ava:"👤"};
   dialogs[themL].preview=p;
   dialogs[themL].t=last.t;
   dialogs[themL].time=t;
+  // unread count: incoming message not from me, and I'm not looking at this chat
+  if(!mine && openChatPeer!==themL && me.handle!==last.from){
+    dialogs[themL].unread=(dialogs[themL].unread||0)+1;
+    notifyIncoming(themL,last.text);
+  } else if(mine){
+    dialogs[themL].unread=0;
+  }
   renderDialogs();
+}
+function clearUnread(themL){
+  themL=String(themL).replace(/^@+/,"").toLowerCase();
+  if(dialogs[themL]) dialogs[themL].unread=0;
+}
+function notifyIncoming(themL,text){
+  try{
+    const nm=dialogs[themL]&&dialogs[themL].name?dialogs[themL].name:themL;
+    if("Notification" in window && Notification.permission==="granted"){
+      new Notification((nm||themL),{body:String(text||"Новое сообщение"),icon:"favicon.svg"});
+    }
+  }catch(e){}
+  // toast fallback
+  toast((themL)+": "+(text?String(text).slice(0,40):"Новое сообщение"));
 }
 
 /* ---------- chat ---------- */
 let openChatPeer=null, chatMsgsEl=null, myListenRef=null, myListenFn=null;
 function openChat(themL){
+  themL=String(themL).replace(/^@+/,"").toLowerCase();
   openChatPeer=themL;
+  clearUnread(themL);
   showView("vChat");
   $("peerName").textContent="@"+themL;
   $("typingInd").style.display="none";
@@ -564,7 +652,7 @@ function openChat(themL){
       const u=snap.val();
       if(u){
         dialogs[themL]=dialogs[themL]||{handle:"@"+themL,ava:u.ava||"👤",name:u.name||"@"+themL};
-        $("peerAva").innerHTML=avaHtml(u.ava);
+        $("peerAva").innerHTML=avaHtml(u.ava,u.name);
         $("peerName").textContent=(u.name||"@"+themL);
         renderDialogs();
       }
@@ -712,7 +800,7 @@ async function doSearch(){
     const themL="@"+key;
     const card=document.createElement("div");
     card.className="result-card";
-    card.innerHTML=`<div class="av">${avaHtml(u.ava)}</div>
+    card.innerHTML=`<div class="av">${avaHtml(u.ava,u.name)}</div>
       <div class="r-body"><div class="n">${esc(u.name||themL)}</div><div class="s">${esc(themL)}</div></div>
       <button class="btn" style="width:auto;padding:10px 16px;font-size:14px">Написать</button>`;
     card.querySelector("button").addEventListener("click",()=>openChat(themL));
@@ -785,6 +873,10 @@ function openSettings(){
   draftTheme=me.theme||"dark";
   draftAva=me.ava||null;
   $("editName").value=me.name||"";
+  // @lincoln personal number
+  const isLincoln=(String(me.handle).toLowerCase().replace(/^@+/,"")==="lincoln");
+  $("myPhoneRow").style.display=isLincoln?"block":"none";
+  if(isLincoln) $("myPhoneVal").textContent="+888 000 88 88";
   // mark selections
   $("#patSwatches").querySelectorAll(".swatch").forEach(x=>x.classList.toggle("sel",x.dataset.v===draftPat));
   $("#themeSwatches").querySelectorAll(".theme-sw").forEach(x=>x.classList.toggle("sel",x.dataset.v===draftTheme));
@@ -847,7 +939,7 @@ $("avaFile").addEventListener("change",e=>{ const f=e.target.files&&e.target.fil
 $("btnRemoveAva").addEventListener("click",()=>{ draftAva=null; renderAvaPreview(); });
 
 function applyMyStyle(){
-  document.body.dataset.theme = me.theme||"dark";
+  document.body.dataset.theme = me.theme||"black";
 }
 function toast(m){
   let el=document.getElementById("toastBox");
@@ -858,14 +950,19 @@ function toast(m){
 
 /* settings buttons: chats list */
 $("btnSettingsChats").addEventListener("click",openSettings);
+$("meSelf").addEventListener("click",openSettings);
 
 /* peer profile modal */
-function openPeerProfileFrom(themL){
-  if(!themL) return;
-  const d=dialogs[themL]||{handle:"@"+themL,name:"@"+themL,ava:"👤"};
-  $("peerBigAva").innerHTML=avaHtml(d.ava);
+function openPeerProfileFrom(rawThem){
+  if(!rawThem) return;
+  const themL=String(rawThem).replace(/^@+/,"").toLowerCase();
+  const d=dialogs[themL]||{handle:themL,name:themL,ava:"👤"};
+  $("peerBigAva").innerHTML=avaHtml(d.ava,d.name);
   $("peerBigName").textContent=d.name||"@"+themL;
   $("peerBigHandle").textContent=themL;
+  $("peerPhoneRow").style.display = (themL==="lincoln") ? "block":"none";
+  if(themL==="lincoln") $("peerPhoneRow").textContent="📞 +888 000 88 88";
+  else $("peerPhoneRow").innerHTML="";
   $("peerOverlay").classList.add("open");
 }
 function openPeerProfile(){
@@ -898,11 +995,29 @@ $("btnBack").addEventListener("click",()=>{
 setInterval(()=>{ try{ localStorage.setItem("pennie_dialogs_"+me.handle, JSON.stringify(dialogs)); }catch(e){} },2500);
 
 /* ---------- boot ---------- */
+function makeDust(){
+  const fx=document.getElementById("bgFx");
+  if(!fx || fx.__done) return;
+  fx.__done=true;
+  const count=window.innerWidth<600?18:30;
+  for(let i=0;i<count;i++){
+    const d=document.createElement("div"); d.className="dust";
+    d.style.left=(Math.random()*100)+"%";
+    d.style.animationDelay=(Math.random()*8)+"s";
+    d.style.animationDuration=(6+Math.random()*6)+"s";
+    d.style.opacity=0;
+    fx.appendChild(d);
+  }
+  try{ if("Notification" in window && Notification.permission==="default") Notification.requestPermission(); }catch(e){}
+}
 (function boot(){
   if(!FB.ok){ alert("Не удалось подключиться к серверу. Попробуйте позже."); return; }
+  makeDust();
   buildSettingsChrome();
   loadSession();
   if(me && me.handle){
+    // normalize handle in stored session too
+    me.handle=normHandle(me.handle)||me.handle;
     applyMyStyle();
     openChats();
   } else {
