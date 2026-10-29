@@ -4,8 +4,8 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <meta name="theme-color" content="#182533">
-<meta name="description" content="Pennie — приватный мессенджер. Входите по юзернейму и коду, находите собеседника по @username и общайтесь один на один.">
-<title>Pennie · приватный мессенджер</title>
+<meta name="description" content="Lincoln - Chat — приватный мессенджер. Входите по юзернейму и коду, находите собеседника по @username и общайтесь.">
+<title>Lincoln - Chat</title>
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAxMjggMTI4Ij4KICA8ZGVmcz4KICAgIDxsaW5lYXJHcmFkaWVudCBpZD0iZzEiIHgxPSIwIiB5MT0iMCIgeDI9IjEiIHkyPSIxIj4KICAgICAgPHN0b3Agb2Zmc2V0PSIwIiBzdG9wLWNvbG9yPSIjZmY4ZmIxIi8+PHN0b3Agb2Zmc2V0PSIxIiBzdG9wLWNvbG9yPSIjYTc4YmZhIi8+CiAgICA8L2xpbmVhckdyYWRpZW50PgogICAgPGxpbmVhckdyYWRpZW50IGlkPSJnMiIgeDE9IjEiIHkxPSIwIiB4Mj0iMCIgeTI9IjEiPgogICAgICA8c3RvcCBvZmZzZXQ9IjAiIHN0b3AtY29sb3I9IiM3YzZmZjAiLz48c3RvcCBvZmZzZXQ9IjEiIHN0b3AtY29sb3I9IiNmZjZiOWQiLz4KICAgIDwvbGluZWFyR3JhZGllbnQ+CiAgPC9kZWZzPgogIDxyZWN0IHdpZHRoPSIxMjgiIGhlaWdodD0iMTI4IiByeD0iMzAiIGZpbGw9IiMwYjBiMTYiLz4KICA8cmVjdCB4PSI0IiB5PSI0IiB3aWR0aD0iMTIwIiBoZWlnaHQ9IjEyMCIgcng9IjI3IiBmaWxsPSJub25lIiBzdHJva2U9InVybCgjZzEpIiBzdHJva2Utb3BhY2l0eT0iMC4zNSIgc3Ryb2tlLXdpZHRoPSIyIi8+CiAgPCEtLSB0d28gaW50ZXJsb2NraW5nIGhlYXJ0cyA9IHR3byBwZW9wbGUgaW4gYSBjaGF0IC0tPgogIDxwYXRoIHRyYW5zZm9ybT0idHJhbnNsYXRlKDI0IDMwKSBzY2FsZSgyLjQpIiBkPSJNMCAyMy4zQy0zLjYgMTcuNS03LjggMTMuOC04LjcgOS40Yy0xLjMtNi42IDIuOC0xMS4yIDguMi0xMC4yIDMuMS42IDUuNSAyLjMgNi45IDQuNiAxLjQtMi4zIDMuOC00IDYuOS00LjYgNS40LTEgOS41IDMuNiA4LjIgMTAuMi0uOSA0LjQtNS4xIDguMS04LjcgMTMuOUw2LjQgMjguNCAwIDIzLjN6IiBmaWxsPSJ1cmwoI2cxKSIvPgogIDxwYXRoIHRyYW5zZm9ybT0idHJhbnNsYXRlKDQ2IDQyKSBzY2FsZSgxLjUpIiBkPSJNMCAyMy4zQy0zLjYgMTcuNS03LjggMTMuOC04LjcgOS40Yy0xLjMtNi42IDIuOC0xMS4yIDguMi0xMC4yIDMuMS42IDUuNSAyLjMgNi45IDQuNiAxLjQtMi4zIDMuOC00IDYuOS00LjYgNS40LTEgOS41IDMuNiA4LjIgMTAuMi0uOSA0LjQtNS4xIDguMS04LjcgMTMuOUw2LjQgMjguNCAwIDIzLjN6IiBmaWxsPSJ1cmwoI2cyKSIgb3BhY2l0eT0iMC45Ii8+CiAgPCEtLSBjaGF0IGJ1YmJsZSBkb3QgLS0+CiAgPGNpcmNsZSBjeD0iOTYiIGN5PSIzMCIgcj0iOCIgZmlsbD0iIzM0ZDM5OSIvPgo8L3N2Zz4=">
 <style>
 :root{
@@ -30,20 +30,18 @@ body[data-theme="marsh"]{--bg:#101609;--bg-in:#161f0e;--panel:#1c2713;--panel2:#
 body[data-theme="sky"]{--bg:#0a1420;--bg-in:#0e1c2e;--panel:#14283c;--panel2:#1a334d;--chip:#234a6b;--line:#22405e;--ink:#eaf6ff;--ink-dim:#9cc2e0;--accent:#4db6f0}
 body[data-theme="violet"]{--bg:#130a20;--bg-in:#1a0e2e;--panel:#221344;--panel2:#2c1a56;--chip:#3c256e;--line:#342056;--ink:#f4edff;--ink-dim:#c2a8ec;--accent:#a06bf0}
 
-/* ============ animated background ============ */
-#bgFx{position:fixed;inset:0;z-index:0;overflow:hidden;pointer-events:none}
+/* ============ animated background (black cosmos) ============ */
+#bgFx{position:fixed;inset:0;z-index:0;overflow:hidden;pointer-events:none;background:#000}
 .view{position:relative;z-index:1}
 .overlay{z-index:50}
 .modal{z-index:51}
-#bgFx .orb{position:absolute;border-radius:50%;filter:blur(90px);opacity:.5;mix-blend-mode:screen;animation:orbFloat 22s ease-in-out infinite}
-#bgFx .orb1{width:420px;height:420px;left:-100px;top:-80px;background:radial-gradient(circle,#4f9bd4,transparent 70%)}
-#bgFx .orb2{width:380px;height:380px;right:-90px;top:25%;background:radial-gradient(circle,#a06bf0,transparent 70%);animation-delay:-6s}
-#bgFx .orb3{width:360px;height:360px;left:30%;bottom:-120px;background:radial-gradient(circle,#ff5e8a,transparent 70%);animation-delay:-12s}
-@keyframes orbFloat{0%,100%{transform:translate(0,0) scale(1)}33%{transform:translate(40px,30px) scale(1.15)}66%{transform:translate(-30px,50px) scale(.9)}}
-#bgFx .dust{position:absolute;width:3px;height:3px;border-radius:50%;background:#fff;opacity:0;animation:dustRise 8s linear infinite}
-@keyframes dustRise{0%{transform:translateY(110vh) translateX(0);opacity:0}12%{opacity:.7}90%{opacity:.2}100%{transform:translateY(-10vh) translateX(60px);opacity:0}}
-body[data-theme="black"] #bgFx .orb{display:block}
-/* default theme is black (animated) unless user picked another */
+#bgFx .star{position:absolute;border-radius:50%;background:#fff;animation:starGlow 4s ease-in-out infinite}
+@keyframes starGlow{0%,100%{opacity:.15;transform:scale(1)}50%{opacity:1;transform:scale(1.4)}}
+#bgFx .nebula{position:absolute;border-radius:50%;filter:blur(110px);opacity:.16;mix-blend-mode:screen;animation:nebulaFloat 30s ease-in-out infinite}
+#bgFx .n1{width:460px;height:460px;left:-140px;top:-100px;background:radial-gradient(circle,#3a2ea0,transparent 70%)}
+#bgFx .n2{width:420px;height:420px;right:-120px;top:22%;background:radial-gradient(circle,#7a2ea0,transparent 70%);animation-delay:-8s}
+#bgFx .n3{width:380px;height:380px;left:30%;bottom:-130px;background:radial-gradient(circle,#2a5aa0,transparent 70%);animation-delay:-16s}
+@keyframes nebulaFloat{0%,100%{transform:translate(0,0) scale(1)}33%{transform:translate(30px,30px) scale(1.15)}66%{transform:translate(-28px,44px) scale(.92)}}
 body:not([data-theme]){ --bg:#000; }
 @media (prefers-reduced-motion:reduce){ #bgFx{display:none} }
 
@@ -51,19 +49,12 @@ body:not([data-theme]){ --bg:#000; }
 .bubble.m,.bubble.patta,.bubble.patpa{
   color:#fff;background:var(--mine);
 }
-/* Own-message coloring: subtle, NOT full-bubble highlight */
-.bubble.m[data-pat="0"]{background:#1e3a52;border:1px solid #4f9bd4}
-.bubble.m[data-pat="1"]{background:#33201a;border:1px solid #ff8a3d;color:#ffd9c4}
-.bubble.m[data-pat="2"]{background:#241b36;border:1px solid #7b4dff;color:#e8dcff}
-.bubble.m[data-pat="3"]{background:#1b2a3a;border:1px solid #2a7de8;color:#d6ecff}
-.bubble.m[data-pat="4"]{background:#212b16;border:1px solid #9be04a;color:#eefad8}
-.bubble.m[data-pat="5"]{background:#162b26;border:1px solid #16c7b4;color:#d4ffee}
-.bubble.m[data-pat="6"]{background:#352012;border:1px solid #ffb95e;color:#ffe6c2}
-.bubble.m[data-pat="7"]{background:#331a26;border:1px solid #ff5e8a;color:#ffdde8}
-.bubble.m[data-pat="8"]{background:#2a1a33;border:1px solid #7c3aed;color:#efe4ff}
-.bubble.m[data-pat="9"]{background:#241531;border:1px solid #9333ea;color:#f0dcff}
-.bubble.m[data-pat="10"]{background:#15241d;border:1px solid #34d399;color:#dcfff0}
-.bubble.m[data-pat="11"]{background:#1b2a37;border:1px solid #0ea5e9;color:#dff4ff}
+/* Own-message colors: simple, no patterns */
+.bubble.m[data-pat="0"]{background:#14161a;color:#fff}
+.bubble.m[data-pat="1"]{background:#3c4146;color:#fff}
+.bubble.m[data-pat="2"]{background:#3a9eff;color:#fff}
+.bubble.m[data-pat="3"]{background:#a06bf0;color:#fff}
+.bubble.m[data-pat="4"]{background:#f0454e;color:#fff}
 *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
 html,body{height:100%}
 body{
@@ -153,8 +144,8 @@ input{font-family:inherit;color:var(--ink)}
 .bubble .mtxt{color:inherit}
 @keyframes msgIn{from{opacity:0;transform:translateY(6px) scale(.98)}to{opacity:1;transform:none}}
 /* glow-animated bubbles (visible to peers when message has glow flag) */
-.bubble.glow{animation:msgGlow 2.2s ease-in-out infinite}
-@keyframes msgGlow{0%,100%{box-shadow:0 0 6px 1px rgba(84,183,233,.5)}50%{box-shadow:0 0 18px 5px rgba(84,183,233,.85)}}
+.bubble.glow{animation:msgGlow 3.5s ease-in-out infinite;will-change:box-shadow}
+@keyframes msgGlow{0%,100%{box-shadow:0 0 4px 1px rgba(84,183,233,.35)}50%{box-shadow:0 0 12px 3px rgba(84,183,233,.55)}}
 .bubble.m{background:var(--mine);color:#fff;align-self:flex-end;border-bottom-right-radius:5px;border:1px solid transparent}
 .bubble.p{background:var(--panel2);align-self:flex-start;border-bottom-left-radius:5px}
 .bubble .tm{display:block;text-align:right;font-size:10.5px;opacity:.6;margin-top:3px}
@@ -295,9 +286,6 @@ input{font-family:inherit;color:var(--ink)}
 <body>
 
 <div id="bgFx" aria-hidden="true">
-  <div class="orb orb1"></div>
-  <div class="orb orb2"></div>
-  <div class="orb orb3"></div>
 </div>
 
 <!-- ============ AUTH VIEW ============ -->
@@ -340,7 +328,7 @@ input{font-family:inherit;color:var(--ink)}
     <button class="chf" data-f="personal">Личные</button>
   </div>
   <div class="searchbar">
-    <input class="search-input" id="searchUser" placeholder="Найти собеседника по @юзернейму…" autocomplete="off" spellcheck="false">
+    <input class="search-input" id="searchUser" placeholder="Введите @user" autocomplete="off" spellcheck="false">
   </div>
   <div id="searchResult"></div>
   <div class="list" id="dialogs"><div class="list-empty" id="dialogsEmpty">Пока нет чатов.<br>Найдите собеседника по @юзернейму сверху.</div></div>
@@ -385,6 +373,7 @@ input{font-family:inherit;color:var(--ink)}
   <div class="profile-scroll">
     <div class="profile-hero" data-pbg="dark">
       <div class="big-ava" id="pBigAva">😊</div>
+      <input type="file" id="pAvaFile" accept="image/*" style="display:none">
       <div class="p-name" id="pName">…</div>
       <div class="p-handle" id="pHandle">@…</div>
       <div class="p-status">● в сети</div>
@@ -421,7 +410,7 @@ input{font-family:inherit;color:var(--ink)}
     <div class="me-name"><div class="n">Контакты</div></div>
   </div>
   <div class="searchbar">
-    <input class="search-input" id="searchContact" placeholder="Найти собеседника по @юзернейму…" autocomplete="off" spellcheck="false">
+    <input class="search-input" id="searchContact" placeholder="Введите @user" autocomplete="off" spellcheck="false">
   </div>
   <div id="contactSearchResult"></div>
   <div class="list" id="contactsList"><div class="list-empty">Контактов пока нет.</div></div>
@@ -436,6 +425,10 @@ input{font-family:inherit;color:var(--ink)}
     <div class="profile-sections">
       <div class="profile-section">
         <div class="sec-title">Внешний вид</div>
+        <div class="profile-row" id="sRowGlow">
+          <div class="r-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v1M18.66 5.34l-.7.7M21 12h-1M18.66 18.66l-.7-.7M12 21v-1M5.34 18.66l.7-.7M4 12H3M5.34 5.34l.7.7" /><path d="M12 8a4 4 0 0 1 4 4 3 3 0 0 1-2 5v1h-4v-1a3 3 0 0 1-2-5 4 4 0 0 1 4-4z" /></svg></div>
+          <div class="r-body"><div class="t">Свечение сообщений</div><div class="v" id="sGlowVal">Выключено</div></div>
+        </div>
         <div class="profile-row" id="sRowAppTheme">
           <div class="r-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M20 13.5A8.5 8.5 0 1 1 10.5 4a7 7 0 0 0 9.5 9.5z" /></svg></div>
           <div class="r-body"><div class="t">Тема приложения</div><div class="v" id="appThemeVal">Тёмная</div></div>
@@ -444,11 +437,6 @@ input{font-family:inherit;color:var(--ink)}
           <div style="font-size:13px;color:var(--ink)">Цвет моих сообщений</div>
           <div class="swatches" id="sPatSwatches"></div>
         </div>
-        <div class="profile-row" style="flex-direction:column;align-items:flex-start;gap:10px;cursor:default">
-          <div style="font-size:13px;color:var(--ink)">Фон чата</div>
-          <div class="swatches" id="sThemeSwatches"></div>
-        </div>
-        <button class="btn" id="sBtnSave" style="margin:12px 14px;width:calc(100% - 28px)">Сохранить</button>
       </div>
       <div class="profile-section">
         <div class="sec-title">Аккаунт</div>
@@ -507,11 +495,6 @@ input{font-family:inherit;color:var(--ink)}
     <div class="field">
       <label>Цвет моих сообщений</label>
       <div class="swatches" id="patSwatches"></div>
-    </div>
-
-    <div class="field">
-      <label>Фон чата</label>
-      <div class="swatches" id="themeSwatches"></div>
     </div>
 
     <button class="btn" id="btnSaveSettings">Сохранить</button>
@@ -1087,16 +1070,22 @@ function sendPhoto(url){
   toast("Фото отправлено");
 }
 
-let glowOn=false;
-$("btnGlow").addEventListener("click",()=>{
+let glowOn = !!(me && me.glow);
+function renderGlowVal(){ const el=$("sGlowVal"); if(el) el.textContent = glowOn?"Включено":"Выключено"; }
+$("sRowGlow").addEventListener("click",()=>{
   glowOn=!glowOn;
-  $("btnGlow").classList.toggle("on",glowOn);
+  renderGlowVal();
+  me.glow=glowOn;
+  saveSession();
+  try{ FB.db.ref("users/"+me.handle.slice(1)).update({glow:glowOn}).catch(()=>{}); }catch(e){}
   toast(glowOn?"Свечение включено":"Свечение выключено");
 });
 function sendNow(){
   const t=$("chatText").value.trim();
   if(!t || !openChatPeer) return;
   const peer=String(openChatPeer).toLowerCase().replace(/^@+/,"");
+  const myKey=me.handle.toLowerCase().replace(/^@+/,"");
+  if(peer===myKey){ toast("Нельзя писать самому себе"); return; }
   if(me.blocked && me.blocked[peer]){ toast("Нельзя отправлять заблокированному пользователю"); return; }
   const key=dialogKeyOf(me.handle,openChatPeer);
   const msg={from:me.handle,text:t,t:Date.now(),glow:glowOn?true:undefined};
@@ -1109,18 +1098,11 @@ $("chatText").addEventListener("keydown",e=>{ if(e.key==="Enter"&&!e.shiftKey){ 
 
 /* ---------- settings / profile ---------- */
 const PATTERNS=[
-  {css:"0",  bg:"#4f9bd4"},
-  {css:"1",  bg:"linear-gradient(135deg,#ff8a3d,#ff5e8a)"},
-  {css:"2",  bg:"repeating-linear-gradient(45deg,#5d2ee0 0,#5d2ee0 14px,#7b4dff 14px,#7b4dff 28px)"},
-  {css:"3",  bg:"radial-gradient(circle at 4px 4px,rgba(255,255,255,.3) 2px,transparent 2px),radial-gradient(circle at 14px 14px,rgba(255,255,255,.3) 2px,transparent 2px),linear-gradient(135deg,#2a7de8,#6a2ee0)"},
-  {css:"4",  bg:"repeating-linear-gradient(90deg,#9be04a 0,#9be04a 12px,#5fb832 12px,#5fb832 24px)"},
-  {css:"5",  bg:"repeating-linear-gradient(-45deg,#16c7b4 0,#16c7b4 10px,#0e9f90 10px,#0e9f90 20px)"},
-  {css:"6",  bg:"repeating-linear-gradient(0deg,#ffb95e 0,#ffb95e 12px,#ff8a3d 12px,#ff8a3d 24px)"},
-  {css:"7",  bg:"radial-gradient(circle at 50% 50%,#ff5e8a 40%,#c2255c 40%)"},
-  {css:"8",  bg:"linear-gradient(135deg,#f43f5e,#7c3aed)"},
-  {css:"9",  bg:"repeating-linear-gradient(45deg,#9333ea 0,#9333ea 16px,#6d28d9 16px,#6d28d9 32px)"},
-  {css:"10", bg:"repeating-linear-gradient(90deg,#34d399 0,#34d399 14px,#0d9668 14px,#0d9668 28px)"},
-  {css:"11", bg:"radial-gradient(circle at 22% 28%,#fb923c 0,#fb923c 24%,transparent 24%),radial-gradient(circle at 74% 62%,#fb923c 0,#fb923c 24%,transparent 24%),linear-gradient(135deg,#0ea5e9,#4f46e5)"}
+  {css:"0", bg:"#14161a", label:"Чёрный"},
+  {css:"1", bg:"#3c4146", label:"Серый"},
+  {css:"2", bg:"#3a9eff", label:"Голубой"},
+  {css:"3", bg:"#a06bf0", label:"Фиолетовый"},
+  {css:"4", bg:"#f0454e", label:"Красный"}
 ];
 const THEMES=[
   {id:"dark",label:"Тёмный",g:"#0b141a"},
@@ -1152,7 +1134,7 @@ function buildSettingsChrome(){
   const sp=$("sPatSwatches"); if(sp){ sp.innerHTML="";
   PATTERNS.forEach(p=>{
     const b=document.createElement("button"); b.type="button"; b.className="swatch"; b.dataset.v=p.css;
-    b.style.background=p.bg; b.setAttribute("aria-label","Узор сообщений "+p.css);
+    b.style.background=p.bg; b.setAttribute("aria-label","Цвет сообщений "+p.label);
     b.addEventListener("click",()=>{ sp.querySelectorAll(".swatch").forEach(x=>x.classList.remove("sel")); b.classList.add("sel"); draftPat=p.css; applyMyStyle(); });
     sp.appendChild(b);
   }); }
@@ -1181,8 +1163,7 @@ function openSettings(){
   $("myPhoneRow").style.display=isLincoln?"block":"none";
   if(isLincoln) $("myPhoneVal").textContent="+888 000 88 88";
   // mark selections
-  $("#patSwatches").querySelectorAll(".swatch").forEach(x=>x.classList.toggle("sel",x.dataset.v===draftPat));
-  $("#themeSwatches").querySelectorAll(".theme-sw").forEach(x=>x.classList.toggle("sel",x.dataset.v===draftTheme));
+  const psw=$("#patSwatches"); if(psw) psw.querySelectorAll(".swatch").forEach(x=>x.classList.toggle("sel",x.dataset.v===draftPat));
   renderAvaPreview();
   $("#settingsOverlay").classList.add("open");
   $('#btnRemoveAva').style.display = (me.ava && me.ava.length) ? "block":"none";
@@ -1195,7 +1176,7 @@ function renderAvaPreview(){
 function readAvaFile(file,immediate){
   if(!file) return;
   if(!/^image\//.test(file.type)){ toast("Выберите изображение"); return; }
-  if(file.size>2*1024*1024){ toast("Файл больше 2 МБ — выберите меньше"); return; }
+  if(file.size>6*1024*1024){ toast("Файл больше 6 МБ — выберите меньше"); return; }
   const rd=new FileReader();
   rd.onload=e=>{
     const img=new Image();
@@ -1398,15 +1379,15 @@ function setTab(tab){
   if(tab==="profile") renderProfile();
 }
 $("sRowLogout").addEventListener("click",()=>{ $("btnLogout").click(); });
-$("sBtnSave").addEventListener("click",()=>{
+function saveSettingsView(){
   me.pat=draftPat; me.theme=draftTheme;
   applyMyStyle();
   try{
     FB.db.ref("users/"+me.handle.slice(1)).update({ pat:me.pat, theme:me.theme }).then(()=>{ saveSession(); }).catch(()=>{ saveSession(); });
   }catch(e){}
   if(typeof renderProfile==="function") renderProfile();
-  toast("Сохранено");
-});
+}
+const sbtn=$("sBtnSave"); if(sbtn) sbtn.addEventListener("click",saveSettingsView);
 document.querySelectorAll(".tabbar .tab").forEach(b=>{
   b.addEventListener("click",()=>{ closeChatIfOpen(); setTab(b.dataset.tab); });
 });
@@ -1440,8 +1421,9 @@ function renderProfile(){
   $("pCreated").textContent=c?new Date(c).toLocaleDateString("ru-RU",{day:"numeric",month:"long",year:"numeric"}):"—";
   const pb=$("pBio"); if(pb) pb.textContent=me.bio||"—";
 }
-$("pActPhoto").addEventListener("click",()=>$("avaFile").click());
-$("pBigAva").addEventListener("click",()=>$("avaFile").click());
+$("pActPhoto").addEventListener("click",()=>$("pAvaFile").click());
+$("pBigAva").addEventListener("click",()=>$("pAvaFile").click());
+$("pAvaFile").addEventListener("change",e=>{ const f=e.target.files&&e.target.files[0]; if(f) readAvaFile(f,true); e.target.value=""; });
 $("pActEdit").addEventListener("click",()=>{ setTab("settings"); });
 $("pActSettings").addEventListener("click",()=>{ setTab("settings"); });
 $("pRowSettings").addEventListener("click",()=>{ setTab("settings"); });
@@ -1493,8 +1475,10 @@ function openSettingsFromView(){
   draftPat=String(me.pat!=null?me.pat:"0");
   draftTheme=me.theme||"black";
   draftAva=me.ava||null;
-  $("#sPatSwatches").querySelectorAll(".swatch").forEach(x=>x.classList.toggle("sel",x.dataset.v===draftPat));
-  $("#sThemeSwatches").querySelectorAll(".theme-sw").forEach(x=>x.classList.toggle("sel",x.dataset.v===draftTheme));
+  glowOn=!!me.glow;
+  renderGlowVal();
+  const sp2=$("#sPatSwatches"); if(sp2) sp2.querySelectorAll(".swatch").forEach(x=>x.classList.toggle("sel",x.dataset.v===draftPat));
+  const st2=$("#sThemeSwatches"); if(st2) st2.querySelectorAll(".theme-sw").forEach(x=>x.classList.toggle("sel",x.dataset.v===draftTheme));
 }
 
 /* ---------- persistence of dialogs ---------- */
@@ -1505,14 +1489,20 @@ function makeDust(){
   const fx=document.getElementById("bgFx");
   if(!fx || fx.__done) return;
   fx.__done=true;
-  const count=window.innerWidth<600?18:30;
+  // nebulae
+  const np="n1 n2 n3".split(" ");
+  np.forEach(c=>{ const n=document.createElement("div"); n.className="nebula "+c; fx.appendChild(n); });
+  // stars
+  const count=window.innerWidth<600?70:130;
   for(let i=0;i<count;i++){
-    const d=document.createElement("div"); d.className="dust";
-    d.style.left=(Math.random()*100)+"%";
-    d.style.animationDelay=(Math.random()*8)+"s";
-    d.style.animationDuration=(6+Math.random()*6)+"s";
-    d.style.opacity=0;
-    fx.appendChild(d);
+    const s=document.createElement("div"); s.className="star";
+    const sz=(Math.random()*2+1).toFixed(1);
+    s.style.width=sz+"px"; s.style.height=sz+"px";
+    s.style.left=(Math.random()*100)+"%";
+    s.style.top=(Math.random()*100)+"%";
+    s.style.animationDelay=(Math.random()*5)+"s";
+    s.style.animationDuration=(3+Math.random()*6)+"s";
+    fx.appendChild(s);
   }
   try{ if("Notification" in window && Notification.permission==="default") Notification.requestPermission(); }catch(e){}
 }
