@@ -140,7 +140,7 @@ input{font-family:inherit;color:var(--ink)}
 #vChat .topbar .peer-name .n{font-weight:700;font-size:15px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 #vChat .topbar .peer-name .s{font-size:12px;color:var(--ink-dim)}
 .msgs{flex:1;overflow-y:auto;padding:14px;display:flex;flex-direction:column;gap:4px;background:var(--bg)}
-.bubble{max-width:78%;padding:9px 13px;border-radius:14px;font-size:15px;line-height:1.45;position:relative;white-space:pre-wrap;overflow-wrap:break-word;word-break:normal;animation:msgIn .22s ease}
+.bubble{width:fit-content;max-width:min(78%,420px);padding:9px 13px;border-radius:14px;font-size:15px;line-height:1.45;position:relative;white-space:pre-wrap;overflow-wrap:break-word;word-break:break-word;animation:msgIn .22s ease}
 .bubble .mtxt{color:inherit}
 @keyframes msgIn{from{opacity:0;transform:translateY(6px) scale(.98)}to{opacity:1;transform:none}}
 /* glow-animated bubbles (visible to peers when message has glow flag) */
