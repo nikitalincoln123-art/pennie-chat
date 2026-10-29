@@ -51,18 +51,19 @@ body:not([data-theme]){ --bg:#000; }
 .bubble.m,.bubble.patta,.bubble.patpa{
   color:#fff;background:var(--mine);
 }
-.bubble.m[data-pat="0"]{background:#4f9bd4}
-.bubble.m[data-pat="1"]{color:#21130a;background:linear-gradient(135deg,#ff8a3d,#ff5e8a)}
-.bubble.m[data-pat="2"]{color:#fff;background:repeating-linear-gradient(45deg,#5d2ee0 0,#5d2ee0 14px,#7b4dff 14px,#7b4dff 28px)}
-.bubble.m[data-pat="3"]{color:#120919;background:radial-gradient(circle at 8px 8px,rgba(255,255,255,.28) 3px,transparent 3px),radial-gradient(circle at 18px 18px,rgba(255,255,255,.28) 3px,transparent 3px),linear-gradient(135deg,#2a7de8,#6a2ee0);background-size:26px 26px,26px 26px,100% 100%}
-.bubble.m[data-pat="4"]{color:#1a230c;background:repeating-linear-gradient(90deg,#9be04a 0,#9be04a 12px,#5fb832 12px,#5fb832 24px)}
-.bubble.m[data-pat="5"]{color:#fff;background:repeating-linear-gradient(-45deg,#16c7b4 0,#16c7b4 10px,#0e9f90 10px,#0e9f90 20px)}
-.bubble.m[data-pat="6"]{color:#2d0f05;background:repeating-linear-gradient(0deg,#ffb95e 0,#ffb95e 12px,#ff8a3d 12px,#ff8a3d 24px)}
-.bubble.m[data-pat="7"]{color:#fff;background:radial-gradient(circle at 50% 50%,#ff5e8a 40%,#c2255c 40%);background-size:100% 100%}
-.bubble.m[data-pat="8"]{color:#fdeeef;background:linear-gradient(135deg,#f43f5e,#7c3aed)}
-.bubble.m[data-pat="9"]{color:#fff;background:repeating-linear-gradient(45deg,#9333ea 0,#9333ea 16px,#6d28d9 16px,#6d28d9 32px)}
-.bubble.m[data-pat="10"]{color:#02100b;background:repeating-linear-gradient(90deg,#34d399 0,#34d399 14px,#0d9668 14px,#0d9668 28px)}
-.bubble.m[data-pat="11"]{color:#fff;background:radial-gradient(circle at 20% 30%,#fb923c 0,#fb923c 26%,transparent 26%),radial-gradient(circle at 75% 65%,#fb923c 0,#fb923c 26%,transparent 26%),linear-gradient(135deg,#0ea5e9,#4f46e5);background-size:44px 44px,44px 44px,100% 100%}
+/* Own-message coloring: subtle, NOT full-bubble highlight */
+.bubble.m[data-pat="0"]{background:#1e3a52;border:1px solid #4f9bd4}
+.bubble.m[data-pat="1"]{background:#33201a;border:1px solid #ff8a3d;color:#ffd9c4}
+.bubble.m[data-pat="2"]{background:#241b36;border:1px solid #7b4dff;color:#e8dcff}
+.bubble.m[data-pat="3"]{background:#1b2a3a;border:1px solid #2a7de8;color:#d6ecff}
+.bubble.m[data-pat="4"]{background:#212b16;border:1px solid #9be04a;color:#eefad8}
+.bubble.m[data-pat="5"]{background:#162b26;border:1px solid #16c7b4;color:#d4ffee}
+.bubble.m[data-pat="6"]{background:#352012;border:1px solid #ffb95e;color:#ffe6c2}
+.bubble.m[data-pat="7"]{background:#331a26;border:1px solid #ff5e8a;color:#ffdde8}
+.bubble.m[data-pat="8"]{background:#2a1a33;border:1px solid #7c3aed;color:#efe4ff}
+.bubble.m[data-pat="9"]{background:#241531;border:1px solid #9333ea;color:#f0dcff}
+.bubble.m[data-pat="10"]{background:#15241d;border:1px solid #34d399;color:#dcfff0}
+.bubble.m[data-pat="11"]{background:#1b2a37;border:1px solid #0ea5e9;color:#dff4ff}
 *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
 html,body{height:100%}
 body{
@@ -151,7 +152,10 @@ input{font-family:inherit;color:var(--ink)}
 .bubble{max-width:78%;padding:9px 13px;border-radius:14px;font-size:15px;line-height:1.45;position:relative;white-space:pre-wrap;overflow-wrap:break-word;word-break:normal;animation:msgIn .22s ease}
 .bubble .mtxt{color:inherit}
 @keyframes msgIn{from{opacity:0;transform:translateY(6px) scale(.98)}to{opacity:1;transform:none}}
-.bubble.m{background:var(--mine);color:#fff;align-self:flex-end;border-bottom-right-radius:5px}
+/* glow-animated bubbles (visible to peers when message has glow flag) */
+.bubble.glow{animation:msgGlow 2.2s ease-in-out infinite}
+@keyframes msgGlow{0%,100%{box-shadow:0 0 6px 1px rgba(84,183,233,.5)}50%{box-shadow:0 0 18px 5px rgba(84,183,233,.85)}}
+.bubble.m{background:var(--mine);color:#fff;align-self:flex-end;border-bottom-right-radius:5px;border:1px solid transparent}
 .bubble.p{background:var(--panel2);align-self:flex-start;border-bottom-left-radius:5px}
 .bubble .tm{display:block;text-align:right;font-size:10.5px;opacity:.6;margin-top:3px}
 .day-chip{align-self:center;font-size:11.5px;color:var(--ink-dim);background:var(--panel);padding:4px 12px;border-radius:999px;margin:8px 0}
@@ -176,6 +180,8 @@ input{font-family:inherit;color:var(--ink)}
 .add-react:hover{transform:scale(1.15);color:var(--ink)}
 .chat-input-bar{background:var(--panel);border-top:1px solid var(--line);padding:10px 12px;display:flex;gap:10px;flex:0 0 auto}
 .chat-input-bar textarea{flex:1;resize:none;background:var(--bg-in);border:1px solid var(--line);border-radius:16px;padding:11px 14px;font-size:15px;outline:none;color:var(--ink);max-height:120px}
+.glow-toggle{width:42px;height:42px;border-radius:50%;display:flex;align-items:center;justify-content:center;color:var(--ink-dim);flex:0 0 auto;transition:all .15s;background:var(--bg-in);border:1px solid var(--line)}
+.glow-toggle.on{color:#8fbfff;border-color:var(--accent);background:rgba(84,183,233,.15);box-shadow:0 0 12px rgba(84,183,233,.4)}
 .chat-input-bar textarea:focus{border-color:var(--accent)}
 .send-btn{width:46px;height:46px;border-radius:50%;background:var(--accent);color:#0b141a;font-size:19px;display:flex;align-items:center;justify-content:center;flex:0 0 auto}
 .typing-ind{align-self:flex-start;font-size:12px;color:var(--ink-dim);padding-left:6px}
@@ -214,6 +220,25 @@ input{font-family:inherit;color:var(--ink)}
 .profile-hero[data-pbg="sky"]{background:radial-gradient(circle at 50% -20%,#155e8f,transparent 70%),#0a1826;color:#dff2ff}
 .profile-hero[data-pbg="violet"]{background:radial-gradient(circle at 50% -20%,#5a2ea8,transparent 70%),#170e28;color:#f0e6ff}
 .profile-hero[data-pbg="dark"]{background:linear-gradient(180deg,#24364a,#17212b)}
+/* Lincoln cosmic animated background */
+.profile-hero[data-pbg="cosmic"],.peer-hero[data-pbg="cosmic"]{
+  background:radial-gradient(circle at 20% 30%,rgba(255,255,255,.15),transparent 40%),radial-gradient(circle at 80% 20%,rgba(160,120,255,.4),transparent 50%),#02030a;
+  overflow:hidden;position:relative;
+}
+.profile-hero[data-pbg="cosmic"]::before,.peer-hero[data-pbg="cosmic"]::before{
+  content:"";position:absolute;width:2px;height:2px;border-radius:50%;background:#fff;box-shadow:
+    40px 20px 0 #fff,120px 60px 0 rgba(255,255,255,.8),200px 30px 0 #fff,60px 110px 0 rgba(255,255,255,.7),
+    260px 130px 0 #fff,340px 40px 0 rgba(255,255,255,.9),160px 170px 0 #fff,90px 200px 0 rgba(255,255,255,.6),
+    300px 210px 0 #fff,20px 160px 0 rgba(255,255,255,.8);
+  opacity:.8;animation:starTwinkle 3s ease-in-out infinite;
+}
+@keyframes starTwinkle{0%,100%{opacity:.3}50%{opacity:1}}
+.profile-hero[data-pbg="cosmic"] .big-ava,.peer-hero[data-pbg="cosmic"] .peer-big-ava{border-color:#c9b8ff;box-shadow:0 0 40px rgba(180,140,255,.6)}
+.pepe-gift{display:inline-block;font-size:26px;margin:4px;animation:pepeBounce 2s ease-in-out infinite}
+.profile-hero .pepe-gifts{align-self:center;text-align:center;margin-top:6px}
+.pepe-gift:nth-child(2n){animation-delay:.3s}
+.pepe-gift:nth-child(3n){animation-delay:.6s}
+@keyframes pepeBounce{0%,100%{transform:translateY(0)}50%{transform:translateY(-6px)}}
 .profile-hero .big-ava{width:110px;height:110px;border-radius:50%;margin:0 auto 14px;background:var(--chip);display:flex;align-items:center;justify-content:center;overflow:hidden;font-size:40px;border:3px solid var(--accent);box-shadow:0 0 30px rgba(84,183,233,.3)}
 .profile-hero .big-ava img{width:100%;height:100%;object-fit:cover}
 .profile-hero .p-name{font-size:22px;font-weight:800}
@@ -238,8 +263,10 @@ input{font-family:inherit;color:var(--ink)}
 .profile-row .r-arrow{color:var(--ink-faint)}
 .profile-row .r-arrow svg{width:18px;height:18px}
 .swatches{display:flex;flex-wrap:wrap;gap:8px}
-.swatch{width:40px;height:40px;border-radius:12px;border:2px solid var(--line);cursor:pointer;flex:0 0 auto}
-.swatch.sel{border-color:var(--accent);transform:scale(1.08)}
+.swatch{width:44px;height:44px;border-radius:14px;border:2px solid var(--line);cursor:pointer;flex:0 0 auto;position:relative;transition:transform .12s,border-color .12s,box-shadow .12s}
+.swatch::after{content:"";position:absolute;inset:0;border-radius:12px;pointer-events:none;box-shadow:inset 0 0 0 1px rgba(255,255,255,.12),inset 0 -6px 12px rgba(0,0,0,.25)}
+.swatch:hover{transform:translateY(-2px);box-shadow:0 4px 12px rgba(0,0,0,.3)}
+.swatch.sel{border-color:var(--accent);transform:scale(1.1);box-shadow:0 0 0 3px rgba(84,183,233,.25),0 4px 12px rgba(0,0,0,.3)}
 .theme-sw{width:56px;height:44px;border-radius:10px;border:2px solid var(--line);cursor:pointer;position:relative;flex:0 0 auto}
 .theme-sw.sel{border-color:var(--accent)}
 .theme-sw span{position:absolute;left:0;right:0;top:50%;transform:translateY(-50%);text-align:center;font-size:11px;font-weight:700;color:var(--ink)}
@@ -329,10 +356,20 @@ input{font-family:inherit;color:var(--ink)}
       <div class="peer-ava" id="peerAva">👤</div>
       <div class="peer-name"><div class="n" id="peerName">…</div></div>
     </button>
+    <button class="icon-btn" id="btnDeleteChat" title="Удалить чат">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6M10 11v6M14 11v6" /></svg>
+    </button>
   </div>
   <div class="msgs" id="msgs"></div>
   <div class="typing-ind" id="typingInd" style="display:none">собеседник печатает…</div>
   <div class="chat-input-bar">
+    <button class="glow-toggle" id="btnGlow" title="Анимированное свечение">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v1M18.66 5.34l-.7.7M21 12h-1M18.66 18.66l-.7-.7M12 21v-1M5.34 18.66l.7-.7M4 12H3M5.34 5.34l.7.7" /><path d="M12 8a4 4 0 0 1 4 4 3 3 0 0 1-2 5v1h-4v-1a3 3 0 0 1-2-5 4 4 0 0 1 4-4z" /></svg>
+    </button>
+    <button class="glow-toggle" id="btnImg" title="Отправить фото">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z" /><circle cx="12" cy="13" r="4" /></svg>
+    </button>
+    <input type="file" id="chatImgFile" accept="image/*" style="display:none">
     <textarea id="chatText" rows="1" placeholder="Сообщение…" maxlength="4000"></textarea>
     <button class="send-btn" id="btnSend">
       <svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor"><path d="M3.4 20.4l17.9-7.6a1.3 1.3 0 0 0 0-2.4L3.4 2.8a1 1 0 0 0-1.36 1.28l2.1 6.3a1 1 0 0 0 .8.68l8.3 1.2-8.3 1.2a1 1 0 0 0-.8.68l-2.1 6.3a1 1 0 0 0 1.36 1.36z" /></svg>
@@ -346,11 +383,14 @@ input{font-family:inherit;color:var(--ink)}
     <div class="me-name" style="display:flex;align-items:baseline;gap:10px"><div class="n">Профиль</div></div>
   </div>
   <div class="profile-scroll">
-    <div class="profile-hero">
+    <div class="profile-hero" data-pbg="dark">
       <div class="big-ava" id="pBigAva">😊</div>
       <div class="p-name" id="pName">…</div>
       <div class="p-handle" id="pHandle">@…</div>
       <div class="p-status">● в сети</div>
+      <div class="pepe-gifts" id="pGifts" style="display:none">
+        <span class="pepe-gift">🐸</span><span class="pepe-gift">💚</span><span class="pepe-gift">🎁</span><span class="pepe-gift">🐸</span><span class="pepe-gift">⭐</span>
+      </div>
     </div>
     <div class="profile-actions">
       <button class="act" id="pActPhoto"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z" /><circle cx="12" cy="13" r="4" /></svg><span>Фото</span></button>
@@ -363,6 +403,7 @@ input{font-family:inherit;color:var(--ink)}
         <div class="sec-title">Информация</div>
         <div class="profile-row"><div class="r-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.9v3a2 2 0 0 1-2.2 2 19.8 19.8 0 0 1-8.6-3 19.5 19.5 0 0 1-6-6 19.8 19.8 0 0 1-3-8.6A2 2 0 0 1 4.1 2h3a2 2 0 0 1 2 1.7c.1 1 .4 2 .7 2.8a2 2 0 0 1-.5 2.1L8.1 9.9a16 16 0 0 0 6 6l1.3-1.2a2 2 0 0 1 2.1-.5c.9.3 1.9.6 2.9.7a2 2 0 0 1 1.7 2z" /></svg></div><div class="r-body"><div class="t">Персональный номер</div><div class="v" id="pPhone">—</div></div></div>
         <div class="profile-row"><div class="r-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" /><circle cx="12" cy="7" r="4" /></svg></div><div class="r-body"><div class="t">Юзернейм</div><div class="v" id="pHandle2">@…</div></div></div>
+        <div class="profile-row"><div class="r-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M4 6h16M4 12h16M4 18h10" /></svg></div><div class="r-body"><div class="t">О себе</div><div class="v" id="pBio" style="white-space:pre-wrap">—</div></div></div>
         <div class="profile-row"><div class="r-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10" /><path d="M12 6v6l4 2" /></svg></div><div class="r-body"><div class="t">Зарегистрирован</div><div class="v" id="pCreated">—</div></div></div>
       </div>
       <div class="profile-section">
@@ -448,6 +489,11 @@ input{font-family:inherit;color:var(--ink)}
     </div>
 
     <div class="field">
+      <label>О себе</label>
+      <textarea class="input" id="editBio" maxlength="120" rows="2" placeholder="Пара слов о себе…" autocomplete="off"></textarea>
+    </div>
+
+    <div class="field">
       <label>Аватар</label>
       <div class="ava-zone">
         <div class="ava-preview" id="avaPreview">👤</div>
@@ -482,10 +528,12 @@ input{font-family:inherit;color:var(--ink)}
       <div class="peer-big-handle" id="peerBigHandle">@…</div>
     </div>
     <div class="code-hint" id="peerPhoneRow" style="display:none;text-align:center;font-size:17px;color:var(--ink);margin-bottom:14px"></div>
+    <div class="peer-bio" id="peerBio" style="display:none;font-size:13.5px;color:var(--ink-dim);text-align:center;white-space:pre-wrap;margin-bottom:12px;padding:10px 12px;background:var(--bg-in);border-radius:12px"></div>
     <div class="field" style="text-align:center;color:var(--ink-dim);font-size:13.5px;line-height:1.6">
       Вы переписываетесь с этим собеседником один на один. Ваши сообщения видны только вам двоим.
     </div>
     <button class="btn" id="btnWritePeer">Написать сообщение</button>
+    <button class="btn ghost" id="btnBlockPeer" style="margin-top:10px;color:var(--bad,#f8708e);border-color:var(--line)">Заблокировать</button>
   </div>
 </div>
 
@@ -647,7 +695,7 @@ async function onNext2(){
       if(!rec || !rec.hash){ setErr("Аккаунт не найден"); btn.disabled=false; stepTo(1); return; }
       const hash=await hashPassword(pw, rec.salt);
       if(hash!==rec.hash){ setErr("Неверный код"); btn.disabled=false; return; }
-      me={handle:pendingUser, name:(rec.name||pendingUser.slice(1)), ava:(rec.ava||""), pat:(rec.pat!=null?rec.pat:"0"), theme:(rec.theme||"black"), appTheme:(rec.appTheme||"dark")};
+      me={handle:pendingUser, name:(rec.name||pendingUser.slice(1)), ava:(rec.ava||""), pat:(rec.pat!=null?rec.pat:"0"), theme:(rec.theme||"black"), appTheme:(rec.appTheme||"dark"), blocked:(rec.blocked||{}), bio:(rec.bio||"")};
       saveSession();
       openChats();
     }
@@ -773,8 +821,11 @@ function updateDialogFromMessages(themL,list){
   dialogs[themL].lastIsMine=mine;
   // unread count: incoming message not from me, and I'm not looking at this chat
   if(!mine && openChatPeer!==themL && me.handle!==last.from){
-    dialogs[themL].unread=(dialogs[themL].unread||0)+1;
-    notifyIncoming(themL,last.text);
+    // blocked senders: no unread badge or notification
+    if(!(me.blocked && me.blocked[themL])){
+      dialogs[themL].unread=(dialogs[themL].unread||0)+1;
+      notifyIncoming(themL,last.text);
+    }
   } else if(mine){
     dialogs[themL].unread=0;
   }
@@ -797,6 +848,27 @@ function notifyIncoming(themL,text){
 
 /* ---------- chat ---------- */
 let openChatPeer=null, chatMsgsEl=null, myListenRef=null, myListenFn=null;
+function deleteChatNow(){
+  if(!openChatPeer) return;
+  const them=String(openChatPeer).toLowerCase().replace(/^@+/,"");
+  const myKey=me.handle.toLowerCase().replace(/^@+/,"");
+  const key=dialogKeyOf(me.handle,them);
+  const choice=confirm("Удалить чат с @"+them+"?\n\n· «ОК» — удалить у себя\n· «Отмена» — не удалять");
+  if(!choice) return;
+  // remove from local dialogs (self)
+  delete dialogs[them];
+  try{ localStorage.setItem("pennie_dialogs_"+me.handle, JSON.stringify(dialogs)); }catch(e){}
+  // detach listener
+  try{ if(myListenRef) myListenRef.off("value",myListenFn); }catch(e){}
+  // remove from my msgs node (self-side)
+  try{ FB.db.ref("msgs/"+key+"/_self_"+myKey).remove().catch(()=>{}); }catch(e){}
+  // back to chats
+  openChatPeer=null;
+  renderDialogs();
+  setTab("chats");
+  toast("Чат удалён");
+}
+$("btnDeleteChat").addEventListener("click",deleteChatNow);
 function openChat(themL){
   themL=String(themL).replace(/^@+/,"").toLowerCase();
   openChatPeer=themL;
@@ -840,21 +912,32 @@ function snapToObj(snap){
 
 function renderChat(themL,list){
   const el=$("msgs");
+  const isBlockedSender = (me.blocked && me.blocked[themL]);
   const items=Object.values(list).sort((a,b)=>(a.t||0)-(b.t||0));
-  if(!items.length){ el.innerHTML='<div class="list-empty">Нет сообщений. Напишите первое 👇</div>'; return; }
   el.innerHTML="";
   let lastDay=null;
+  let shown=false;
   items.forEach(m=>{
+    const mine=m.from===me.handle;
+    // skip incoming messages from a blocked sender (keep my own)
+    if(!mine && isBlockedSender) return;
+    shown=true;
     const mk=new Date(m.t).getDate();
     if(mk!==lastDay){ lastDay=mk; const c=document.createElement("div"); c.className="day-chip"; c.textContent=new Date(m.t).toLocaleDateString("ru-RU",{day:"numeric",month:"long"}); el.appendChild(c); }
     const wrap=document.createElement("div");
-    const mine=m.from===me.handle;
     wrap.className="msg-row "+(mine?"m":"p");
     wrap.dataset.key=m.__key;
     const b=document.createElement("div");
-    b.className="bubble "+(mine?"m":"p");
+    b.className="bubble "+(mine?"m":"p")+(m.glow?" glow":"");
     if(mine) b.setAttribute("data-pat",(me.pat!=null?me.pat:"0"));
-    b.textContent=m.text;
+    if(m.kind==="photo" && m.img){
+      const im=document.createElement("img");
+      im.src=m.img; im.alt="Фото";
+      im.style.cssText="max-width:240px;max-height:240px;border-radius:10px;display:block;margin-bottom:4px";
+      b.appendChild(im);
+    } else {
+      b.textContent=m.text;
+    }
     const t=document.createElement("span"); t.className="tm"; t.textContent=fmtTime(m.t);
     b.appendChild(t);
     wrap.appendChild(b);
@@ -969,11 +1052,54 @@ async function doSearch(){
 }
 
 /* ---------- send ---------- */
+$("btnImg").addEventListener("click",()=>$("chatImgFile").click());
+$("chatImgFile").addEventListener("change",e=>{
+  const f=e.target.files&&e.target.files[0]; e.target.value="";
+  if(!f) return;
+  if(!/^image\//.test(f.type)){ toast("Выберите изображение"); return; }
+  if(f.size>3*1024*1024){ toast("Фото больше 3 МБ"); return; }
+  const rd=new FileReader();
+  rd.onload=pe=>{
+    const img=new Image();
+    img.onload=()=>{
+      const MAX=1280;
+      const r=Math.min(1,MAX/img.width,MAX/img.height);
+      const cv=document.createElement("canvas");
+      cv.width=Math.round(img.width*r); cv.height=Math.round(img.height*r);
+      cv.getContext("2d").drawImage(img,0,0,cv.width,cv.height);
+      let url;
+      try{ url=cv.toDataURL("image/jpeg",0.7); }catch(e){ url=pe.target.result; }
+      sendPhoto(url);
+    };
+    img.onerror=()=>toast("Не удалось прочитать изображение");
+    img.src=pe.target.result;
+  };
+  rd.readAsDataURL(f);
+});
+function sendPhoto(url){
+  if(!openChatPeer) return;
+  const peer=String(openChatPeer).toLowerCase().replace(/^@+/,"");
+  if(me.blocked && me.blocked[peer]){ toast("Нельзя отправлять заблокированному"); return; }
+  const key=dialogKeyOf(me.handle,openChatPeer);
+  const msg={from:me.handle, kind:"photo", img:url, t:Date.now()};
+  FB.db.ref("msgs/"+key).push(msg).catch(()=>{});
+  updateDialogFromMessages(openChatPeer,{x:{from:me.handle,kind:"photo",token:"📷 Фото",t:msg.t}});
+  toast("Фото отправлено");
+}
+
+let glowOn=false;
+$("btnGlow").addEventListener("click",()=>{
+  glowOn=!glowOn;
+  $("btnGlow").classList.toggle("on",glowOn);
+  toast(glowOn?"Свечение включено":"Свечение выключено");
+});
 function sendNow(){
   const t=$("chatText").value.trim();
   if(!t || !openChatPeer) return;
+  const peer=String(openChatPeer).toLowerCase().replace(/^@+/,"");
+  if(me.blocked && me.blocked[peer]){ toast("Нельзя отправлять заблокированному пользователю"); return; }
   const key=dialogKeyOf(me.handle,openChatPeer);
-  const msg={from:me.handle,text:t,t:Date.now()};
+  const msg={from:me.handle,text:t,t:Date.now(),glow:glowOn?true:undefined};
   FB.db.ref("msgs/"+key).push(msg).catch(e=>{});
   $("chatText").value="";
   updateDialogFromMessages(openChatPeer,{x:{from:me.handle,text:t,t:msg.t}});
@@ -1049,6 +1175,7 @@ function openSettings(){
   draftAva=me.ava||null;
   $("editFirst").value=me.first||"";
   $("editLast").value=me.last||"";
+  const ebio=$("editBio"); if(ebio) ebio.value=me.bio||"";
   // @lincoln personal number
   const isLincoln=(String(me.handle).toLowerCase().replace(/^@+/,"")==="lincoln");
   $("myPhoneRow").style.display=isLincoln?"block":"none";
@@ -1098,13 +1225,14 @@ $("btnSaveSettings").addEventListener("click",()=>{
   me.first=($("editFirst").value||"").trim();
   me.last=($("editLast").value||"").trim();
   me.name=[me.first,me.last].filter(Boolean).join(" ")||me.handle.slice(1);
+  me.bio=($("editBio").value||"").trim();
   me.pat=draftPat; me.theme=draftTheme; me.ava=draftAva;
   applyMyStyle();
   $("meAva").innerHTML=avaHtml(me.ava);
   $("meName").textContent=me.name;
   // persist profile to Firebase user record
   try{
-    FB.db.ref("users/"+me.handle.slice(1)).update({ pat:me.pat, theme:me.theme, ava:me.ava||"" , name:me.name, first:me.first, last:me.last }).then(()=>{ saveSession(); }).catch(()=>{ saveSession(); });
+    FB.db.ref("users/"+me.handle.slice(1)).update({ pat:me.pat, theme:me.theme, ava:me.ava||"" , name:me.name, first:me.first, last:me.last, bio:me.bio }).then(()=>{ saveSession(); }).catch(()=>{ saveSession(); });
   }catch(e){}
   closeSettings();
   renderDialogs();
@@ -1155,7 +1283,16 @@ function openPeerProfileFrom(rawThem){
   if(!rawThem) return;
   const themL=String(rawThem).replace(/^@+/,"").toLowerCase();
   const d=dialogs[themL]||{handle:themL,name:themL,ava:"👤",theme:"dark"};
-  // apply peer personal background to the peer modal
+  // hide "block" button when viewing your own profile
+  const isSelf = (themL===String(me.handle).toLowerCase().replace(/^@+/,""));
+  const blkBtn=$("btnBlockPeer");
+  if(blkBtn){ blkBtn.style.display = isSelf ? "none":"block"; }
+  // show current block state
+  const blkBtn2=$("btnBlockPeer");
+  if(blkBtn2 && !isSelf){
+    const isBlocked = me.blocked && me.blocked[themL];
+    blkBtn2.textContent = isBlocked ? "Разблокировать" : "Заблокировать";
+  }
   const hero=document.querySelector("#peerOverlay .peer-hero");
   if(hero){
     hero.setAttribute("data-pbg",d.theme||"dark");
@@ -1171,16 +1308,36 @@ function openPeerProfileFrom(rawThem){
   $("peerPhoneRow").style.display = (themL==="lincoln") ? "block":"none";
   if(themL==="lincoln") $("peerPhoneRow").textContent="📞 +888 000 88 88";
   else $("peerPhoneRow").innerHTML="";
-  // fetch fresh peer data (avat, name, theme) to keep visible to all
+  // fetch fresh peer data (ava, name, theme, bio) to keep visible to all
   FB.db.ref("users/"+themL).once("value").then(s=>{
     const u=s.val(); if(!u) return;
     dialogs[themL]=dialogs[themL]||{};
     dialogs[themL].ava=u.ava||"";
     dialogs[themL].name=u.name||"@"+themL;
     dialogs[themL].theme=u.theme||"dark";
+    dialogs[themL].bio=u.bio||"";
     if(hero) hero.setAttribute("data-pbg",u.theme||"dark");
+    // Lincoln always gets cosmic background + Pepe gifts (visible to all)
+    if(themL==="lincoln"){
+      if(hero) hero.setAttribute("data-pbg","cosmic");
+      // inject Pepe gifts into peer hero
+      let g=document.getElementById("peerGifts");
+      if(!g && hero){
+        g=document.createElement("div"); g.id="peerGifts"; g.className="pepe-gifts";
+        g.innerHTML='<span class="pepe-gift">🐸</span><span class="pepe-gift">💚</span><span class="pepe-gift">🎁</span><span class="pepe-gift">🐸</span><span class="pepe-gift">⭐</span>';
+        hero.appendChild(g);
+      }
+      if(g) g.style.display="block";
+    } else {
+      const g=document.getElementById("peerGifts"); if(g) g.style.display="none";
+    }
     $("peerBigAva").innerHTML=avaHtml(u.ava,u.name);
     $("peerBigName").textContent=u.name||"@"+themL;
+    const bio=$("peerBio");
+    if(bio){
+      bio.style.display = u.bio?"block":"none";
+      bio.textContent = u.bio||"";
+    }
   }).catch(()=>{});
   $("peerOverlay").classList.add("open");
 }
@@ -1194,6 +1351,20 @@ $("peerClick").addEventListener("click",openPeerProfile);
 $("btnClosePeer").addEventListener("click",()=>$("peerOverlay").classList.remove("open"));
 $("peerOverlay").addEventListener("click",e=>{ if(e.target===$("peerOverlay")) $("peerOverlay").classList.remove("open"); });
 $("btnWritePeer").addEventListener("click",()=>{ $("peerOverlay").classList.remove("open"); $("chatText").focus(); });
+$("btnBlockPeer").addEventListener("click",()=>{ blockPeer(openChatPeer); });
+function blockPeer(peerLower){
+  if(!peerLower) return;
+  const them=String(peerLower).toLowerCase().replace(/^@+/,"");
+  const myKey=me.handle.toLowerCase().replace(/^@+/,"");
+  const isBlocked = me.blocked && me.blocked[them];
+  FB.db.ref("users/"+myKey+"/blocked/"+them).set(isBlocked?null:{at:Date.now()}).then(()=>{
+    me.blocked=me.blocked||{};
+    if(isBlocked){ delete me.blocked[them]; toast("Вы разблокировали @"+them); }
+    else { me.blocked[them]={at:Date.now()}; toast("Пользователь @"+them+" заблокирован"); }
+    saveSession();
+    $("peerOverlay").classList.remove("open");
+  }).catch(()=>{ toast("Ошибка"); });
+}
 
 /* ---------- logout ---------- */
 $("btnLogout").addEventListener("click",()=>{
@@ -1256,15 +1427,18 @@ function updateChatsBadge(){
 /* profile view  */
 function renderProfile(){
   const hero=document.querySelector("#vProfile .profile-hero");
-  if(hero) hero.setAttribute("data-pbg",me.theme||"dark");
+  const isLincoln=(String(me.handle||"").toLowerCase().replace(/^@+/,"")==="lincoln");
+  if(hero) hero.setAttribute("data-pbg", isLincoln ? "cosmic" : (me.theme||"dark"));
+  const gifts=$("pGifts");
+  if(gifts) gifts.style.display = isLincoln ? "block":"none";
   $("pBigAva").innerHTML=avaHtml(me.ava,me.name);
   $("pName").textContent=me.name||me.handle.slice(1);
   $("pHandle").textContent=me.handle;
   $("pHandle2").textContent=me.handle;
-  const isLincoln=(String(me.handle).toLowerCase().replace(/^@+/,"")==="lincoln");
   $("pPhone").textContent=isLincoln?"+888 000 88 88":"—";
   const c=me.created||null;
   $("pCreated").textContent=c?new Date(c).toLocaleDateString("ru-RU",{day:"numeric",month:"long",year:"numeric"}):"—";
+  const pb=$("pBio"); if(pb) pb.textContent=me.bio||"—";
 }
 $("pActPhoto").addEventListener("click",()=>$("avaFile").click());
 $("pBigAva").addEventListener("click",()=>$("avaFile").click());
