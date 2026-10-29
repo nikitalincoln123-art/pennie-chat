@@ -1092,7 +1092,10 @@ function sendPhoto(url){
   if(me.blocked && me.blocked[peer]){ toast("Нельзя отправлять заблокированному"); return; }
   const key=dialogKeyOf(me.handle,openChatPeer);
   const msg={from:me.handle, kind:"photo", img:url, t:Date.now()};
-  FB.db.ref("msgs/"+key).push(msg).catch(()=>{});
+  try{
+    const pr=FB.db.ref("msgs/"+key).push(msg);
+    if(pr&&pr.then){ pr.catch(()=>{ toast("Фото не отправилось. Проверьте интернет."); }); }
+  }catch(e){ toast("Фото не отправилось. Проверьте интернет."); return; }
   updateDialogFromMessages(openChatPeer,{x:{from:me.handle,kind:"photo",token:"📷 Фото",t:msg.t}});
   toast("Фото отправлено");
 }
@@ -1108,7 +1111,8 @@ $("sRowGlow").addEventListener("click",()=>{
   toast(glowOn?"Свечение включено":"Свечение выключено");
 });
 function sendNow(){
-  const t=$("chatText").value.trim();
+  const el=$("chatText");
+  const t=el.value.trim();
   if(!t || !openChatPeer) return;
   const peer=String(openChatPeer).toLowerCase().replace(/^@+/,"");
   const myKey=me.handle.toLowerCase().replace(/^@+/,"");
@@ -1116,8 +1120,17 @@ function sendNow(){
   if(me.blocked && me.blocked[peer]){ toast("Нельзя отправлять заблокированному пользователю"); return; }
   const key=dialogKeyOf(me.handle,openChatPeer);
   const msg={from:me.handle,text:t,t:Date.now(),glow:glowOn?true:undefined};
-  FB.db.ref("msgs/"+key).push(msg).catch(e=>{});
-  $("chatText").value="";
+  // clear field FIRST so a failing write never leaves text stuck
+  el.value="";
+  function onFail(){
+    // restore the text so the user can retry / doesn't lose it
+    if(el && t && !el.value){ el.value=t; }
+    toast("Не удалось отправить. Проверьте интернет.");
+  }
+  try{
+    const pr=FB.db.ref("msgs/"+key).push(msg);
+    if(pr&&pr.then){ pr.catch(onFail); }
+  }catch(e){ onFail(); }
   updateDialogFromMessages(openChatPeer,{x:{from:me.handle,text:t,t:msg.t}});
 }
 $("btnSend").addEventListener("click",sendNow);
