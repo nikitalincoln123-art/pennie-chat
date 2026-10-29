@@ -21,6 +21,31 @@
   --mine:#4f9bd4;
   --font:'Segoe UI',system-ui,-apple-system,'Helvetica Neue',Roboto,Arial,sans-serif;
 }
+/* ============ chat themes (backgrounds) ============ */
+body[data-theme="dark"]{--bg:#0b141a;--bg-in:#0e1a21;--panel:#17212b;--panel2:#242f3d;--chip:#2b3b49;--line:#202d38;--ink:#f1f3f5;--ink-dim:#8696a0;--accent:#54b7e9}
+body[data-theme="black"]{--bg:#000000;--bg-in:#0c0c0c;--panel:#141414;--panel2:#202020;--chip:#2a2a2a;--line:#2c2c2c;--ink:#fff;--ink-dim:#9a9a9a;--accent:#7aa2f0}
+body[data-theme="white"]{--bg:#f0f2f5;--bg-in:#ffffff;--panel:#ffffff;--panel2:#e8ebf0;--chip:#e0e4ea;--line:#d5dae2;--ink:#15181d;--ink-dim:#5b6470;--accent:#1c6feb}
+body[data-theme="gold"]{--bg:#1a1507;--bg-in:#241d0a;--panel:#2b2310;--panel2:#372c14;--chip:#45361a;--line:#4d3d16;--ink:#fdf3d7;--ink-dim:#d6bd82;--accent:#e6b93c}
+body[data-theme="marsh"]{--bg:#101609;--bg-in:#161f0e;--panel:#1c2713;--panel2:#24331a;--chip:#2e4022;--line:#34481f;--ink:#f0f6e6;--ink-dim:#a8c08a;--accent:#8fbf5a}
+body[data-theme="sky"]{--bg:#0a1420;--bg-in:#0e1c2e;--panel:#14283c;--panel2:#1a334d;--chip:#234a6b;--line:#22405e;--ink:#eaf6ff;--ink-dim:#9cc2e0;--accent:#4db6f0}
+body[data-theme="violet"]{--bg:#130a20;--bg-in:#1a0e2e;--panel:#221344;--panel2:#2c1a56;--chip:#3c256e;--line:#342056;--ink:#f4edff;--ink-dim:#c2a8ec;--accent:#a06bf0}
+
+/* ============ patterned my-message colors ============ */
+.bubble.m,.bubble.patta,.bubble.patpa{
+  color:#fff;background:var(--mine);
+}
+.bubble.m[data-pat="0"]{background:#4f9bd4}
+.bubble.m[data-pat="1"]{color:#21130a;background:linear-gradient(135deg,#ff8a3d,#ff5e8a)}
+.bubble.m[data-pat="2"]{color:#fff;background:repeating-linear-gradient(45deg,#5d2ee0 0,#5d2ee0 14px,#7b4dff 14px,#7b4dff 28px)}
+.bubble.m[data-pat="3"]{color:#120919;background:radial-gradient(circle at 8px 8px,rgba(255,255,255,.28) 3px,transparent 3px),radial-gradient(circle at 18px 18px,rgba(255,255,255,.28) 3px,transparent 3px),linear-gradient(135deg,#2a7de8,#6a2ee0);background-size:26px 26px,26px 26px,100% 100%}
+.bubble.m[data-pat="4"]{color:#1a230c;background:repeating-linear-gradient(90deg,#9be04a 0,#9be04a 12px,#5fb832 12px,#5fb832 24px)}
+.bubble.m[data-pat="5"]{color:#fff;background:repeating-linear-gradient(-45deg,#16c7b4 0,#16c7b4 10px,#0e9f90 10px,#0e9f90 20px)}
+.bubble.m[data-pat="6"]{color:#2d0f05;background:repeating-linear-gradient(0deg,#ffb95e 0,#ffb95e 12px,#ff8a3d 12px,#ff8a3d 24px)}
+.bubble.m[data-pat="7"]{color:#fff;background:radial-gradient(circle at 50% 50%,#ff5e8a 40%,#c2255c 40%);background-size:100% 100%}
+.bubble.m[data-pat="8"]{color:#fdeeef;background:linear-gradient(135deg,#f43f5e,#7c3aed)}
+.bubble.m[data-pat="9"]{color:#fff;background:repeating-linear-gradient(45deg,#9333ea 0,#9333ea 16px,#6d28d9 16px,#6d28d9 32px)}
+.bubble.m[data-pat="10"]{color:#02100b;background:repeating-linear-gradient(90deg,#34d399 0,#34d399 14px,#0d9668 14px,#0d9668 28px)}
+.bubble.m[data-pat="11"]{color:#fff;background:radial-gradient(circle at 20% 30%,#fb923c 0,#fb923c 26%,transparent 26%),radial-gradient(circle at 75% 65%,#fb923c 0,#fb923c 26%,transparent 26%),linear-gradient(135deg,#0ea5e9,#4f46e5);background-size:44px 44px,44px 44px,100% 100%}
 *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
 html,body{height:100%}
 body{
@@ -109,6 +134,28 @@ input{font-family:inherit;color:var(--ink)}
 .confirm-bar{padding:8px 14px;display:flex;gap:8px;background:var(--panel);border-top:1px solid var(--line);align-self:stretch}
 .confirm-bar .btn{width:auto;padding:9px 16px;font-size:14px;border-radius:10px}
 
+/* ============ settings modal ============ */
+.overlay{position:fixed;inset:0;background:rgba(0,0,0,.55);z-index:50;display:none;align-items:center;justify-content:center;padding:18px}
+.overlay.open{display:flex}
+.modal{background:var(--panel);border:1px solid var(--line);border-radius:18px;width:100%;max-width:420px;max-height:88vh;overflow-y:auto;padding:20px}
+.modal .m-head{display:flex;align-items:center;margin-bottom:18px}
+.modal .m-head .m-title{flex:1;font-weight:700;font-size:17px}
+.modal .x-btn{width:34px;height:34px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:16px;background:var(--panel2);flex:0 0 auto}
+.modal .field{margin-bottom:16px}
+.swatches{display:flex;flex-wrap:wrap;gap:8px}
+.swatch{width:40px;height:40px;border-radius:12px;border:2px solid var(--line);cursor:pointer;flex:0 0 auto}
+.swatch.sel{border-color:var(--accent);transform:scale(1.08)}
+.theme-sw{width:56px;height:44px;border-radius:10px;border:2px solid var(--line);cursor:pointer;position:relative;flex:0 0 auto}
+.theme-sw.sel{border-color:var(--accent)}
+.theme-sw span{position:absolute;left:0;right:0;top:50%;transform:translateY(-50%);text-align:center;font-size:11px;font-weight:700;color:var(--ink)}
+.ava-zone{display:flex;flex-direction:column;align-items:center;gap:12px}
+.ava-preview{width:84px;height:84px;border-radius:50%;background:var(--chip);display:flex;align-items:center;justify-content:center;overflow:hidden;font-size:26px;border:2px solid var(--line);flex:0 0 auto}
+.ava-preview img{width:100%;height:100%;object-fit:cover;display:block}
+.upload-btn{display:flex;align-items:center;gap:9px;width:100%;justify-content:center;background:var(--accent);color:#0b141a;border-radius:12px;padding:13px;font-size:15px;font-weight:700}
+.upload-btn:hover{filter:brightness(1.08)}
+.upload-btn.ghost{background:transparent;color:var(--accent);border:1px solid var(--line)}
+.upload-ico{font-size:18px}
+
 @media(max-width:600px){ .auth-card{padding:24px 20px} }
 </style>
 </head>
@@ -147,6 +194,7 @@ input{font-family:inherit;color:var(--ink)}
   <div class="topbar">
     <div class="me-ava" id="meAva">😊</div>
     <div class="me-name"><div class="n" id="meName">…</div><div class="s" id="meLogin">@…</div></div>
+    <button class="icon-btn" id="btnSettingsChats" title="Профиль и вид">🎨</button>
     <button class="icon-btn" id="btnLogout" title="Выйти">⏻</button>
   </div>
   <div class="searchbar">
@@ -173,6 +221,36 @@ input{font-family:inherit;color:var(--ink)}
   <div class="chat-input-bar">
     <textarea id="chatText" rows="1" placeholder="Сообщение…" maxlength="4000"></textarea>
     <button class="send-btn" id="btnSend">➤</button>
+  </div>
+</div>
+
+<!-- ============ SETTINGS MODAL ============ -->
+<div class="overlay" id="settingsOverlay">
+  <div class="modal">
+    <div class="m-head"><div class="m-title">Профиль и вид</div><button class="x-btn" id="btnCloseSettings">✕</button></div>
+
+    <div class="field">
+      <label>Аватар</label>
+      <div class="ava-zone">
+        <div class="ava-preview" id="avaPreview">👤</div>
+        <input type="file" id="avaFile" accept="image/*" style="display:none">
+        <button class="upload-btn" id="btnUploadAva"><span class="upload-ico">📷</span> Загрузить фото</button>
+        <button class="upload-btn ghost" id="btnRemoveAva" style="display:none">✕ Убрать фото</button>
+        <p style="font-size:12px;color:var(--ink-dim);text-align:center">Фото квадратное, до 2 МБ. Или оставьте без аватара.</p>
+      </div>
+    </div>
+
+    <div class="field">
+      <label>Цвет моих сообщений</label>
+      <div class="swatches" id="patSwatches"></div>
+    </div>
+
+    <div class="field">
+      <label>Фон чата</label>
+      <div class="swatches" id="themeSwatches"></div>
+    </div>
+
+    <button class="btn" id="btnSaveSettings">Сохранить</button>
   </div>
 </div>
 
@@ -209,6 +287,10 @@ const FB=(()=>{try{
 
 /* ---------- helpers ---------- */
 function esc(s){return String(s==null?"":s).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));}
+function avaHtml(a){
+  if(a && /^data:image\//.test(a)) return `<img src="${a}" alt="" style="width:100%;height:100%;object-fit:cover;border-radius:50%">`;
+  return esc(a||"👤");
+}
 function normHandle(raw){
   let s=String(raw||"").trim();
   if(!s.startsWith("@")) return null;
@@ -308,7 +390,7 @@ async function onNext2(){
       await fbRef.update({
         ["users/"+key]:{ name:pendingUser, hash:hash, salt:salt, created:Date.now() }
       });
-      me={handle:pendingUser, name:prompt("Ваше отображаемое имя (можно оставить пустым)")||pendingUser.slice(1), ava:"😊"};
+      me={handle:pendingUser, name:prompt("Ваше отображаемое имя (можно оставить пустым)")||pendingUser.slice(1), ava:"", pat:"0", theme:"dark"};
       saveSession();
       openChats();
     } else {
@@ -319,7 +401,7 @@ async function onNext2(){
       if(!rec || !rec.hash){ setErr("Аккаунт не найден"); btn.disabled=false; stepTo(1); return; }
       const hash=await hashPassword(pw, rec.salt);
       if(hash!==rec.hash){ setErr("Неверный код"); btn.disabled=false; return; }
-      me={handle:pendingUser, name:(rec.name||pendingUser.slice(1)), ava:(rec.ava||"😊")};
+      me={handle:pendingUser, name:(rec.name||pendingUser.slice(1)), ava:(rec.ava||""), pat:(rec.pat!=null?rec.pat:"0"), theme:(rec.theme||"dark")};
       saveSession();
       openChats();
     }
@@ -334,7 +416,8 @@ let dialogs={}, dialogRefs=[];
 
 function openChats(){
   showView("vChats");
-  $("meAva").textContent=me.ava||"😊";
+  applyMyStyle();
+  $("meAva").innerHTML=avaHtml(me.ava);
   $("meName").textContent=me.name||me.handle.slice(1);
   $("meLogin").textContent=me.handle;
   $("searchUser").value="";
@@ -387,7 +470,7 @@ function renderDialogs(){
   arr.forEach(d=>{
     const row=document.createElement("div");
     row.className="dialog";
-    row.innerHTML=`<div class="av">${esc(d.ava||"👤")}</div>
+    row.innerHTML=`<div class="av">${avaHtml(d.ava)}</div>
       <div class="body">
         <div class="row"><span class="nm">${esc(d.name||d.handle)}</span><span class="tm">${esc(d.time||"")}</span></div>
         <div class="lp">${esc(d.preview||"")}</div>
@@ -435,7 +518,7 @@ function openChat(themL){
       const u=snap.val();
       if(u){
         dialogs[themL]=dialogs[themL]||{handle:"@"+themL,ava:u.ava||"👤",name:u.name||"@"+themL};
-        $("peerAva").textContent=u.ava||"👤";
+        $("peerAva").innerHTML=avaHtml(u.ava);
         $("peerName").textContent=(u.name||"@"+themL);
         renderDialogs();
       }
@@ -465,7 +548,9 @@ function renderChat(themL,list){
     const mk=new Date(m.t).getDate();
     if(mk!==lastDay){ lastDay=mk; const c=document.createElement("div"); c.className="day-chip"; c.textContent=new Date(m.t).toLocaleDateString("ru-RU",{day:"numeric",month:"long"}); el.appendChild(c); }
     const b=document.createElement("div");
-    b.className="bubble "+(m.from===me.handle?"m":"p");
+    const mine=m.from===me.handle;
+    b.className="bubble "+(mine?"m":"p");
+    if(mine) b.setAttribute("data-pat",(me.pat!=null?me.pat:"0"));
     b.textContent=m.text;
     const t=document.createElement("span"); t.className="tm"; t.textContent=fmtTime(m.t);
     b.appendChild(t);
@@ -495,7 +580,7 @@ async function doSearch(){
     const themL="@"+key;
     const card=document.createElement("div");
     card.className="result-card";
-    card.innerHTML=`<div class="av">${esc(u.ava||"👤")}</div>
+    card.innerHTML=`<div class="av">${avaHtml(u.ava)}</div>
       <div class="r-body"><div class="n">${esc(u.name||themL)}</div><div class="s">${esc(themL)}</div></div>
       <button class="btn" style="width:auto;padding:10px 16px;font-size:14px">Написать</button>`;
     card.querySelector("button").addEventListener("click",()=>openChat(themL));
@@ -515,6 +600,129 @@ function sendNow(){
 }
 $("btnSend").addEventListener("click",sendNow);
 $("chatText").addEventListener("keydown",e=>{ if(e.key==="Enter"&&!e.shiftKey){ e.preventDefault(); sendNow(); } });
+
+/* ---------- settings / profile ---------- */
+const PATTERNS=[
+  {css:"0",  bg:"#4f9bd4"},
+  {css:"1",  bg:"linear-gradient(135deg,#ff8a3d,#ff5e8a)"},
+  {css:"2",  bg:"repeating-linear-gradient(45deg,#5d2ee0 0,#5d2ee0 14px,#7b4dff 14px,#7b4dff 28px)"},
+  {css:"3",  bg:"radial-gradient(circle at 4px 4px,rgba(255,255,255,.3) 2px,transparent 2px),radial-gradient(circle at 14px 14px,rgba(255,255,255,.3) 2px,transparent 2px),linear-gradient(135deg,#2a7de8,#6a2ee0)"},
+  {css:"4",  bg:"repeating-linear-gradient(90deg,#9be04a 0,#9be04a 12px,#5fb832 12px,#5fb832 24px)"},
+  {css:"5",  bg:"repeating-linear-gradient(-45deg,#16c7b4 0,#16c7b4 10px,#0e9f90 10px,#0e9f90 20px)"},
+  {css:"6",  bg:"repeating-linear-gradient(0deg,#ffb95e 0,#ffb95e 12px,#ff8a3d 12px,#ff8a3d 24px)"},
+  {css:"7",  bg:"radial-gradient(circle at 50% 50%,#ff5e8a 40%,#c2255c 40%)"},
+  {css:"8",  bg:"linear-gradient(135deg,#f43f5e,#7c3aed)"},
+  {css:"9",  bg:"repeating-linear-gradient(45deg,#9333ea 0,#9333ea 16px,#6d28d9 16px,#6d28d9 32px)"},
+  {css:"10", bg:"repeating-linear-gradient(90deg,#34d399 0,#34d399 14px,#0d9668 14px,#0d9668 28px)"},
+  {css:"11", bg:"radial-gradient(circle at 22% 28%,#fb923c 0,#fb923c 24%,transparent 24%),radial-gradient(circle at 74% 62%,#fb923c 0,#fb923c 24%,transparent 24%),linear-gradient(135deg,#0ea5e9,#4f46e5)"}
+];
+const THEMES=[
+  {id:"dark",label:"Тёмный",g:"#0b141a"},
+  {id:"black",label:"Чёрный",g:"#000"},
+  {id:"white",label:"Белый",g:"#f0f2f5"},
+  {id:"gold",label:"Золото",g:"#3a2d0e"},
+  {id:"marsh",label:"Болотный",g:"#1c2713"},
+  {id:"sky",label:"Голубой",g:"#0e1c2e"},
+  {id:"violet",label:"Фиолет",g:"#221344"}
+];
+let draftPat="0", draftTheme="dark", draftAva=null;
+
+function buildSettingsChrome(){
+  const pat=$("patSwatches"); pat.innerHTML="";
+  PATTERNS.forEach(p=>{
+    const b=document.createElement("button"); b.type="button"; b.className="swatch"; b.dataset.v=p.css;
+    b.style.background=p.bg; b.setAttribute("aria-label","Узор сообщений "+p.css);
+    b.addEventListener("click",()=>{ pat.querySelectorAll(".swatch").forEach(x=>x.classList.remove("sel")); b.classList.add("sel"); draftPat=p.css; previewPat(); });
+    pat.appendChild(b);
+  });
+  const th=$("themeSwatches"); th.innerHTML="";
+  THEMES.forEach(t=>{
+    const b=document.createElement("button"); b.type="button"; b.className="theme-sw"; b.dataset.v=t.id; b.title=t.label;
+    b.style.background=t.g; b.style.color="#fff"; b.innerHTML="<span>"+esc(t.label)+"</span>";
+    b.addEventListener("click",()=>{ th.querySelectorAll(".theme-sw").forEach(x=>x.classList.remove("sel")); b.classList.add("sel"); draftTheme=t.id; });
+    th.appendChild(b);
+  });
+}
+function previewPat(){
+  // show the chosen pattern live on the current message area (if a chat is open)
+  const b=document.querySelector(".bubble.m");
+  if(b) b.setAttribute("data-pat",draftPat);
+}
+function openSettings(){
+  draftPat=String(me.pat!=null?me.pat:"0");
+  draftTheme=me.theme||"dark";
+  draftAva=me.ava||null;
+  // mark selections
+  $("#patSwatches").querySelectorAll(".swatch").forEach(x=>x.classList.toggle("sel",x.dataset.v===draftPat));
+  $("#themeSwatches").querySelectorAll(".theme-sw").forEach(x=>x.classList.toggle("sel",x.dataset.v===draftTheme));
+  renderAvaPreview();
+  $("#settingsOverlay").classList.add("open");
+  $('#btnRemoveAva').style.display = (me.ava && me.ava.length) ? "block":"none";
+}
+function renderAvaPreview(){
+  const el=$("avaPreview");
+  el.innerHTML = draftAva && draftAva.length ? `<img src="${draftAva}" alt="">` : "👤";
+  $('#btnRemoveAva').style.display = (draftAva && draftAva.length) ? "block":"none";
+}
+function readAvaFile(file){
+  if(!file) return;
+  if(!/^image\//.test(file.type)){ toast("Выберите изображение"); return; }
+  if(file.size>2*1024*1024){ toast("Файл больше 2 МБ — выберите меньше"); return; }
+  const rd=new FileReader();
+  rd.onload=e=>{
+    const img=new Image();
+    img.onload=()=>{
+      const S=180, cv=document.createElement("canvas");
+      const side=Math.min(img.width,img.height);
+      cv.width=S; cv.height=S;
+      const ctx=cv.getContext("2d");
+      const sx=(img.width-side)/2, sy=(img.height-side)/2;
+      try{ ctx.drawImage(img,sx,sy,side,side,0,0,S,S); }catch(err){
+        // some browsers need different draw args
+        ctx.drawImage(img,0,0,S,S); }
+      let url;
+      try{ url=cv.toDataURL("image/jpeg",0.82); }catch(e){ url=e.target.result; }
+      draftAva=url; renderAvaPreview();
+      toast("Фото выбрано");
+    };
+    img.onerror=()=>toast("Не удалось прочитать изображение");
+    img.src=e.target.result;
+  };
+  rd.readAsDataURL(file);
+}
+function closeSettings(){ $("#settingsOverlay").classList.remove("open"); }
+
+// save settings
+$("btnSaveSettings").addEventListener("click",()=>{
+  me.pat=draftPat; me.theme=draftTheme; me.ava=draftAva;
+  applyMyStyle();
+  // persist profile to Firebase user record
+  try{
+    FB.db.ref("users/"+me.handle.slice(1)).update({ pat:me.pat, theme:me.theme, ava:me.ava||"" , name:me.name}).then(()=>{ saveSession(); }).catch(()=>{ saveSession(); });
+  }catch(e){}
+  closeSettings();
+  renderDialogs();
+  toast("Сохранено");
+});
+$("btnCloseSettings").addEventListener("click",closeSettings);
+$("settingsOverlay").addEventListener("click",e=>{ if(e.target===$("settingsOverlay")) closeSettings(); });
+$("btnUploadAva").addEventListener("click",()=>$("avaFile").click());
+$("avaFile").addEventListener("change",e=>{ const f=e.target.files&&e.target.files[0]; if(f) readAvaFile(f); e.target.value=""; });
+$("btnRemoveAva").addEventListener("click",()=>{ draftAva=null; renderAvaPreview(); });
+
+function applyMyStyle(){
+  document.body.dataset.theme = me.theme||"dark";
+}
+function toast(m){
+  let el=document.getElementById("toastBox");
+  if(!el){ el=document.createElement("div"); el.id="toastBox"; el.style.cssText="position:fixed;left:50%;bottom:24px;transform:translateX(-50%);background:rgba(20,27,35,.9);color:#fff;padding:11px 18px;border-radius:12px;font-size:14px;z-index:99;transition:opacity .3s"; document.body.appendChild(el); }
+  el.textContent=m; el.style.opacity="1";
+  clearTimeout(el.__t); el.__t=setTimeout(()=>{ el.style.opacity="0"; },2200);
+}
+
+/* settings buttons: chat topbar + chats list */
+$("btnPeer").addEventListener("click",openSettings);
+$("btnSettingsChats").addEventListener("click",openSettings);
 
 /* ---------- logout ---------- */
 $("btnLogout").addEventListener("click",()=>{
@@ -537,8 +745,10 @@ setInterval(()=>{ try{ localStorage.setItem("pennie_dialogs_"+me.handle, JSON.st
 /* ---------- boot ---------- */
 (function boot(){
   if(!FB.ok){ alert("Не удалось подключиться к серверу. Попробуйте позже."); return; }
+  buildSettingsChrome();
   loadSession();
   if(me && me.handle){
+    applyMyStyle();
     openChats();
   } else {
     showView("vAuth");
