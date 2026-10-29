@@ -813,8 +813,7 @@ function connect(room, side){
     const done=(fn,arg)=>{ if(!settled){ settled=true; fn(arg);} };
     const ref=FB.db.ref(fbRoomPath(room));
     const mailbox=ref.child("mailbox");
-    // Subscribe to all kinds via one listener on the room mailbox
-    try{ ref.child("presence").child(side).set({online:true,ts:Date.now(),t:Date.now()}); }catch(e){}
+    // Subscribe to the single mailbox channel (all kinds: msg, presence, typing, react, control)
     fbRoomListener=mailbox.on("value", snap=>{
       const data=snap.val()||{};
       Object.keys(data).forEach(k=>{
@@ -831,34 +830,32 @@ function connect(room, side){
   });
 }
 
-function fbWrite(room, kind, obj){
+function fbWrite(room, obj){
   try{
     if(!FB.db) return;
-    const ref=FB.db.ref(fbRoomPath(room));
-    // use push() to an unordered child list; dedup handled by id
-    ref.child(kind).push(obj);
+    const ref=FB.db.ref(fbRoomPath(room)+"/mailbox");
+    ref.push(obj);
   }catch(e){}
 }
 
 function send(topic,obj){
   if(!state.room) return;
-  fbWrite(state.room, topic, Object.assign({kind:topic,t:Date.now()}, obj));
+  fbWrite(state.room, Object.assign({kind:topic,t:Date.now()}, obj));
 }
 
 function announcePresence(){
   try{
-    if(FB.db&&state.room){
-      FB.db.ref(fbRoomPath(state.room)+"/presence/"+state.role).set({online:true,ts:Date.now(),t:Date.now(),name:state.name});
+    if(FB.db&&state.room&&state.role){
+      fbWrite(state.room, {kind:"presence",side:state.role,name:state.name,ts:Date.now(),online:true});
     }
   }catch(e){}
 }
 
-/* Simplify delivery: Firebase pushes are reliable; receiver dedups by id.
-   Keep a tiny outbox just to mark delivery (ACK unnecessary but harmless). */
+/* Simplify delivery: Firebase pushes are reliable; receiver dedups by id. */
 function sendMsg(o){ send("msg", o); }
 function sendControl(o){ send("control", o); }
 function sendReact(o){ send("react", o); }
-function sendTypingMsg(b){ try{ if(FB.db&&state.room) FB.db.ref(fbRoomPath(state.room)+"/typing/"+state.role).set({typing:!!b,t:Date.now()}); }catch(e){} }
+function sendTypingMsg(b){ send("typing",{side:state.role,typing:!!b}); }
 
 function onFireEvent(room, d){
   const kind=d.kind;
