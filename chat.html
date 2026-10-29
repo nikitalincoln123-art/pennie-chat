@@ -45,6 +45,13 @@
     --standard:#ffffff;
     --scale:linear-gradient(135deg,#ffffff,#e9eaf6);
   }
+  /* ===== Chat themes (full background) ===== */
+  body[data-theme="dark"]{--bg:#05050a;--bg2:#0b0b12;--panel:#0f0f18;--panel2:#161622;--line:#232431;--ink:#f4f5fb;--ink-dim:#aab0cf;--ink-faint:#7b80a0;--sca:#ffffff}
+  body[data-theme="light"]{--bg:#eceff8;--bg2:#ffffff;--panel:#f7f8fd;--panel2:#eef0f8;--line:#d4d8ea;--ink:#14162a;--ink-dim:#4a4f6e;--ink-faint:#8a8fb0;--sca:#2b3550}
+  body[data-theme="midnight"]{--bg:#080a1c;--bg2:#101433;--panel:#141a40;--panel2:#1c2450;--line:#2a3470;--ink:#eef0ff;--ink-dim:#b8bfee;--ink-faint:#7d86c8;--sca:#d9e3ff}
+  body[data-theme="violet"]{--bg:#140a24;--bg2:#241040;--panel:#2a124f;--panel2:#35195f;--line:#4a2480;--ink:#f6efff;--ink-dim:#d4bcff;--ink-faint:#a184e0;--sca:#e7d4ff}
+  body[data-theme="emerald"]{--bg:#052012;--bg2:#0a3521;--panel:#0e442b;--panel2:#145637;--line:#1f7a4d;--ink:#eafff5;--ink-dim:#a9e6c8;--ink-faint:#6ab791;--sca:#d2ffe9}
+  body[data-theme="sunset"]{--bg:#20110a;--bg2:#34201a;--panel:#3f241d;--panel2:#4d2c24;--line:#6e3f33;--ink:#fff3ec;--ink-dim:#ffd3bd;--ink-faint:#e09270;--sca:#ffefe2}
   *{box-sizing:border-box;margin:0;padding:0}
   .card,.btn,.input,.seg button,.user-item,.comm-item,.chatbox .cb-m,.qbtn,.hdr-btn,.modal{transition:all .25s cubic-bezier(.2,.7,.3,1)}
   .btn:hover{transform:translateY(-1px)}
@@ -101,7 +108,6 @@
   #sc-landing .logo-row{margin-bottom:22px}
   #sc-landing .seg{margin-bottom:0}
   #sc-landing .hint{margin:16px 0 0}
-  #sc-landing #btnCreate{margin-top:20px}
   #sc-landing .divider{margin:20px 0}
   #sc-landing #btnOpenByLink{margin-top:0}
   #sc-landing .credit{margin-top:22px}
@@ -187,9 +193,13 @@
   .ava-pick button{width:44px;height:44px;border-radius:14px;display:flex;align-items:center;justify-content:center;
     font-size:21px;background:var(--bg2);border:1px solid var(--line);transition:all .15s}
   .ava-pick button.sel{border-color:var(--accent);box-shadow:0 0 0 3px rgba(255,255,255,.22);transform:translateY(-2px)}
-  .color-row{display:flex;gap:9px;margin-top:6px}
-  .color-row button{width:30px;height:30px;border-radius:50%;border:3px solid transparent;transition:all .15s}
+  .color-row{display:flex;gap:9px;margin-top:6px;flex-wrap:wrap}
+  .color-row button{width:30px;height:30px;border-radius:50%;border:3px solid transparent;transition:all .15s;flex:0 0 auto}
   .color-row button.sel{transform:scale(1.15);border-color:var(--ink)}
+  .theme-row{display:flex;gap:9px;margin-top:6px;flex-wrap:wrap}
+  .theme-row button{width:54px;height:40px;border-radius:12px;border:2px solid var(--line);cursor:pointer;transition:all .15s;position:relative;flex:0 0 auto}
+  .theme-row button span{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);font-size:16px;filter:drop-shadow(0 1px 1px rgba(0,0,0,.6))}
+  .theme-row button.sel{border-color:var(--accent);transform:translateY(-2px);box-shadow:0 0 0 3px rgba(255,255,255,.18)}
 
   /* ---------- Chat shell ---------- */
   .chat-header{display:flex;align-items:center;gap:14px;padding:12px 18px;background:linear-gradient(180deg,rgba(255,255,255,.06),rgba(18,19,31,.75));
@@ -220,7 +230,7 @@
   .bubble{position:relative;padding:10px 14px;border-radius:20px;font-size:15px;line-height:1.5;
     word-wrap:break-word;overflow-wrap:anywhere;min-width:0;box-shadow:0 4px 16px rgba(0,0,0,.25)}
   .msg.peer .bubble{background:linear-gradient(180deg,rgba(255,255,255,.07),rgba(255,255,255,.02));border:1px solid var(--line);border-top-left-radius:7px;backdrop-filter:blur(6px)}
-  .msg.me .bubble{background:var(--scale);color:#0d0e16;border-top-right-radius:7px;box-shadow:0 6px 20px rgba(255,255,255,.10),0 4px 16px rgba(0,0,0,.2)}
+  .msg.me .bubble{background:var(--me-bubble,var(--scale));color:#0d0e16;border-top-right-radius:7px;box-shadow:0 6px 20px rgba(255,255,255,.10),0 4px 16px rgba(0,0,0,.2)}
   .bubble .mtxt{white-space:pre-wrap}
   .bubble .edited{display:inline-block;font-size:10.5px;opacity:.55;margin-left:5px;font-style:italic;vertical-align:2px}
   .bubble.sticker{padding:6px}
@@ -357,7 +367,7 @@
 <!-- LANDING -->
 <section id="sc-landing" class="screen active">
   <div class="center-wrap">
-    <div class="card">
+    <div class="card big">
       <div class="logo-row">
         <div class="logo"><img src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAxMjggMTI4Ij4KICA8cmVjdCB3aWR0aD0iMTI4IiBoZWlnaHQ9IjEyOCIgcng9IjMwIiBmaWxsPSIjMGUwZTE2Ii8+CiAgPHBhdGggdHJhbnNmb3JtPSJ0cmFuc2xhdGUoMjQgMzApIHNjYWxlKDIuNCkiIGQ9Ik0wIDIzLjNDLTMuNiAxNy41LTcuOCAxMy44LTguNyA5LjRjLTEuMy02LjYgMi44LTExLjIgOC4yLTEwLjIgMy4xLjYgNS41IDIuMyA2LjkgNC42IDEuNC0yLjMgMy44LTQgNi45LTQuNiA1LjQtMSA5LjUgMy42IDguMiAxMC4yLS45IDQuNC01LjEgOC4xLTguNyAxMy45TDYuNCAyOC40IDAgMjMuM3oiIGZpbGw9IiNGRjY0QjUiLz4KICA8cGF0aCB0cmFuc2Zvcm09InRyYW5zbGF0ZSg0NiA0Mikgc2NhbGUoMS41KSIgZD0iTTAgMjMuM0MtMy42IDE3LjUtNy44IDEzLjgtOC43IDkuNGMtMS4zLTYuNiAyLjgtMTEuMiA4LjItMTAuMiAzLjEuNiA1LjUgMi4zIDYuOSA0LjYgMS40LTIuMyAzLjgtNCA2LjktNC42IDUuNC0xIDkuNSAzLjYgOC4yIDEwLjItLjkgNC40LTUuMSA4LjEtOC43IDEzLjlMNi40IDI4LjQgMCAyMy4zeiIgZmlsbD0iI0E3OEFGQSIgb3BhY2l0eT0iMC45Ii8+Cjwvc3ZnPg==" alt="Pennie" width="52" height="52"></div>
         <div>
@@ -370,16 +380,34 @@
         <span class="bn-tag">Beta-Test</span>
         <span class="bn-txt">Возможны ошибки, вылеты, недочёты</span>
       </div>
-      <div class="seg" id="newRoleSeg">
-        <button data-v="c1" class="on">Создать ссылку</button>
-        <button data-v="c2">Перейти по ссылке</button>
+      <div class="field">
+        <label for="profUsername">Юзернейм (уникальный)</label>
+        <input id="profUsername" aria-label="Юзернейм" class="input" type="text" maxlength="20" placeholder="@Nickname" autocomplete="off" spellcheck="false">
+        <p class="hint" id="unameHint">Начинается с @ и только английские буквы, цифры, _ (3–20 символов). Имя нельзя сменить — оно будет только вашим.</p>
       </div>
-      <p class="hint" id="newRoleHint">Создайте комнату — получите персональную ссылку. Передать её можно только одному человеку, и только он вместе с вами попадёт в этот уютный чат.</p>
-      <button class="btn primary block" id="btnCreate"><span id="btnCreateTxt">Создать персональную ссылку</span></button>
-      <div class="divider">уже есть ссылка?</div>
-      <button class="btn ghost block" id="btnOpenByLink">Вставить ссылку собеседника</button>
-      <button class="btn ghost block" id="btnCommunity" style="margin-top:10px">🌐 Сообщество · отзывы и вопросы</button>
+      <div class="field">
+        <label for="profName">Никнейм (как вас видно)</label>
+        <input id="profName" aria-label="Никнейм" class="input" type="text" maxlength="24" placeholder="Например, Никита">
+      </div>
+      <div class="field">
+        <label>Цвет ваших сообщений</label>
+        <div class="color-row" id="profColors"></div>
+      </div>
+      <div class="field">
+        <label>Фон чата</label>
+        <div class="theme-row" id="profThemes"></div>
+      </div>
+      <div class="field">
+        <label>Аватар</label>
+        <div class="ava-pick" id="profAvas"></div>
+        <button class="ava-photo-btn" id="btnProfPhoto" type="button" style="margin-top:8px">📷 Загрузить фото</button>
+        <input type="file" id="photoInputProf" accept="image/*" style="display:none">
+      </div>
+      <button class="btn primary block" id="btnProfDone">Войти</button>
       <div class="status-line" id="landStatus"></div>
+      <div class="divider">или</div>
+      <button class="btn ghost block" id="btnOpenByLink" style="margin-top:4px">Перейти по ссылке собеседника</button>
+      <button class="btn ghost block" id="btnCommunity" style="margin-top:10px">🌐 Сообщество · отзывы и вопросы</button>
       <div class="credit">Автор проекта: <b>Никита Линкольн</b></div>
     </div>
   </div>
@@ -499,42 +527,7 @@
   </div>
 </section>
 
-<!-- CREATE PROFILE -->
-<section id="sc-profile" class="screen">
-  <div class="center-wrap">
-    <div class="card big">
-      <div class="logo-row">
-        <div class="logo"><img src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAxMjggMTI4Ij4KICA8cmVjdCB3aWR0aD0iMTI4IiBoZWlnaHQ9IjEyOCIgcng9IjMwIiBmaWxsPSIjMGUwZTE2Ii8+CiAgPHBhdGggdHJhbnNmb3JtPSJ0cmFuc2xhdGUoMjQgMzApIHNjYWxlKDIuNCkiIGQ9Ik0wIDIzLjNDLTMuNiAxNy41LTcuOCAxMy44LTguNyA5LjRjLTEuMy02LjYgMi44LTExLjIgOC4yLTEwLjIgMy4xLjYgNS41IDIuMyA2LjkgNC42IDEuNC0yLjMgMy44LTQgNi45LTQuNiA1LjQtMSA5LjUgMy42IDguMiAxMC4yLS45IDQuNC01LjEgOC4xLTguNyAxMy45TDYuNCAyOC40IDAgMjMuM3oiIGZpbGw9IiNGRjY0QjUiLz4KICA8cGF0aCB0cmFuc2Zvcm09InRyYW5zbGF0ZSg0NiA0Mikgc2NhbGUoMS41KSIgZD0iTTAgMjMuM0MtMy42IDE3LjUtNy44IDEzLjgtOC43IDkuNGMtMS4zLTYuNiAyLjgtMTEuMiA4LjItMTAuMiAzLjEuNiA1LjUgMi4zIDYuOSA0LjYgMS40LTIuMyAzLjgtNCA2LjktNC42IDUuNC0xIDkuNSAzLjYgOC4yIDEwLjItLjkgNC40LTUuMSA4LjEtOC43IDEzLjlMNi40IDI4LjQgMCAyMy4zeiIgZmlsbD0iI0E3OEFGQSIgb3BhY2l0eT0iMC45Ii8+Cjwvc3ZnPg==" alt="Pennie" width="52" height="52"></div>
-        <div>
-          <div class="brand-name">Представьтесь</div>
-          <div class="brand-sub">ваше имя увидят в комнате</div>
-        </div>
-      </div>
-      <div class="field">
-        <label>Ваш юзернейм (уникальный)</label>
-        <input id="profUsername" aria-label="Юзернейм" class="input" type="text" maxlength="20" placeholder="Пример: @DevLincoln" autocomplete="off">
-        <p class="hint">Его нельзя будет сменить. Другой человек не сможет занять это имя, пока занято вами.</p>
-      </div>
-      <div class="field">
-        <label>Ваш никнейм</label>
-        <input id="profName" aria-label="Ваш никнейм" class="input" type="text" maxlength="24" placeholder="Как вас зовут?">
-      </div>
-      <div class="field">
-        <label>Цвет ваших сообщений</label>
-        <div class="color-row" id="profColors"></div>
-      </div>
-      <div class="field">
-        <label>Аватар</label>
-        <div class="ava-pick" id="profAvas"></div>
-      <button class="ava-photo-btn" id="btnProfPhoto" type="button" style="margin-top:8px">📷 Загрузить фото</button>
-      <input type="file" id="photoInputProf" accept="image/*" style="display:none">
-      </div>
-      <button class="btn primary block" id="btnProfDone">Продолжить</button>
-      <button class="btn ghost block" id="btnProfBack" style="margin-top:10px">← Назад</button>
-    </div>
-  </div>
-</section>
-
+<!-- CREATE PROFILE (now merged into landing) -->
 <!-- EDIT PROFILE -->
 <section id="sc-editprof" class="screen">
   <div class="center-wrap">
@@ -554,6 +547,10 @@
       <div class="field">
         <label>Цвет сообщений</label>
         <div class="color-row" id="editColors"></div>
+      </div>
+      <div class="field">
+        <label>Фон чата</label>
+        <div class="theme-row" id="editThemes"></div>
       </div>
       <div class="field">
         <label>Аватар</label>
@@ -674,12 +671,20 @@ const FB = (()=>{
 })();
 const DEFAULT_AVAS = ["😊","😎","🥰","🤠","🐱","🐼","🦊","👻","🦋","🌙","⚡","🍀","🔥","🍩","🎧","🌸"];
 const DEFAULT_COLORS = ["#8b86f5","#f96b96","#3fd6a2","#f0c25f","#6aa7f0","#f472b6","#4ade80","#fb923c"];
+const THEMES = [
+  {id:"dark",    icon:"🌑", label:"Тёмный",   g:"linear-gradient(135deg,#05050a,#1c1e30)"},
+  {id:"light",   icon:"☀️", label:"Светлый",  g:"linear-gradient(135deg,#eceff8,#cfd6ee)"},
+  {id:"midnight",icon:"🌌", label:"Полночь",  g:"linear-gradient(135deg,#080a1c,#1a2460)"},
+  {id:"violet",  icon:"💜", label:"Фиолет",   g:"linear-gradient(135deg,#140a24,#3a1a6e)"},
+  {id:"emerald", icon:"💚", label:"Изумруд",  g:"linear-gradient(135deg,#052012,#0d5a38)"},
+  {id:"sunset",  icon:"🌅", label:"Закат",    g:"linear-gradient(135deg,#20110a,#7a3a24)"}
+];
 const STICKER_POOL = ["😂","❤️","👍","🔥","😍","🥳","😭","🤔","😅","🙌","💜","✨","👏","😘","🤝","🫶","😴","🤯","🍕","🐣","🙈","🥺","😢","🫠","🤗","💔","🎉","🥲","😱","🤫","😏","😈"];
 
 let state = {
   phase:"landing", room:null, role:null, // "a" or "b"
   name:"", color:"#8b86f5", ava:"😊", stickers:[],
-  pendingName:"", pendingColor:"#8b86f5", pendingAva:"😊",
+  pendingName:"", pendingColor:"#8b86f5", pendingAva:"😊", pendingTheme:"dark", theme:"dark",
   username:"", profLocked:false,
   peerName:null, peerAva:"😊",
   client:null,
@@ -702,7 +707,7 @@ function setStatus(mode,msg){ const el=$("landStatus"); el.textContent=msg; el.c
 function setJoinStatus(msg,mode){ const el=$("joinStatus"); el.textContent=msg; el.className="status-line"+(mode==="err"?" err":""); }
 
 function setScreen(id){
-  ["sc-landing","sc-join","sc-profile","sc-editprof","sc-chat"].forEach(s=>$(s).classList.toggle("active",s===id));
+  ["sc-landing","sc-join","sc-editprof","sc-chat"].forEach(s=>$(s).classList.toggle("active",s===id));
   state.phase=id.replace("sc-","");
   if(id==="sc-chat") setTimeout(()=>scrollBottom(true),40);
 }
@@ -731,6 +736,12 @@ function buildColorRow(contId, sel){
   DEFAULT_COLORS.forEach(col=>{ const b=document.createElement("button");
     b.style.background=col; b.dataset.v=col; b.type="button"; b.setAttribute("aria-label","Цвет сообщений "+col); if(col===sel) b.classList.add("sel"); c.appendChild(b); });
 }
+function buildThemeRow(contId, sel){
+  const c=$(contId); c.innerHTML="";
+  THEMES.forEach(t=>{ const b=document.createElement("button"); b.type="button"; b.dataset.v=t.id;
+    b.style.background=t.g; b.setAttribute("aria-label","Фон "+t.label); b.title=t.label;
+    b.innerHTML=`<span>${t.icon}</span>`; if(t.id===sel) b.classList.add("sel"); c.appendChild(b); });
+}
 function buildAvaRow(contId, sel){
   const c=$(contId); c.innerHTML="";
   DEFAULT_AVAS.forEach(a=>{ const b=document.createElement("button"); b.textContent=a; b.dataset.v=a; b.type="button";
@@ -746,6 +757,11 @@ function buildStickerRow(contId, sel){
 function initColorRow(contId, cb){
   $(contId).addEventListener("click",e=>{ const b=e.target.closest("button"); if(!b) return;
     $(contId).querySelectorAll("button").forEach(x=>x.classList.remove("sel")); b.classList.add("sel"); cb(b.dataset.v); });
+}
+function initThemeRow(contId, cb){
+  $(contId).addEventListener("click",e=>{ const b=e.target.closest("button"); if(!b) return;
+    $(contId).querySelectorAll("button").forEach(x=>x.classList.remove("sel")); b.classList.add("sel");
+    applyTheme(b.dataset.v); if(cb) cb(b.dataset.v); });
 }
 
 /* ===================== MQTT (reliable layer) =====================
@@ -1187,12 +1203,14 @@ function autosize(){ const ta=$("chatText"); ta.style.height="auto"; ta.style.he
 /* ===================== NAV: CREATE/EDIT PROFILE ===================== */
 function populateCreateProfile(){
   $("profName").value="";
-  state.pendingColor="#8b86f5"; state.pendingAva="😊";
-  buildColorRow("profColors","#8b86f5"); buildAvaRow("profAvas","😊");
+  $("profUsername").value="";
+  state.pendingColor="#8b86f5"; state.pendingAva="😊"; state.pendingTheme="dark";
+  buildColorRow("profColors","#8b86f5"); buildAvaRow("profAvas","😊"); buildThemeRow("profThemes","dark");
 }
 function populateEditProfile(){
   $("editName").value=state.name;
   buildColorRow("editColors",state.color); buildAvaRow("editAvas",state.ava); buildStickerRow("editStickers",state.stickers);
+  buildThemeRow("editThemes",state.theme||"dark");
 }
 
 /* ===================== ENTER CHAT ===================== */
@@ -1211,26 +1229,44 @@ function enterChat({room,side},isCreator){
 }
 
 /* ===================== EVENT WIRING ===================== */
-$("newRoleSeg").addEventListener("click",e=>{
-  const b=e.target.closest("button"); if(!b) return;
-  $("newRoleSeg").querySelectorAll("button").forEach(x=>x.classList.remove("on")); b.classList.add("on");
-  $("btnCreateTxt").textContent = b.dataset.v==="c1" ? "Создать персональную ссылку" : "Начать по ссылке собеседника";
-});
-$("btnCreate").addEventListener("click",()=>{ populateCreateProfile(); setScreen("sc-profile"); });
-$("btnProfBack").addEventListener("click",()=>setScreen("sc-landing"));
 let pendingRoom=null, pendingSide=null;
+
+/* normalize a username to a safe handle key: starts with @, a-z0-9_ only.
+   Returns null when invalid. */
+function normalizeHandle(raw){
+  let s=String(raw||"").trim();
+  if(!s.startsWith("@")) return null;
+  const body=s.slice(1);
+  if(!/^[A-Za-z0-9_]{3,19}$/.test(body)) return null;
+  return "@"+body;
+}
+function applyTheme(id){
+  const t=THEMES.find(x=>x.id===id)||THEMES[0];
+  state.theme=id;
+  document.body.dataset.theme=t.id;
+}
+function applyColor(c){
+  try{ document.body.style.setProperty("--me-bubble", c); }catch(e){}
+}
+
 $("btnProfDone").addEventListener("click",()=>{
-  const uname=$("profUsername").value.trim();
-  if(!uname){ $("landStatus").textContent="Введите уникальный юзернейм"; $("landStatus").className="status-line err"; return; }
-  state.name=$("profName").value.trim()||uname;
+  const raw=$("profUsername").value.trim();
+  const uname=normalizeHandle(raw);
+  if(!uname){
+    $("landStatus").textContent="Юзернейм: начните с @, дальше 3–19 символов (a–z, 0–9, _)";
+    $("landStatus").className="status-line err"; return;
+  }
+  state.name=$("profName").value.trim()||uname.slice(1);
   state.color=state.pendingColor; state.ava=state.pendingAva;
+  applyTheme(state.pendingTheme); applyColor(state.color);
   const done=()=>{
     state.username=uname; state.profLocked=true;
     // remember this as the last logged-in account on this device
     try{
       const cleanU=String(uname).toLowerCase().replace(/^@+/,"");
       localStorage.setItem(NS+"_lastuser", cleanU);
-      localStorage.setItem(NS+"_face_"+cleanU, JSON.stringify({display:(state.name||uname),ava:state.ava,color:state.color,t:Date.now()}));
+      localStorage.setItem(NS+"_face_"+cleanU, JSON.stringify({display:(state.name||uname),ava:state.ava,color:state.color,theme:state.pendingTheme,t:Date.now()}));
+      localStorage.setItem(NS+"_theme", state.pendingTheme);
     }catch(e){}
     if(pendingRoom && pendingSide){
       const r=pendingRoom, s=pendingSide;
@@ -1281,14 +1317,17 @@ $("btnJoinGo").addEventListener("click",()=>{
   const room=codeToId(t.room); if(!room||room.length<10){ setJoinStatus("Код комнаты слишком короткий","err"); return; }
   const side=t.side||"b";
   pendingRoom=room; pendingSide=side;
-  populateCreateProfile(); setScreen("sc-profile");
+  setJoinStatus("Ссылка распознана. Заполните вход и нажмите «Войти»","");
+  setScreen("sc-landing");
 });
 
 /* profile color/ava/sticker bindings */
 initColorRow("profColors",c=>state.pendingColor=c);
+initThemeRow("profThemes",t=>state.pendingTheme=t);
 $("profAvas").addEventListener("click",e=>{ const b=e.target.closest("button"); if(!b)return;
   $("profAvas").querySelectorAll("button").forEach(x=>x.classList.remove("sel")); b.classList.add("sel"); state.pendingAva=b.dataset.v; });
 initColorRow("editColors",c=>state.color=c);
+initThemeRow("editThemes",t=>state.theme=t);
 $("editAvas").addEventListener("click",e=>{ const b=e.target.closest("button"); if(!b)return;
   $("editAvas").querySelectorAll("button").forEach(x=>x.classList.remove("sel")); b.classList.add("sel"); state.ava=b.dataset.v; });
 $("editStickers").addEventListener("click",e=>{ const b=e.target.closest("button"); if(!b)return;
@@ -1343,6 +1382,8 @@ function highlightPhotoAva(container,d){
 /* edit profile save */
 $("btnEditProfSave").addEventListener("click",()=>{
   state.name=$("editName").value.trim()||state.name;
+  applyTheme(state.theme); applyColor(state.color);
+  try{ localStorage.setItem(NS+"_theme", state.theme); }catch(e){}
   buildQuickbar();
   $("hdrAva").innerHTML=avaHtml(state.ava); $("hdrAva").style.background=state.color;
   toast("Профиль сохранён");
@@ -1383,7 +1424,6 @@ $("btnInfo").addEventListener("click",()=>{
   $("infoOverlay").classList.add("open");
 });
 $("btnOpenProfile").addEventListener("click",()=>{
-  if(state.profLocked){ toast("Профиль уже настроен — изменить его нельзя"); return; }
   populateEditProfile(); setScreen("sc-editprof");
 });
 
@@ -1458,6 +1498,18 @@ window.addEventListener("hashchange",()=>{
 
 buildEmojiPanel(); buildStickerPanel();
 bindEmojiPanel();
+populateCreateProfile();
+/* restore saved theme on load */
+(function(){
+  let t="dark";
+  try{ t=localStorage.getItem(NS+"_theme")||"dark"; }catch(e){}
+  state.pendingTheme=t; state.theme=t;
+  applyTheme(t);
+  try{
+    const lu=localStorage.getItem(NS+"_lastuser");
+    if(lu){ const f=JSON.parse(localStorage.getItem(NS+"_face_"+lu)||"null"); if(f&&f.color) applyColor(f.color); }
+  }catch(e){}
+})();
 
 /* ===================== COMMUNITY (reviews, users, Q&A) =====================
    Stored as retained MQTT topics so they survive reloads and are shared by
