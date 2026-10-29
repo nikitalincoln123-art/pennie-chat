@@ -58,7 +58,8 @@ input{font-family:inherit;color:var(--ink)}
 
 /* ============ views ============ */
 .view{display:none;flex:1;flex-direction:column;min-height:0}
-.view.active{display:flex}
+.view.active{display:flex;animation:viewIn .28s ease}
+@keyframes viewIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
 
 /* ============ auth ============ */
 #vAuth{align-items:center;justify-content:center;padding:20px;overflow-y:auto}
@@ -121,11 +122,31 @@ input{font-family:inherit;color:var(--ink)}
 #vChat .topbar .peer-name .n{font-weight:700;font-size:15px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 #vChat .topbar .peer-name .s{font-size:12px;color:var(--ink-dim)}
 .msgs{flex:1;overflow-y:auto;padding:14px;display:flex;flex-direction:column;gap:4px;background:var(--bg)}
-.bubble{max-width:78%;padding:9px 13px;border-radius:14px;font-size:15px;line-height:1.45;word-wrap:break-word;overflow-wrap:anywhere;position:relative;white-space:pre-wrap}
+.bubble{max-width:78%;padding:9px 13px;border-radius:14px;font-size:15px;line-height:1.45;word-wrap:break-word;overflow-wrap:anywhere;position:relative;white-space:pre-wrap;animation:msgIn .22s ease}
+@keyframes msgIn{from{opacity:0;transform:translateY(6px) scale(.98)}to{opacity:1;transform:none}}
 .bubble.m{background:var(--mine);color:#fff;align-self:flex-end;border-bottom-right-radius:5px}
 .bubble.p{background:var(--panel2);align-self:flex-start;border-bottom-left-radius:5px}
 .bubble .tm{display:block;text-align:right;font-size:10.5px;opacity:.6;margin-top:3px}
 .day-chip{align-self:center;font-size:11.5px;color:var(--ink-dim);background:var(--panel);padding:4px 12px;border-radius:999px;margin:8px 0}
+.msg-row{display:flex;flex-direction:column;max-width:78%}
+.msg-row.m{align-self:flex-end;align-items:flex-end}
+.msg-row.p{align-self:flex-start;align-items:flex-start}
+.msg-row .bubble+.reacts{margin-top:3px}
+.reacts{display:flex;gap:4px;flex-wrap:wrap}
+.react{display:inline-flex;align-items:center;gap:3px;background:var(--panel2);border:1px solid var(--line);border-radius:999px;
+  padding:2px 7px;font-size:13px;cursor:pointer;transition:transform .12s,background .15s;user-select:none}
+.react:hover{transform:translateY(-1px);background:var(--chip)}
+.react.on{border-color:var(--accent)}
+.react .rc{font-size:11px;color:var(--ink-dim)}
+.react-picker{position:absolute;z-index:60;background:var(--panel);border:1px solid var(--line);border-radius:14px;
+  padding:6px;display:flex;gap:4px;box-shadow:0 10px 30px rgba(0,0,0,.5);animation:popIn .12s ease}
+.react-picker button{width:34px;height:34px;font-size:20px;border-radius:9px;transition:background .12s,transform .1s}
+.react-picker button:hover{background:var(--panel2);transform:scale(1.15)}
+@keyframes popIn{from{opacity:0;transform:scale(.9)}to{opacity:1;transform:scale(1)}}
+.add-react{width:24px;height:24px;border-radius:50%;background:var(--panel2);border:1px solid var(--line);color:var(--ink-dim);
+  font-size:14px;line-height:1;display:inline-flex;align-items:center;justify-content:center;opacity:0;transition:opacity .15s,transform .12s;flex:0 0 auto}
+.msg-row:hover .add-react{opacity:1}
+.add-react:hover{transform:scale(1.15);color:var(--ink)}
 .chat-input-bar{background:var(--panel);border-top:1px solid var(--line);padding:10px 12px;display:flex;gap:10px;flex:0 0 auto}
 .chat-input-bar textarea{flex:1;resize:none;background:var(--bg-in);border:1px solid var(--line);border-radius:16px;padding:11px 14px;font-size:15px;outline:none;color:var(--ink);max-height:120px}
 .chat-input-bar textarea:focus{border-color:var(--accent)}
@@ -135,8 +156,11 @@ input{font-family:inherit;color:var(--ink)}
 .confirm-bar .btn{width:auto;padding:9px 16px;font-size:14px;border-radius:10px}
 
 /* ============ settings modal ============ */
-.overlay{position:fixed;inset:0;background:rgba(0,0,0,.55);z-index:50;display:none;align-items:center;justify-content:center;padding:18px}
+.overlay{position:fixed;inset:0;background:rgba(0,0,0,.55);z-index:50;display:none;align-items:center;justify-content:center;padding:18px;animation:fadeIn .2s ease}
 .overlay.open{display:flex}
+.overlay .modal{animation:modalIn .22s cubic-bezier(.2,.9,.3,1)}
+@keyframes fadeIn{from{opacity:0}to{opacity:1}}
+@keyframes modalIn{from{opacity:0;transform:translateY(14px) scale(.97)}to{opacity:1;transform:none}}
 .modal{background:var(--panel);border:1px solid var(--line);border-radius:18px;width:100%;max-width:420px;max-height:88vh;overflow-y:auto;padding:20px}
 .modal .m-head{display:flex;align-items:center;margin-bottom:18px}
 .modal .m-head .m-title{flex:1;font-weight:700;font-size:17px}
@@ -155,6 +179,10 @@ input{font-family:inherit;color:var(--ink)}
 .upload-btn:hover{filter:brightness(1.08)}
 .upload-btn.ghost{background:transparent;color:var(--accent);border:1px solid var(--line)}
 .upload-ico{font-size:18px}
+.peer-big-ava{width:96px;height:96px;border-radius:50%;background:var(--chip);margin:0 auto 12px;display:flex;align-items:center;justify-content:center;overflow:hidden;font-size:34px;border:2px solid var(--line)}
+.peer-big-ava img{width:100%;height:100%;object-fit:cover;display:block}
+.peer-big-name{font-size:19px;font-weight:700}
+.peer-big-handle{font-size:13.5px;color:var(--ink-dim);margin-top:4px}
 
 @media(max-width:600px){ .auth-card{padding:24px 20px} }
 </style>
@@ -208,16 +236,13 @@ input{font-family:inherit;color:var(--ink)}
 <div class="view" id="vChat">
   <div class="topbar">
     <button class="icon-btn" id="btnBack" title="Назад">←</button>
-    <div class="peer-ava" id="peerAva">👤</div>
-    <div class="peer-name"><div class="n" id="peerName">…</div><div class="s" id="peerStatus">…</div></div>
-    <button class="icon-btn" id="btnPeer" title="Профиль">👤</button>
+    <button class="peer-click" id="peerClick" style="border:none;background:none;padding:0;display:flex;align-items:center;gap:11px;flex:1;min-width:0;cursor:pointer;text-align:left">
+      <div class="peer-ava" id="peerAva">👤</div>
+      <div class="peer-name"><div class="n" id="peerName">…</div></div>
+    </button>
   </div>
   <div class="msgs" id="msgs"></div>
   <div class="typing-ind" id="typingInd" style="display:none">собеседник печатает…</div>
-  <div class="confirm-bar" id="confirmPeerBg" style="display:none">
-    <span style="flex:1;font-size:13px;color:var(--ink-dim);align-self:center">Начать переписку с <b id="confirmPeerName"></b>?</span>
-    <button class="btn" id="btnConfirmChat">Открыть чат</button>
-  </div>
   <div class="chat-input-bar">
     <textarea id="chatText" rows="1" placeholder="Сообщение…" maxlength="4000"></textarea>
     <button class="send-btn" id="btnSend">➤</button>
@@ -227,7 +252,12 @@ input{font-family:inherit;color:var(--ink)}
 <!-- ============ SETTINGS MODAL ============ -->
 <div class="overlay" id="settingsOverlay">
   <div class="modal">
-    <div class="m-head"><div class="m-title">Профиль и вид</div><button class="x-btn" id="btnCloseSettings">✕</button></div>
+    <div class="m-head"><div class="m-title">Мой профиль</div><button class="x-btn" id="btnCloseSettings">✕</button></div>
+
+    <div class="field">
+      <label>Имя</label>
+      <input class="input" id="editName" maxlength="24" placeholder="Как вас зовут?" autocomplete="off">
+    </div>
 
     <div class="field">
       <label>Аватар</label>
@@ -251,6 +281,22 @@ input{font-family:inherit;color:var(--ink)}
     </div>
 
     <button class="btn" id="btnSaveSettings">Сохранить</button>
+  </div>
+</div>
+
+<!-- ============ PEER PROFILE MODAL ============ -->
+<div class="overlay" id="peerOverlay">
+  <div class="modal peer-modal">
+    <div class="m-head"><div class="m-title">Профиль</div><button class="x-btn" id="btnClosePeer">✕</button></div>
+    <div style="text-align:center;margin-bottom:18px">
+      <div class="peer-big-ava" id="peerBigAva">👤</div>
+      <div class="peer-big-name" id="peerBigName">…</div>
+      <div class="peer-big-handle" id="peerBigHandle">@…</div>
+    </div>
+    <div class="field" style="text-align:center;color:var(--ink-dim);font-size:13.5px;line-height:1.6">
+      Вы переписываетесь с этим собеседником один на один. Ваши сообщения видны только вам двоим.
+    </div>
+    <button class="btn" id="btnWritePeer">Написать сообщение</button>
   </div>
 </div>
 
@@ -476,6 +522,7 @@ function renderDialogs(){
         <div class="lp">${esc(d.preview||"")}</div>
       </div>`;
     row.addEventListener("click",()=>openInstant(me.handle,d.handle));
+    row.addEventListener("contextmenu",ev=>{ ev.preventDefault(); openPeerFromList(d.handle); });
     el.appendChild(row);
   });
 }
@@ -509,7 +556,6 @@ function openChat(themL){
   openChatPeer=themL;
   showView("vChat");
   $("peerName").textContent="@"+themL;
-  $("peerStatus").textContent="…";
   $("typingInd").style.display="none";
   $("chatText").value="";
   // load profile for avatar/name
@@ -530,12 +576,18 @@ function openChat(themL){
   const key=dialogKeyOf(me.handle,themL);
   const ref=FB.db.ref("msgs/"+key);
   if(myListenRef){ try{ myListenRef.off("value",myListenFn); }catch(e){} }
-  myListenFn=snap=>renderChat(themL,snap.val()||{});
+  myListenFn=snap=>renderChat(themL,snapToObj(snap));
   myListenRef=ref;
   ref.on("value",myListenFn);
   // reset unread/preview cleanup not needed
   renderChat(themL,{});
   $("chatText").focus();
+}
+
+function snapToObj(snap){
+  const o={};
+  snap.forEach(ch=>{ const v=ch.val()||{}; v.__key=ch.key; o[v.__key]=v; });
+  return o;
 }
 
 function renderChat(themL,list){
@@ -547,20 +599,100 @@ function renderChat(themL,list){
   items.forEach(m=>{
     const mk=new Date(m.t).getDate();
     if(mk!==lastDay){ lastDay=mk; const c=document.createElement("div"); c.className="day-chip"; c.textContent=new Date(m.t).toLocaleDateString("ru-RU",{day:"numeric",month:"long"}); el.appendChild(c); }
-    const b=document.createElement("div");
+    const wrap=document.createElement("div");
     const mine=m.from===me.handle;
+    wrap.className="msg-row "+(mine?"m":"p");
+    wrap.dataset.key=m.__key;
+    const b=document.createElement("div");
     b.className="bubble "+(mine?"m":"p");
     if(mine) b.setAttribute("data-pat",(me.pat!=null?me.pat:"0"));
     b.textContent=m.text;
     const t=document.createElement("span"); t.className="tm"; t.textContent=fmtTime(m.t);
     b.appendChild(t);
-    el.appendChild(b);
+    wrap.appendChild(b);
+    // reactions
+    const rr=m.reacts||{};
+    const rk=Object.keys(rr);
+    if(rk.length){
+      const row=document.createElement("div"); row.className="reacts";
+      rk.forEach(e=>{
+        const s=document.createElement("button"); s.className="react"+( (rr[e]&&rr[e].mine)?" on":"");
+        s.setAttribute("data-re","1"); s.dataset.key=m.__key; s.dataset.e=e;
+        s.innerHTML=`<span>${esc(e)}</span><span class="rc">${esc(String(rr[e].n))}</span>`;
+        row.appendChild(s);
+      });
+      wrap.appendChild(row);
+    }
+    // hover/action to add reaction (on peer messages highlight)
+    if(!mine){
+      const marker=document.createElement("button");
+      marker.className="add-react"; marker.dataset.key=m.__key; marker.setAttribute("aria-label","Реакция");
+      marker.textContent="+";
+      wrap.insertBefore(marker, wrap.firstChild);
+    }
+    el.appendChild(wrap);
   });
   el.scrollTop=el.scrollHeight;
 }
 function fmtTime(t){
   return new Date(t).toLocaleTimeString("ru-RU",{hour:"2-digit",minute:"2-digit"});
 }
+
+/* reactions */
+const REACT_EMOJIS=["❤️","👍","😂","😮","😢","🔥"];
+let reactPicker=null;
+function openReactPicker(key,anchorEl){
+  closeReactPicker();
+  reactPicker=document.createElement("div");
+  reactPicker.className="react-picker";
+  REACT_EMOJIS.forEach(e=>{
+    const b=document.createElement("button"); b.type="button"; b.textContent=e; b.dataset.e=e; b.dataset.key=key;
+    b.addEventListener("click",()=>toggleReact(key,e));
+    reactPicker.appendChild(b);
+  });
+  const r=anchorEl.getBoundingClientRect();
+  reactPicker.style.position="fixed";
+  reactPicker.style.left=Math.min(r.left,window.innerWidth-280)+"px";
+  reactPicker.style.top=(r.top-46)+"px";
+  document.body.appendChild(reactPicker);
+  setTimeout(()=>{ document.addEventListener("click",closeReactPicker,{once:true}); },0);
+}
+function closeReactPicker(){
+  if(reactPicker){ reactPicker.remove(); reactPicker=null; }
+}
+function toggleReact(msgKey,emoji){
+  closeReactPicker();
+  if(!openChatPeer||!msgKey) return;
+  const dbKey=dialogKeyOf(me.handle,openChatPeer);
+  const ref=FB.db.ref("msgs/"+dbKey+"/"+msgKey+"/reacts/"+emoji);
+  ref.once("value",snap=>{
+    const cur=snap.val();
+    const mineHandle=me.handle;
+    if(cur && cur.mine){
+      // already react by me -> remove
+      ref.remove().catch(()=>{});
+    } else {
+      // add mine (aggregate n from current)
+      const n=(cur&&cur.n?cur.n:0)+1;
+      ref.set({mine:mineHandle,n:n}).catch(()=>{});
+    }
+  });
+}
+$("msgs").addEventListener("click",e=>{
+  const addBtn=e.target.closest(".add-react");
+  if(addBtn){ openReactPicker(addBtn.dataset.key, addBtn); return; }
+  const rEl=e.target.closest("[data-re]");
+  if(rEl){
+    const key=rEl.dataset.key, em=rEl.dataset.e;
+    const dbKey=dialogKeyOf(me.handle,openChatPeer);
+    FB.db.ref("msgs/"+dbKey+"/"+key+"/reacts/"+em).once("value",snap=>{
+      const cur=snap.val();
+      if(cur && cur.mine){ FB.db.ref("msgs/"+dbKey+"/"+key+"/reacts/"+em).remove().catch(()=>{}); }
+      else { const n=(cur&&cur.n?cur.n:0)+1; FB.db.ref("msgs/"+dbKey+"/"+key+"/reacts/"+em).set({mine:me.handle,n:n}).catch(()=>{}); }
+    });
+    return;
+  }
+});
 
 /* ---------- search ---------- */
 let searchTO=null;
@@ -652,6 +784,7 @@ function openSettings(){
   draftPat=String(me.pat!=null?me.pat:"0");
   draftTheme=me.theme||"dark";
   draftAva=me.ava||null;
+  $("editName").value=me.name||"";
   // mark selections
   $("#patSwatches").querySelectorAll(".swatch").forEach(x=>x.classList.toggle("sel",x.dataset.v===draftPat));
   $("#themeSwatches").querySelectorAll(".theme-sw").forEach(x=>x.classList.toggle("sel",x.dataset.v===draftTheme));
@@ -694,8 +827,11 @@ function closeSettings(){ $("#settingsOverlay").classList.remove("open"); }
 
 // save settings
 $("btnSaveSettings").addEventListener("click",()=>{
+  me.name=($("editName").value.trim()||me.handle.slice(1));
   me.pat=draftPat; me.theme=draftTheme; me.ava=draftAva;
   applyMyStyle();
+  $("meAva").innerHTML=avaHtml(me.ava);
+  $("meName").textContent=me.name;
   // persist profile to Firebase user record
   try{
     FB.db.ref("users/"+me.handle.slice(1)).update({ pat:me.pat, theme:me.theme, ava:me.ava||"" , name:me.name}).then(()=>{ saveSession(); }).catch(()=>{ saveSession(); });
@@ -720,9 +856,28 @@ function toast(m){
   clearTimeout(el.__t); el.__t=setTimeout(()=>{ el.style.opacity="0"; },2200);
 }
 
-/* settings buttons: chat topbar + chats list */
-$("btnPeer").addEventListener("click",openSettings);
+/* settings buttons: chats list */
 $("btnSettingsChats").addEventListener("click",openSettings);
+
+/* peer profile modal */
+function openPeerProfileFrom(themL){
+  if(!themL) return;
+  const d=dialogs[themL]||{handle:"@"+themL,name:"@"+themL,ava:"👤"};
+  $("peerBigAva").innerHTML=avaHtml(d.ava);
+  $("peerBigName").textContent=d.name||"@"+themL;
+  $("peerBigHandle").textContent=themL;
+  $("peerOverlay").classList.add("open");
+}
+function openPeerProfile(){
+  if(!openChatPeer) return;
+  openPeerProfileFrom(openChatPeer);
+}
+function openPeerFromList(themL){ openPeerProfileFrom(String(themL).toLowerCase()); }
+$("btnPeer")&&$("btnPeer").addEventListener("click",openPeerProfile);
+$("peerClick").addEventListener("click",openPeerProfile);
+$("btnClosePeer").addEventListener("click",()=>$("peerOverlay").classList.remove("open"));
+$("peerOverlay").addEventListener("click",e=>{ if(e.target===$("peerOverlay")) $("peerOverlay").classList.remove("open"); });
+$("btnWritePeer").addEventListener("click",()=>{ $("peerOverlay").classList.remove("open"); $("chatText").focus(); });
 
 /* ---------- logout ---------- */
 $("btnLogout").addEventListener("click",()=>{
