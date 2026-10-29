@@ -1428,7 +1428,6 @@ function setTab(tab){
 }
 $("sRowLogout").addEventListener("click",()=>{ $("btnLogout").click(); });
 /* privacy toggles */
-me.privacy=me.privacy||{seen:false,ava:false,phone:false};
 function renderPrivacyVals(){
   const f=(id,v)=> { const e=$(id); if(e) e.textContent = v?"Да":"Нет"; };
   f("sHideSeenVal", !!(me.privacy&&me.privacy.seen));
