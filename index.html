@@ -105,7 +105,9 @@ input{font-family:inherit;color:var(--ink)}
 .auth-sub{font-size:13.5px;color:var(--ink-dim);text-align:center;line-height:1.6;margin-bottom:22px}
 .field{margin-bottom:14px}
 .field label{display:block;font-size:13px;color:var(--ink-dim);margin-bottom:6px}
-.input{width:100%;background:var(--bg-in);border:1px solid var(--line);border-radius:12px;padding:13px 15px;font-size:16px;outline:none}
+.input{width:100%;background:var(--bg-in);border:1px solid var(--line);border-radius:12px;padding:13px 15px;font-size:16px;outline:none;color:var(--ink);caret-color:var(--ink)}
+.input::placeholder{color:var(--ink-dim);opacity:1}
+textarea.input,textarea{color:var(--ink);caret-color:var(--ink);font-family:inherit}
 .input:focus{border-color:var(--accent)}
 .input.err{border-color:#e05a5a}
 .btn{width:100%;background:#262b2f;color:#e8e8e8;border:1px solid #343a40;border-radius:12px;padding:14px;font-size:16px;font-weight:700;
@@ -1621,12 +1623,14 @@ function openSettings(){
   const psw=$("#patSwatches"); if(psw) psw.querySelectorAll(".swatch").forEach(x=>x.classList.toggle("sel",x.dataset.v===draftPat));
   renderAvaPreview();
   $("#settingsOverlay").classList.add("open");
-  $('#btnRemoveAva').style.display = (me.ava && me.ava.length) ? "block":"none";
+  const rmA=$("btnRemoveAva"); if(rmA) rmA.style.display = (me.ava && me.ava.length) ? "block":"none";
 }
 function renderAvaPreview(){
   const el=$("avaPreview");
-  el.innerHTML = draftAva && draftAva.length ? `<img src="${draftAva}" alt="">` : "👤";
-  $('#btnRemoveAva').style.display = (draftAva && draftAva.length) ? "block":"none";
+  if(el) el.innerHTML = draftAva && draftAva.length ? `<img src="${draftAva}" alt="">` : "👤";
+  const sp=$("setAvaPrev");
+  if(sp) sp.innerHTML = draftAva && draftAva.length ? `<img src="${draftAva}" alt="" style="width:100%;height:100%;object-fit:cover">` : "👤";
+  const rm=$("btnRemoveAva"); if(rm) rm.style.display = (draftAva && draftAva.length) ? "block":"none";
 }
 function readAvaFile(file,immediate){
   if(!file) return;
@@ -2101,6 +2105,7 @@ function openSettingsFromView(){
   if(sl) sl.value=me.last||"";
   if(sb) sb.value=me.bio||"";
   if(sbd) sbd.value=me.birth||"";
+  renderAvaPreview();
   const sp2=$("#sPatSwatches"); if(sp2) sp2.querySelectorAll(".swatch").forEach(x=>x.classList.toggle("sel",x.dataset.v===draftPat));
   const st2=$("#sThemeSwatches"); if(st2) st2.querySelectorAll(".theme-sw").forEach(x=>x.classList.toggle("sel",x.dataset.v===draftTheme));
 }
