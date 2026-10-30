@@ -303,16 +303,17 @@ html{overflow:hidden!important}
 .founder-star::before,.founder-star::after{content:"";position:absolute;top:0;background:inherit;box-shadow:inherit;width:20px;height:20px;border-radius:3px}
 .founder-star::before{left:calc(50% - 10px);transform:rotate(60deg)}
 .founder-star::after{left:calc(50% - 10px);transform:rotate(120deg)}
-.founder-badge{display:inline-flex;align-items:center;gap:7px;margin-top:8px;padding:5px 13px;border-radius:999px;background:rgba(230,185,60,.16);border:1px solid rgba(230,185,60,.5);color:#ffd95e;font-size:12px;font-weight:700}
-.founder-badge .founder-star{width:15px;height:15px;margin-left:0;top:0}
 .profile-hero .p-handle{font-size:14px;color:var(--ink-dim);margin-top:3px}
+.founder-row{display:flex;justify-content:center;margin-top:9px}
+.founder-badge{display:inline-flex;align-items:center;gap:7px;padding:5px 13px;border-radius:999px;background:rgba(230,185,60,.16);border:1px solid rgba(230,185,60,.5);color:#ffd95e;font-size:12px;font-weight:700;line-height:1}
+.founder-badge .founder-star{width:16px;height:16px;margin-left:0;top:0}
 .profile-hero .p-status{font-size:13px;color:var(--ok,#34d399);margin-top:4px}
-.profile-actions{display:flex;gap:10px;justify-content:center;padding:16px 12px}
-.profile-actions .act{flex:1;max-width:130px;background:#fff;border:1px solid rgba(255,255,255,.4);border-radius:18px;padding:12px 6px;display:flex;flex-direction:column;align-items:center;gap:7px;cursor:pointer;transition:transform .12s,background .15s,box-shadow .2s;color:#1a1a1a;box-shadow:0 6px 18px rgba(0,0,0,.35)}
-.profile-actions .act:hover{background:#f0f0f0;transform:translateY(-2px);box-shadow:0 10px 24px rgba(0,0,0,.45)}
-.profile-actions .act-ic{width:40px;height:40px;border-radius:50%;background:#1a1a1a;display:flex;align-items:center;justify-content:center;flex:0 0 auto}
-.profile-actions .act-ic svg{width:22px;height:22px;color:#fff}
-.profile-actions .act span:not(.act-ic){font-size:12px;font-weight:700;line-height:1.25;text-align:center;color:#1a1a1a}
+.profile-actions{display:flex;gap:8px;justify-content:center;padding:14px 8px 6px}
+.profile-actions .act{flex:1;max-width:104px;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.08);border-radius:14px;padding:9px 4px;display:flex;flex-direction:column;align-items:center;gap:6px;cursor:pointer;transition:transform .12s,background .15s,box-shadow .2s;color:var(--ink)}
+.profile-actions .act:hover{background:rgba(255,255,255,.14);transform:translateY(-1px);box-shadow:0 6px 16px rgba(0,0,0,.4)}
+.profile-actions .act-ic{width:34px;height:34px;border-radius:11px;background:rgba(255,255,255,.1);display:flex;align-items:center;justify-content:center;flex:0 0 auto}
+.profile-actions .act-ic svg{width:18px;height:18px;color:#fff}
+.profile-actions .act span:not(.act-ic){font-size:11.5px;font-weight:600;line-height:1.2;text-align:center;color:var(--ink)}
 .profile-sections{padding:8px 14px 24px}
 .profile-section{background:rgba(255,255,255,.06);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);border:1px solid rgba(255,255,255,.07);border-radius:18px;margin-bottom:14px;overflow:hidden;box-shadow:0 8px 24px rgba(0,0,0,.25)}
 .profile-section .sec-title{font-size:12px;color:#7d8c99;padding:12px 14px 6px;font-weight:600}
@@ -479,6 +480,7 @@ html{overflow:hidden!important}
       <input type="file" id="pAvaFile" accept="image/*" style="display:none">
       <div class="p-name" id="pName">…</div>
       <div class="p-handle" id="pHandle">@…</div>
+      <div class="founder-row" id="pFounder" style="display:none"><span class="founder-badge"><span class="founder-star"></span>Основатель проекта</span></div>
       <div class="p-status" id="pStatus">● в сети</div>
       <div class="profile-actions">
         <button class="act" id="pActPhoto"><span class="act-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z" /><circle cx="12" cy="13" r="4" /></svg></span><span>Выбрать<br>фото</span></button>
@@ -2625,8 +2627,9 @@ function renderProfile(){
   if(hero) hero.setAttribute("data-pbg", isLincoln ? "cosmic" : (me.theme||"dark"));
   $("pBigAva").innerHTML=avaHtml(me.ava,me.name);
   $("pName").innerHTML=esc(me.name||me.handle.slice(1));
-  $("pHandle").innerHTML=esc(me.handle)+(isLincoln?' <span class="founder-badge"><span class="founder-star"></span>Основатель проекта</span>':"");
+  $("pHandle").innerHTML=esc(me.handle);
   $("pHandle2").textContent=me.handle;
+  const pfr=$("pFounder"); if(pfr) pfr.style.display = isLincoln ? "flex":"none";
   const ppk=$("pPhone"); if(ppk) ppk.textContent=(me.privacy&&me.privacy.phone)? "—":(isLincoln?"+888 888 88 88":"—");
   const c=me.created||null;
   $("pCreated").textContent=c?new Date(c).toLocaleDateString("ru-RU",{day:"numeric",month:"long",year:"numeric"}):"—";
