@@ -143,7 +143,9 @@ input{font-family:inherit;color:var(--ink)}
 #vChat .topbar .peer-name .n{font-weight:700;font-size:15px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 #vChat .topbar .peer-name .s{font-size:12px;color:var(--ink-dim)}
 .msgs{flex:1;overflow-y:auto;overflow-x:hidden;padding:16px 14px;display:flex;flex-direction:column;gap:6px;align-items:stretch;
-  background:transparent;
+  background-color:#000;
+  background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='220' height='220' viewBox='0 0 220 220'><g fill='none' stroke='%23ffffff' stroke-opacity='0.20' stroke-width='1.7' stroke-linecap='round' stroke-linejoin='round'><path d='M20 34c8-10 22-10 26 0 3 8-6 14-13 14'/><path d='M150 20l14 0 0 14-14 0z'/><path d='M90 26a8 8 0 1 1 0 16 8 8 0 0 1 0-16z'/><path d='M40 90c10 0 14 10 8 16-4 4-12 2-12-4'/><path d='M120 78c6-8 18-6 20 2M126 88l10 0'/><path d='M170 96c-8-6-18 0-16 10 2 8 12 8 16 2'/><path d='M28 150c8 8 8 20-2 24-8 3-14-6-8-12'/><path d='M96 140l16 0 0 16-16 0zM104 140l0 16'/><path d='M160 150a10 10 0 1 0 12 10c1-6-4-11-9-11'/><path d='M60 190c10-6 22 2 18 12-3 8-14 6-14-2'/><path d='M140 200c6-10 20-6 20 4 0 8-10 10-14 4'/><path d='M196 40c6 4 6 12 0 16-5 3-10-2-8-7'/><path d='M8 60c4 6 2 12-4 12-5 0-6-6-2-8'/><path d='M112 200l10-10 4 12-10 4z'/></g></svg>");
+  background-size:220px 220px;background-repeat:repeat;
   scroll-behavior:smooth;scrollbar-width:none;-ms-overflow-style:none;overscroll-behavior:contain}
 .msgs::-webkit-scrollbar{width:0!important;height:0!important;display:none!important}
 /* hide scrollbars everywhere (side white strip) */
@@ -151,7 +153,7 @@ html{overflow:hidden!important}
 *{scrollbar-width:none;-ms-overflow-style:none}
 *::-webkit-scrollbar{width:0!important;height:0!important;display:none!important}
 *::-webkit-scrollbar-thumb,*::-webkit-scrollbar-track{background:transparent!important}
-.bubble{width:fit-content;max-width:82%;padding:7px 11px 6px;border-radius:16px;font-size:15px;line-height:1.38;position:relative;white-space:pre-wrap;overflow-wrap:break-word;word-break:normal;display:block;color:#fff;animation:msgIn .3s cubic-bezier(.22,1,.36,1);backdrop-filter:blur(2px)}
+.bubble{width:fit-content;max-width:78%;padding:7px 11px 6px;border-radius:16px;font-size:15px;line-height:1.38;position:relative;white-space:pre-wrap;overflow-wrap:break-word;word-break:normal;hyphens:none;display:block;color:#fff;animation:msgIn .3s cubic-bezier(.22,1,.36,1)}
 .bubble .mtxt{color:inherit}
 @keyframes msgIn{from{opacity:0;transform:translateY(8px) scale(.98)}to{opacity:1;transform:none}}
 /* soft glow kept off to avoid side bars */
@@ -170,9 +172,9 @@ html{overflow:hidden!important}
 .bubble .tm{flex:0 0 auto;font-size:11px;opacity:.7;margin-top:0;white-space:nowrap;padding-left:10px;align-self:flex-end}
 .dev-badge{display:inline-block;margin-left:6px;font-size:10px;font-weight:700;color:#fff;background:#e6b93c;border-radius:6px;padding:1px 6px;vertical-align:middle;letter-spacing:.3px;white-space:nowrap}
 .day-chip{align-self:center;font-size:11.5px;color:var(--ink-dim);background:rgba(255,255,255,.05);border:1px solid var(--line);padding:4px 14px;border-radius:999px;margin:10px 0}
-.msg-row{display:flex;flex-direction:column;width:fit-content;max-width:90%}
-.msg-row.m{align-self:flex-end;align-items:flex-end}
-.msg-row.p{align-self:flex-start;align-items:flex-start}
+.msg-row{display:flex;flex-direction:column;width:100%;max-width:100%;min-width:0}
+.msg-row.m{align-items:flex-end}
+.msg-row.p{align-items:flex-start}
 .msg-row .bubble+.reacts{margin-top:3px}
 .reacts{display:flex;gap:4px;flex-wrap:wrap}
 .react{display:inline-flex;align-items:center;gap:3px;background:var(--panel2);border:1px solid var(--line);border-radius:999px;
@@ -445,6 +447,20 @@ html{overflow:hidden!important}
   </div>
   <div class="profile-scroll">
     <div class="profile-sections">
+      <div class="profile-section">
+        <div class="sec-title">Профиль</div>
+        <div class="profile-row" style="cursor:default">
+          <div class="r-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" /><circle cx="12" cy="7" r="4" /></svg></div>
+          <div class="r-body"><div class="t">Имя</div><input class="input" id="setFirst" maxlength="24" placeholder="Имя" autocomplete="off" style="margin-top:6px;padding:9px 12px;border-radius:10px;font-size:14px"></div>
+        </div>
+        <div class="profile-row" style="cursor:default">
+          <div class="r-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" /><circle cx="12" cy="7" r="4" /></svg></div>
+          <div class="r-body"><div class="t">Фамилия</div><input class="input" id="setLast" maxlength="24" placeholder="Фамилия" autocomplete="off" style="margin-top:6px;padding:9px 12px;border-radius:10px;font-size:14px"></div>
+        </div>
+        <div class="profile-row" style="cursor:default">
+          <button class="btn" id="setNameSave" style="width:100%;padding:11px;border-radius:12px;font-size:14.5px">Сохранить имя</button>
+        </div>
+      </div>
       <div class="profile-section">
         <div class="sec-title">Внешний вид</div>
         <div class="profile-row" id="sRowDevices">
@@ -747,6 +763,98 @@ function openChats(){
   $("searchResult").innerHTML="";
   loadDialogs();
   listenMyChats();
+  listenInbox();
+}
+
+let inboxRef=null, inboxFn=null;
+function listenInbox(){
+  if(!me||!me.handle) return;
+  const myKey=me.handle.toLowerCase().replace(/^@+/,"");
+  try{ if(inboxRef&&inboxFn){ inboxRef.off("value",inboxFn); } }catch(e){}
+  try{
+    inboxRef=FB.db.ref("inbox/"+myKey);
+    inboxFn=snap=>{
+      const data=snap.val()||{};
+      Object.keys(data).forEach(senderKey=>{
+        const it=data[senderKey]||{};
+        if(!it.t) return;
+        const themL=String(senderKey).toLowerCase();
+        const known=dialogs[themL];
+        // register a new dialog the first time this sender writes
+        dialogs[themL]=dialogs[themL]||{handle:themL, name:(it.name||"@"+themL), ava:(it.ava||"👤"), t:0};
+        if(it.name) dialogs[themL].name=it.name;
+        if(it.ava) dialogs[themL].ava=it.ava;
+        // count as unread if not currently looking at this chat
+        const isOpen = openChatPeer && String(openChatPeer).toLowerCase().replace(/^@+/,"")===themL;
+        if(!known || it.t > (known._inboxT||0)){
+          dialogs[themL]._inboxT=it.t;
+          dialogs[themL].preview=String(it.text||"Новое сообщение");
+          dialogs[themL].t=it.t;
+          dialogs[themL].time=fmtTime(it.t);
+          if(!isOpen && !(me.blocked&&me.blocked[themL])){
+            dialogs[themL].unread=(dialogs[themL].unread||0)+1;
+            notifyIncoming(themL,it.text);
+            // make sure this sender's message stream is being listened to
+            try{ attachMyListener(themL); }catch(e){}
+          }
+        }
+      });
+      updateChatsBadge();
+      renderDialogs();
+    };
+    inboxRef.on("value",inboxFn);
+  }catch(e){}
+}
+
+let supportModalEl=null;
+function closeSupportInbox(){ if(supportModalEl){ supportModalEl.remove(); supportModalEl=null; } }
+function openSupportInbox(){
+  if(supportModalEl) supportModalEl.remove();
+  supportModalEl=document.createElement("div");
+  supportModalEl.className="overlay open";
+  supportModalEl.style.zIndex="120";
+  supportModalEl.innerHTML='<div class="modal" style="max-width:460px"><div class="m-head"><div class="m-title">Поддержка — входящие</div><button class="x-btn" id="supX">✕</button></div><div id="supList" style="font-size:14px;color:var(--ink-dim)">Загрузка…</div></div>';
+  document.body.appendChild(supportModalEl);
+  supportModalEl.addEventListener("click",e=>{ if(e.target===supportModalEl) closeSupportInbox(); });
+  supportModalEl.querySelector("#supX").addEventListener("click",closeSupportInbox);
+  loadSupportInbox();
+}
+async function loadSupportInbox(){
+  const box=supportModalEl&&supportModalEl.querySelector("#supList"); if(!box) return;
+  let data=null;
+  try{
+    data=await new Promise((res)=>{
+      let done=false;
+      try{ FB.db.ref("inbox/lincoln").once("value",s=>{ done=true; res(s.val()||{}); }); }catch(e){}
+      setTimeout(()=>{ if(!done){ done=true; res(null); } },3500);
+    });
+  }catch(e){ data=null; }
+  if(data===null){
+    try{ const r=await fetch("https://pennie-chat-default-rtdb.firebaseio.com/inbox/lincoln.json",{cache:"no-store"}); data=await r.json()||{}; }catch(e){ data={}; }
+  }
+  const list=Object.keys(data||{}).map(k=>Object.assign({_from:k},data[k]||{})).sort((a,b)=>(b.t||0)-(a.t||0));
+  if(!list.length){ box.innerHTML='<div style="padding:8px 0">Пока никто не написал в поддержку.</div>'; return; }
+  box.innerHTML=list.map(it=>{
+    const h=String(it._from||it.from||"").toLowerCase().replace(/^@+/,"");
+    const nm=it.name||("@"+h);
+    const when=it.t?new Date(it.t).toLocaleString("ru-RU",{day:"numeric",month:"short",hour:"2-digit",minute:"2-digit"}):"—";
+    return '<div class="sup-item" data-h="'+esc(h)+'" style="display:flex;gap:12px;align-items:flex-start;padding:12px 0;border-top:1px solid rgba(255,255,255,.07);cursor:pointer">'+
+      '<div style="width:38px;height:38px;border-radius:50%;background:#232c35;display:flex;align-items:center;justify-content:center;flex:0 0 auto;font-size:18px">👤</div>'+
+      '<div style="flex:1;min-width:0">'+
+        '<div style="color:var(--ink);font-weight:600;font-size:14px">'+esc(nm)+' <span style="color:var(--ink-dim);font-weight:400">@'+esc(h)+'</span></div>'+
+        '<div style="font-size:13px;margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">'+esc(String(it.text||"Вопрос"))+'</div>'+
+        '<div style="font-size:11.5px;margin-top:2px;opacity:.8">'+esc(when)+'</div>'+
+      '</div>'+
+      '<div style="color:var(--accent);font-size:18px;flex:0 0 auto">›</div>'+
+    '</div>';
+  }).join("");
+  box.querySelectorAll(".sup-item").forEach(el=>{
+    el.addEventListener("click",()=>{
+      const h=el.getAttribute("data-h");
+      closeSupportInbox();
+      openInstant(me.handle,h);
+    });
+  });
 }
 
 function attachMyListener(themLower){
@@ -800,6 +908,18 @@ function renderDialogs(){
   if(filter==="personal") arr=arr.filter(d=>d.lastIsMine);
   // pinned Support chat — always visible, opens dialog with @lincoln (hidden from @lincoln himself)
   const isLincolnMe = String(me&&me.handle||"").toLowerCase().replace(/^@+/,"")==="lincoln";
+  if(filter!=="personal" && isLincolnMe){
+    // @Lincoln: support inbox — all users who wrote to him
+    const sup=document.createElement("div");
+    sup.className="dialog support-row";
+    sup.innerHTML=`<div class="av" style="background:linear-gradient(135deg,#2b7fd4,#3fb0e8);color:#fff">🎧</div>
+      <div class="body">
+        <div class="row"><span class="nm">Поддержка <span class="dev-badge">Входящие</span></span></div>
+        <div class="lp">Вопросы пользователей — откройте список</div>
+      </div>`;
+    sup.addEventListener("click",openSupportInbox);
+    el.appendChild(sup);
+  }
   if(filter!=="personal" && !isLincolnMe){
     const sd=dialogs["lincoln"]||{};
     const sup=document.createElement("div");
@@ -1293,6 +1413,11 @@ function sendNow(){
       .then(r=>{ clearTimeout(tim); if(!r.ok) throw new Error("http"+r.status); })
       .catch(failSend);
   }catch(e){ failSend(); }
+  // notify recipient via their inbox (so a brand-new sender shows up with a badge)
+  try{
+    const inbox={from:me.handle, name:me.name||me.handle.slice(1), ava:me.ava||"", text:t, t:msg.t};
+    fetch("https://pennie-chat-default-rtdb.firebaseio.com/inbox/"+peer+"/"+myKey+".json",{method:"PUT",headers:{"Content-Type":"application/json"},body:JSON.stringify(inbox)}).catch(()=>{});
+  }catch(e){}
   updateDialogFromMessages(openChatPeer,{x:{from:me.handle,text:t,t:msg.t}});
   const msgsEl=$("msgs"); if(msgsEl){ try{ msgsEl.scrollTop=msgsEl.scrollHeight; }catch(e){} }
 }
@@ -1716,9 +1841,29 @@ function openSettingsFromView(){
   glowOn=!!me.glow;
   renderGlowVal();
   renderPrivacyVals();
+  // name / surname fields in settings view
+  const sf=$("setFirst"), sl=$("setLast");
+  if(sf) sf.value=me.first||"";
+  if(sl) sl.value=me.last||"";
   const sp2=$("#sPatSwatches"); if(sp2) sp2.querySelectorAll(".swatch").forEach(x=>x.classList.toggle("sel",x.dataset.v===draftPat));
   const st2=$("#sThemeSwatches"); if(st2) st2.querySelectorAll(".theme-sw").forEach(x=>x.classList.toggle("sel",x.dataset.v===draftTheme));
 }
+document.addEventListener("click",e=>{
+  if(e.target && e.target.id==="setNameSave"){
+    me.first=($("setFirst").value||"").trim();
+    me.last=($("setLast").value||"").trim();
+    me.name=[me.first,me.last].filter(Boolean).join(" ")||me.handle.slice(1);
+    saveSession();
+    const mnm=$("meName"); if(mnm) mnm.textContent=me.name;
+    try{
+      const payload={name:me.name, first:me.first, last:me.last};
+      const key=me.handle.slice(1);
+      try{ FB.db.ref("users/"+key).update(payload).catch(()=>{}); }catch(er){}
+      fetch("https://pennie-chat-default-rtdb.firebaseio.com/users/"+key+".json",{method:"PATCH",headers:{"Content-Type":"application/json"},body:JSON.stringify(payload)}).catch(()=>{});
+    }catch(er){}
+    toast("Имя сохранено");
+  }
+});
 
 /* ---------- persistence of dialogs ---------- */
 setInterval(()=>{ try{ localStorage.setItem("pennie_dialogs_"+me.handle, JSON.stringify(dialogs)); }catch(e){} },2500);
