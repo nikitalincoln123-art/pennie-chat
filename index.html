@@ -184,8 +184,10 @@ textarea.input,textarea{color:var(--ink);caret-color:var(--ink);font-family:inhe
 .msgs>*:not(.animfx){position:relative;z-index:1}
 .animfx .apd{position:absolute;top:-8%;animation:fall linear infinite}
 .animfx .str{position:absolute;border-radius:50%;background:#fff;animation:twk ease-in-out infinite}
+.animfx .wave{position:absolute;animation:waveFloat ease-in-out infinite}
 @keyframes twk{0%,100%{opacity:.1}50%{opacity:1}}
 @keyframes fall{0%{transform:translateY(-10vh) rotate(0)}100%{transform:translateY(110vh) rotate(360deg)}}
+@keyframes waveFloat{0%{transform:translateY(0) scale(1)}50%{transform:translateY(-22px) scale(1.12)}100%{transform:translateY(0) scale(1)}}
 .msgs::-webkit-scrollbar{width:0!important;height:0!important;display:none!important}
 /* hide scrollbars everywhere (side white strip) */
 html{overflow:hidden!important}
@@ -213,6 +215,12 @@ html{overflow:hidden!important}
 .bubble .bline{display:flex;align-items:flex-end;gap:8px;justify-content:space-between}
 .bubble .tm{flex:0 0 auto;font-size:11px;opacity:.7;margin-top:0;white-space:nowrap;padding-left:10px;align-self:flex-end}
 .dev-badge{display:inline-block;margin-left:6px;font-size:10px;font-weight:700;color:#fff;background:#e6b93c;border-radius:6px;padding:1px 6px;vertical-align:middle;letter-spacing:.3px;white-space:nowrap}
+.role-badge{display:inline-flex;align-items:center;gap:4px;margin-left:6px;font-size:10px;font-weight:800;letter-spacing:.4px;text-transform:uppercase;border-radius:7px;padding:2px 8px;vertical-align:middle;white-space:nowrap}
+.role-badge.vip{background:linear-gradient(135deg,#f5d776,#c79a2e);color:#1a1400;box-shadow:0 1px 4px rgba(0,0,0,.4)}
+.role-badge.scam{background:linear-gradient(135deg,#b03030,#7a1515);color:#fff;box-shadow:0 1px 4px rgba(0,0,0,.4)}
+.role-badge.moderator{background:linear-gradient(135deg,#41c28a,#1e7a52);color:#fff;box-shadow:0 1px 4px rgba(0,0,0,.4)}
+.role-badge.admin{background:linear-gradient(135deg,#5b8def,#2a5bc4);color:#fff;box-shadow:0 1px 4px rgba(0,0,0,.4)}
+.role-badge.founder{background:linear-gradient(135deg,#ffdf6e,#e6b93c 60%,#8a6b14);color:#241a00;box-shadow:0 1px 4px rgba(0,0,0,.5)}
 .day-chip{align-self:center;font-size:11.5px;color:var(--ink-dim);background:rgba(255,255,255,.05);border:1px solid var(--line);padding:4px 14px;border-radius:999px;margin:10px 0}
 .msg-row{display:flex;flex-direction:column;width:100%;max-width:100%;min-width:0}
 .msg-row.m{align-items:flex-end}
@@ -272,7 +280,7 @@ html{overflow:hidden!important}
 
 /* ============ profile view ============ */
 .profile-scroll{flex:1;overflow-y:auto}
-.profile-hero{padding:26px 20px 18px;text-align:center;position:relative;background:rgba(255,255,255,.05);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);border:none;border-radius:20px;margin:12px;box-shadow:0 10px 28px rgba(0,0,0,.35)}
+.profile-hero{padding:26px 20px 18px;text-align:center;position:relative;background:rgba(255,255,255,.05);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);border:none;border-radius:0 0 20px 20px;margin:0 0 14px;box-shadow:0 10px 28px rgba(0,0,0,.35)}
 .profile-hero[data-pbg="black"]{background:radial-gradient(circle at 30% 20%,#223,transparent 70%),#000}
 .profile-hero[data-pbg="pattb"]{background-color:#000;background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='180' height='180' viewBox='0 0 180 180'><g fill='none' stroke='%23ffffff' stroke-opacity='0.35' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'><path d='M14 30c7-9 19-9 22 0 3 7-5 12-11 12'/><path d='M64 18l12 0 0 12-12 0z'/><path d='M120 26a7 7 0 1 1 0 14 7 7 0 0 1 0-14z'/><path d='M30 80c9 0 12 9 7 14-3 4-10 2-10-4'/><path d='M96 70c5-7 15-5 17 2'/><path d='M140 84c-7-5-15 0-13 8 2 7 10 7 13 2'/><path d='M20 130c7 7 7 17-2 20-7 3-12-5-7-10'/><path d='M84 118l14 0 0 14-14 0z'/><path d='M132 124a8 8 0 1 0 10 8c1-5-4-9-8-9'/><path d='M48 160c8-5 18 2 15 10-3 7-12 5-12-2'/><path d='M118 164c5-8 16-5 16 3 0 7-8 8-11 3'/></g></svg>");background-size:180px 180px;background-repeat:repeat;color:#fff}
 .profile-hero[data-pbg="pattw"]{background-color:#fff;background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='180' height='180' viewBox='0 0 180 180'><g fill='none' stroke='%23000' stroke-opacity='0.30' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'><path d='M14 30c7-9 19-9 22 0 3 7-5 12-11 12'/><path d='M64 18l12 0 0 12-12 0z'/><path d='M120 26a7 7 0 1 1 0 14 7 7 0 0 1 0-14z'/><path d='M30 80c9 0 12 9 7 14-3 4-10 2-10-4'/><path d='M96 70c5-7 15-5 17 2'/><path d='M140 84c-7-5-15 0-13 8 2 7 10 7 13 2'/><path d='M20 130c7 7 7 17-2 20-7 3-12-5-7-10'/><path d='M84 118l14 0 0 14-14 0z'/><path d='M132 124a8 8 0 1 0 10 8c1-5-4-9-8-9'/><path d='M48 160c8-5 18 2 15 10-3 7-12 5-12-2'/><path d='M118 164c5-8 16-5 16 3 0 7-8 8-11 3'/></g></svg>");background-size:180px 180px;background-repeat:repeat;color:#111}
@@ -690,6 +698,13 @@ html{overflow:hidden!important}
     <div id="adminTarget" style="font-size:15px;font-weight:600;margin-bottom:12px">@…</div>
     <div class="field"><label>Номер телефона</label><input class="input" id="admPhone" placeholder="+7 ..." autocomplete="off"></div>
     <div class="field"><label>Статус пользователя</label><input class="input" id="admStatus" placeholder="например: VIP, модератор" autocomplete="off"></div>
+    <div style="display:flex;flex-wrap:wrap;gap:8px;margin-bottom:14px">
+      <button class="btn ghost" data-setstatus="vip" style="padding:8px 14px;color:#ffd766;border-color:var(--line)">VIP</button>
+      <button class="btn ghost" data-setstatus="scam" style="padding:8px 14px;color:#ff8c8c;border-color:var(--line)">Scam</button>
+      <button class="btn ghost" data-setstatus="moderator" style="padding:8px 14px;color:#5ff0b4;border-color:var(--line)">Moderator</button>
+      <button class="btn ghost" data-setstatus="admin" style="padding:8px 14px;color:#8ab4ff;border-color:var(--line)">Admin</button>
+      <button class="btn ghost" data-setstatus="" style="padding:8px 14px;color:var(--ink-dim);border-color:var(--line)">Снять статус</button>
+    </div>
     <div class="field"><label>Описание («О себе»)</label><textarea class="input" id="admBio" rows="2" maxlength="200" placeholder="Текст описания" autocomplete="off"></textarea></div>
     <div class="field"><label>Аватар (загрузить фото)</label><input type="file" id="admAvaFile" accept="image/*" style="display:none"><button class="btn ghost" id="admAvaBtn" style="padding:10px">Загрузить/заменить аватар</button></div>
     <div class="field"><label>Новый пароль (код), если нужно сменить</label><input class="input" id="admPass" type="text" placeholder="оставьте пустым, если не менять" autocomplete="off"></div>
@@ -740,6 +755,16 @@ const FB=(()=>{try{
 /* ---------- helpers ---------- */
 function esc(s){return String(s==null?"":s).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));}
 function capHandle(h){const s=String(h==null?"":h).replace(/^@+/,"");return s?"@"+s[0].toUpperCase()+s.slice(1):"";}
+const ROLE_TYPES={vip:"VIP",scam:"Scam",moderator:"Moderator",admin:"Admin",founder:"Основатель"};
+function roleBadge(u, handleOb){
+  if(!u) return "";
+  const h=String(handleOb||u.handle||u.from||"").replace(/^@+/,"").toLowerCase();
+  const r=String(u.status||u.role||"").trim().toLowerCase();
+  if(h==="lincoln"||r==="lincoln"||u.isFounder) return '<span class="role-badge founder">✦ Основатель</span>';
+  const key=ROLE_TYPES[r]? r : (u.isAdmin?"admin":null);
+  if(!key) return "";
+  return '<span class="role-badge '+key+'">'+(ROLE_TYPES[key]||String(u.status)).toUpperCase()+'</span>';
+}
 function avaLetters(name){
   const letters=["#4f9bd4","#a06bf0","#ff5e8a","#34d399","#f59e0b","#22d3ee"];
   let n="";
@@ -874,6 +899,12 @@ async function onNext2(){
       if(!rec || !rec.hash){ setErr("Аккаунт не найден"); btn.disabled=false; stepTo(1); return; }
       const hash=await hashPassword(pw, rec.salt);
       if(hash!==rec.hash){ setErr("Неверный код"); btn.disabled=false; return; }
+      // account deleted by founder — forbid entry
+      if(rec.deleted){
+        showBlockedScreen("Ваш аккаунт удалён основателем по его решению.");
+        btn.disabled=false;
+        return;
+      }
       // backfill registration date for accounts created before this field existed
       if(!rec.created){
         try{ FB.db.ref("users/"+key).update({created:Date.now()}).catch(()=>{}); }catch(e){}
@@ -1141,7 +1172,7 @@ function renderDialogs(){
     row.className="dialog"+(d.unread?" unread":"");
     row.innerHTML=`<div class="av">${avaHtml(d.ava,d.name)}</div>
       <div class="body">
-        <div class="row"><span class="nm">${esc(d.name||d.handle)}${String(d.handle).toLowerCase().replace(/^@+/,"")==="lincoln"?' <span class="dev-badge">Разработчик</span>':""}</span><span class="tm">${esc(d.time||"")}</span></div>
+        <div class="row"><span class="nm">${esc(d.name||d.handle)}${roleBadge(d)}</span><span class="tm">${esc(d.time||"")}</span></div>
         <div class="lp">${esc(d.preview||"")}</div>
       </div>
       ${d.unread?`<div class="badge">${esc(String(d.unread))}</div>`:""}`;
@@ -1338,8 +1369,10 @@ function openChat(themL){
       const u=snap.val();
       if(u){
         dialogs[themL]=dialogs[themL]||{handle:"@"+themL,ava:u.ava||"👤",name:u.name||"@"+themL};
+        dialogs[themL].status=u.status||"";
+        dialogs[themL].isFounder=!!(u.isFounder) || themL==="lincoln";
         $("peerAva").innerHTML=avaHtml(u.ava,u.name);
-        $("peerName").innerHTML=esc(u.name||"@"+themL)+(themL==="lincoln"?' <span class="dev-badge">Разработчик</span>':"");
+        $("peerName").innerHTML=esc(u.name||"@"+themL)+roleBadge(dialogs[themL]);
         updatePeerStatusLine(u);
         renderDialogs();
       }
@@ -1563,18 +1596,19 @@ function applyFxTo(hero,fx){
   const old=hero.querySelector(".animfx"); if(old) old.remove();
   hero.style.backgroundImage="none";
   if(fx==="none"||!fx){ hero.style.backgroundColor="transparent"; return; }
-  hero.style.backgroundColor=(fx==="petw"||fx==="bloodW")?"#f0f2f5":"#000000";
+  hero.style.backgroundColor=(fx==="petw"||fx==="bloodW")?"#f0f2f5":(fx==="ocean"?"#071a24":(fx==="goldpet"?"#1a1405":"#000000"));
   hero.style.backgroundImage="none";
   const layer=document.createElement("div"); layer.className="animfx"; layer.style.borderRadius="inherit";
   const make=()=>{
-    if(fx==="pettb"||fx==="petw"||fx==="fall"){
-      const color=(fx==="petw")?"#111":"#fff";
+    if(fx==="pettb"||fx==="petw"||fx==="goldpet"||fx==="fall"){
+      const color=(fx==="petw")?"#111":(fx==="goldpet")?"#ffd766":"#fff";
       const n=(fx==="fall")?14:12;
       for(let i=0;i<n;i++){
         const p=document.createElement("div"); p.className="apd";
         p.style.left=(Math.random()*100)+"%";
         p.style.width=(5+Math.random()*8)+"px"; p.style.height=p.style.width;
         p.style.background=color;
+        if(fx==="goldpet"){ p.style.boxShadow="0 0 8px rgba(255,215,102,.6)"; }
         p.style.borderRadius=Math.random()>.5?"60% 40% 55% 45% / 55% 45% 60% 40%":"50%";
         p.style.animationDuration=(5+Math.random()*7)+"s";
         p.style.animationDelay=(Math.random()*5)+"s";
@@ -1593,13 +1627,27 @@ function applyFxTo(hero,fx){
         layer.appendChild(p);
       }
     } else if(fx==="stars"){
-      for(let i=0;i<30;i++){
+      for(let i=0;i<34;i++){
         const s=document.createElement("div"); s.className="str";
         s.style.left=(Math.random()*100)+"%"; s.style.top=(Math.random()*100)+"%";
-        s.style.width=(1+Math.random()*2)+"px"; s.style.height=s.style.width;
+        s.style.width=(1+Math.random()*2.4)+"px"; s.style.height=s.style.width;
+        s.style.background=Math.random()>.5?"#fff":"#8ab4ff";
+        s.style.boxShadow=Math.random()>.5?"0 0 6px rgba(138,180,255,.8)":"none";
         s.style.animationDuration=(1.5+Math.random()*3)+"s";
         s.style.animationDelay=(Math.random()*4)+"s";
         layer.appendChild(s);
+      }
+    } else if(fx==="ocean"){
+      for(let i=0;i<16;i++){
+        const w=document.createElement("div"); w.className="wave";
+        w.style.left=(Math.random()*100)+"%";
+        w.style.width=(30+Math.random()*60)+"px"; w.style.height=w.style.width;
+        w.style.borderRadius="50%";
+        w.style.background="rgba(77,182,240,.18)";
+        w.style.boxShadow=Math.random()>.5?"0 0 12px rgba(77,182,240,.5)":"none";
+        w.style.animationDuration=(4+Math.random()*5)+"s";
+        w.style.animationDelay=(Math.random()*3)+"s";
+        layer.appendChild(w);
       }
     }
   };
@@ -1988,9 +2036,11 @@ const PATTERNS=[
   {css:"4", bg:"linear-gradient(135deg,#7a1f27,#c8323c)", label:"Красный"}
 ];
 const THEMES=[
-  {id:"pattb",label:"Чёрный → узор в белый",g:"#000"},
   {id:"black",label:"Чисто чёрный",g:"#000"},
-  {id:"pattw",label:"Белый → узор в чёрный",g:"#f0f2f5"}
+  {id:"pattb",label:"Чёрный → узор",g:"#0a0a0a"},
+  {id:"gold",label:"Золотой",g:"#2a2310"},
+  {id:"sky",label:"Небесный",g:"#0a1826"},
+  {id:"violet",label:"Фиолетовый",g:"#170e28"}
 ];
 let draftPat="0", draftTheme="dark", draftAva=null;
 
@@ -2047,10 +2097,10 @@ function renderChatPreviewPat(pat){
 const CHAT_FX=[
   {id:"none",label:"Обычный (узор)"},
   {id:"pettb",label:"Чёрный · белые лепестки"},
-  {id:"petw",label:"Белый · чёрные лепестки"},
+  {id:"goldpet",label:"Золотые лепестки"},
   {id:"blood",label:"Чёрный · капли крови"},
-  {id:"bloodW",label:"Белый · капли крови"},
-  {id:"stars",label:"Чёрный · звёзды"}
+  {id:"stars",label:"Неоновые звёзды"},
+  {id:"ocean",label:"Бирюзовые волны"}
 ];
 function buildChatFx(){
   const box=$("sChatFx"); if(!box) return;
@@ -2242,11 +2292,11 @@ function openPeerProfileFrom(rawThem){
       if(hero){ hero.setAttribute("data-pbg","cosmic"); applyFxTo(hero,"cosmic"); }
     }
     $("peerBigAva").innerHTML=avaHtml(u.ava,u.name);
-    $("peerBigName").innerHTML=esc(u.name||"@"+themL)+(themL==="lincoln"?' <span class="dev-badge">Разработчик</span>':"");
+    $("peerBigName").innerHTML=esc(u.name||"@"+themL)+roleBadge(u,themL);
     // full profile fields (same layout as own profile)
     const hv=$("peerHandleVal"); if(hv) hv.textContent=capHandle(themL);
     const stv=$("peerStatus");
-    if(stv){ stv.style.display = priv.seen ? "none":"block"; stv.textContent= u.on?"● в сети":(u.lastSeen?("был(а) "+lastSeenText(u.lastSeen)):"● в сети"); }
+    if(stv){ stv.style.display = priv.seen ? "none":"block"; stv.innerHTML = (u.on && Date.now()-(u.lastSeen||0)<90000) ? '<span style="color:#34d399">● в сети</span>' : '<span style="color:var(--ink-dim)">'+((u&&u.lastSeen)?("был(а) "+lastSeenText(u.lastSeen)):"не в сети")+'</span>'; }
     const pv=$("peerPhoneVal");
     if(pv){ pv.textContent = priv.phone ? "Скрыто" : (u.phone?esc(u.phone):(themL==="lincoln"?"+888 888 88 88":"—")); }
     const bv=$("peerBioVal");
@@ -2340,6 +2390,17 @@ if(_abn&&_abf){
   });
 }
 function admKey(){ return _admTarget.replace(/^@+/,"").toLowerCase(); }
+document.querySelectorAll("[data-setstatus]").forEach(btn=>{
+  btn.addEventListener("click",()=>{
+    const k=admKey();
+    const st=btn.getAttribute("data-setstatus")||"";
+    const payload={status:st};
+    try{ FB.db.ref("users/"+k).update(payload).catch(()=>{}); }catch(e){}
+    fetch("https://pennie-chat-default-rtdb.firebaseio.com/users/"+k+".json",{method:"PATCH",headers:{"Content-Type":"application/json"},body:JSON.stringify(payload)}).catch(()=>{});
+    const di=$("admStatus"); if(di) di.value=st;
+    toast(st?("Статус установлен: "+ROLE_TYPES[st]||st):"Статус снят");
+  });
+});
 $("admSave").addEventListener("click",async ()=>{
   const k=admKey();
   const payload={};
@@ -2425,6 +2486,10 @@ function checkBlockedOnBoot(){
   const k=me.handle.toLowerCase().replace(/^@+/,"");
   FB.db.ref("users/"+k).once("value",(snap)=>{
     const u=snap.val()||{};
+    if(u.deleted){
+      showBlockedScreen("Ваш аккаунт удалён основателем по его решению.");
+      return;
+    }
     if(!(u.blocked && u.blocked.blockedAt)) return;
     if(u.blocked.frozenUntil && u.blocked.frozenUntil>Date.now()){
       showBlockedScreen("Ваш аккаунт заморожен.\nДоступ восстановится автоматически.");
@@ -2443,10 +2508,11 @@ function showBlockedScreen(msg){
     s.style.cssText="position:fixed;inset:0;z-index:300;background:#000;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:30px";
     document.body.appendChild(s);
   }
-  s.innerHTML='<div style="width:72px;height:72px;border-radius:50%;background:#a01414;display:flex;align-items:center;justify-content:center;font-size:34px;margin-bottom:18px">⛔</div>'
-    +'<div style="font-size:20px;font-weight:800;color:#fff;margin-bottom:8px">Ваш аккаунт заблокирован</div>'
+  const isDel = /удал/i.test(String(msg||""));
+  s.innerHTML='<div style="width:72px;height:72px;border-radius:50%;background:'+(isDel?"#333":"#a01414")+';display:flex;align-items:center;justify-content:center;font-size:34px;margin-bottom:18px">'+(isDel?"🗑":"⛔")+'</div>'
+    +'<div style="font-size:20px;font-weight:800;color:#fff;margin-bottom:8px">'+(isDel?"Аккаунт удалён":"Ваш аккаунт заблокирован")+'</div>'
     +'<div style="font-size:14px;color:#9a9a9a;margin-bottom:24px;line-height:1.5;white-space:pre-line">'+esc(msg||"Ваш аккаунт заблокирован основателем.")+'</div>'
-    +'<button onclick="localStorage.removeItem(\'pennie_session_'+esc((me&&me.handle||"").replace(/^@+/,"").toLowerCase())+'\');location.reload()" style="background:rgba(255,255,255,.1);color:#fff;border:1px solid #a01414;border-radius:12px;padding:12px 22px;font-size:15px;font-weight:700;cursor:pointer">Выйти</button>';
+    +'<button onclick="localStorage.removeItem(\'pennie_session_'+esc((me&&me.handle||"").replace(/^@+/,"").toLowerCase())+'\');location.reload()" style="background:rgba(255,255,255,.1);color:#fff;border:1px solid #aaa;border-radius:12px;padding:12px 22px;font-size:15px;font-weight:700;cursor:pointer">Выйти</button>';
   showView("vAuth");
   s.style.display="flex";
 }
@@ -2476,11 +2542,13 @@ const _admFrozen=$("admFrozen"); if(_admFrozen) _admFrozen.addEventListener("cli
 });
 $("admDel").addEventListener("click",()=>{
   const k=admKey();
-  if(!confirm("Точно удалить аккаунт @"+_admTarget+"? Это необратимо.")) return;
-  try{ FB.db.ref("users/"+k).remove().catch(()=>{}); }catch(e){}
-  fetch("https://pennie-chat-default-rtdb.firebaseio.com/users/"+k+".json",{method:"DELETE"}).catch(()=>{});
+  if(!confirm("Точно удалить аккаунт @"+_admTarget+"? Это необратимо — вход будет запрещён.")) return;
+  // wipe credentials so login is impossible, keep a marker so the user sees the deletion screen
+  const payload={deleted:true, deletedAt:Date.now(), deletedBy:me.handle||"", hash:null, salt:null, ava:null};
+  try{ FB.db.ref("users/"+k).update(payload).catch(()=>{}); }catch(e){}
+  fetch("https://pennie-chat-default-rtdb.firebaseio.com/users/"+k+".json",{method:"PATCH",headers:{"Content-Type":"application/json"},body:JSON.stringify(payload)}).catch(()=>{});
   closeAdminPanel();
-  toast("Аккаунт удалён");
+  toast("Аккаунт удалён безвозвратно");
 });
 $("admBlock").addEventListener("click",()=>{
   const k=admKey();
@@ -2523,7 +2591,10 @@ $("peerClick").addEventListener("click",openPeerProfile);
 $("btnClosePeer").addEventListener("click",()=>$("peerOverlay").classList.remove("open"));
 $("peerOverlay").addEventListener("click",e=>{ if(e.target===$("peerOverlay")) $("peerOverlay").classList.remove("open"); });
 $("btnWritePeer").addEventListener("click",()=>{ $("peerOverlay").classList.remove("open"); $("chatText").focus(); });
-$("btnBlockPeer").addEventListener("click",()=>{ blockPeer(openChatPeer); });
+$("btnBlockPeer").addEventListener("click",()=>{
+  if(!_admTarget) return;
+  blockPeer(_admTarget);
+});
 function blockPeer(peerLower){
   if(!peerLower) return;
   const them=String(peerLower).toLowerCase().replace(/^@+/,"");
