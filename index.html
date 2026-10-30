@@ -239,12 +239,6 @@ html{overflow:hidden!important}
 .send-btn:hover{filter:brightness(1.1);box-shadow:0 6px 18px rgba(46,166,255,.5)}
 .send-btn:active{transform:scale(.9)}
 .send-btn:active{transform:scale(.9)}
-.typing-ind{align-self:flex-start;font-size:12px;color:var(--ink-dim);padding:6px 10px;border-radius:12px;background:rgba(255,255,255,.05);backdrop-filter:blur(6px);border:1px solid rgba(255,255,255,.06);display:flex;align-items:center;gap:7px;animation:floaty 2.4s ease-in-out infinite;box-shadow:0 6px 18px rgba(0,0,0,.25)}
-@keyframes floaty{0%,100%{transform:translateY(0)}50%{transform:translateY(-3px)}}
-.typing-ind .dot{width:5px;height:5px;border-radius:50%;background:var(--accent);display:inline-block;animation:bounce 1.2s ease-in-out infinite}
-.typing-ind .dot:nth-child(2){animation-delay:.15s}
-.typing-ind .dot:nth-child(3){animation-delay:.3s}
-@keyframes bounce{0%,60%,100%{transform:translateY(0);opacity:.4}30%{transform:translateY(-4px);opacity:1}}
 .confirm-bar{padding:8px 14px;display:flex;gap:8px;background:var(--panel);border-top:1px solid var(--line);align-self:stretch}
 .confirm-bar .btn{width:auto;padding:9px 16px;font-size:14px;border-radius:10px}
 
@@ -431,9 +425,6 @@ html{overflow:hidden!important}
   </div>
   <div class="msgs" id="msgs"></div>
   <div class="chat-input-bar">
-    <button class="glow-toggle" id="btnGlow" title="Анимированное свечение">
-      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v1M18.66 5.34l-.7.7M21 12h-1M18.66 18.66l-.7-.7M12 21v-1M5.34 18.66l.7-.7M4 12H3M5.34 5.34l.7.7" /><path d="M12 8a4 4 0 0 1 4 4 3 3 0 0 1-2 5v1h-4v-1a3 3 0 0 1-2-5 4 4 0 0 1 4-4z" /></svg>
-    </button>
     <button class="glow-toggle" id="btnImg" title="Отправить фото">
       <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z" /><circle cx="12" cy="13" r="4" /></svg>
     </button>
@@ -562,8 +553,6 @@ html{overflow:hidden!important}
       </div>
       <div class="profile-section">
         <div class="sec-title">Аккаунт</div>
-        <div class="profile-row" id="sRowHideBio"><div class="r-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M4 6h16M4 12h16M4 18h10" /></svg></div><div class="r-body"><div class="t">Скрывать «О себе»</div><div class="v" id="sHideBioVal">Нет</div></div></div>
-        <div class="profile-row" id="sRowHideBirth"><div class="r-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" /><path d="M8 2v4M16 2v4M3 10h18" /></svg></div><div class="r-body"><div class="t">Скрывать дату рождения</div><div class="v" id="sHideBirthVal">Нет</div></div></div>
         <div class="profile-row" id="sRowLogout"><div class="r-ic" style="color:var(--bad,#f8708e)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" /><path d="M16 17l5-5-5-5M21 12H9" /></svg></div><div class="r-body"><div class="t" style="color:var(--bad,#f8708e)">Выйти из аккаунта</div></div></div>
       </div>
     </div>
@@ -1679,10 +1668,6 @@ async function registerDevice(){
       fetch("https://pennie-chat-default-rtdb.firebaseio.com/users/"+key+"/devices/"+id+".json",{method:"PUT",headers:{"Content-Type":"application/json"},body:JSON.stringify(payload)}).catch(()=>{});
     }catch(e){}
   }catch(e){}
-}
-function renderDevicesVal(){
-  const el=$("sDevicesVal"); if(!el) return;
-  el.textContent="Смотреть активные сессии";
 }
 let devicesModalEl=null;
 function openDevices(){
