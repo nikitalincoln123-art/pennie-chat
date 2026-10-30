@@ -447,9 +447,9 @@ html{overflow:hidden!important}
     <div class="profile-sections">
       <div class="profile-section">
         <div class="sec-title">Внешний вид</div>
-        <div class="profile-row" id="sRowGlow">
-          <div class="r-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v1M18.66 5.34l-.7.7M21 12h-1M18.66 18.66l-.7-.7M12 21v-1M5.34 18.66l.7-.7M4 12H3M5.34 5.34l.7.7" /><path d="M12 8a4 4 0 0 1 4 4 3 3 0 0 1-2 5v1h-4v-1a3 3 0 0 1-2-5 4 4 0 0 1 4-4z" /></svg></div>
-          <div class="r-body"><div class="t">Свечение сообщений</div><div class="v" id="sGlowVal">Выключено</div></div>
+        <div class="profile-row" id="sRowDevices">
+          <div class="r-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="4" width="14" height="12" rx="2" /><path d="M6 20h6M9 16v4" /><rect x="17" y="8" width="5" height="12" rx="1.5" /></svg></div>
+          <div class="r-body"><div class="t">Устройства</div><div class="v" id="sDevicesVal">—</div></div>
         </div>
         <div class="profile-row" id="sRowAppTheme">
           <div class="r-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M20 13.5A8.5 8.5 0 1 1 10.5 4a7 7 0 0 0 9.5 9.5z" /></svg></div>
@@ -722,12 +722,10 @@ async function onNext2(){
       const hash=await hashPassword(pw, rec.salt);
       if(hash!==rec.hash){ setErr("Неверный код"); btn.disabled=false; return; }
       me={handle:pendingUser, name:(rec.name||pendingUser.slice(1)), ava:(rec.ava||""), pat:(rec.pat!=null?rec.pat:"0"), theme:(rec.theme||"black"), appTheme:(rec.appTheme||"dark"), blocked:(rec.blocked||{}), bio:(rec.bio||""), created:(rec.created||Date.now()), birth:(rec.birth||"")};
-      // record lastSeen on login
-      try{ FB.db.ref("users/"+me.handle.slice(1)).update({lastSeen:Date.now(),on:true}).catch(()=>{}); }catch(e){}
-      // heartbeat keeps lastSeen fresh
-      setInterval(()=>{ try{ FB.db.ref("users/"+me.handle.slice(1)).update({lastSeen:Date.now(),on:true}).catch(()=>{}); }catch(e){} },30000);
-      window.addEventListener("beforeunload",()=>{ try{ FB.db.ref("users/"+me.handle.slice(1)).update({on:false,lastSeen:Date.now()}).catch(()=>{}); }catch(e){} });
+      // online heartbeat (lastSeen/on) — shared helper
+      ensureOnlineHeartbeat();
       saveSession();
+      registerDevice();
       openChats();
     }
   }catch(e){ setErr("Ошибка соединения. Попробуйте снова."); btn.disabled=false; return; }
@@ -1146,14 +1144,122 @@ function sendPhoto(url){
 
 let glowOn = !!(me && me.glow);
 function renderGlowVal(){ const el=$("sGlowVal"); if(el) el.textContent = glowOn?"Включено":"Выключено"; }
-$("sRowGlow").addEventListener("click",()=>{
-  glowOn=!glowOn;
-  renderGlowVal();
-  me.glow=glowOn;
-  saveSession();
-  try{ FB.db.ref("users/"+me.handle.slice(1)).update({glow:glowOn}).catch(()=>{}); }catch(e){}
-  toast(glowOn?"Свечение включено":"Свечение выключено");
-});
+
+/* ---------- devices ---------- */
+function deviceId(){
+  try{
+    let id=localStorage.getItem("pennie_device_id");
+    if(!id){ id="d"+Math.random().toString(36).slice(2)+Date.now().toString(36); localStorage.setItem("pennie_device_id",id); }
+    return id;
+  }catch(e){ return "d"+Date.now().toString(36); }
+}
+function deviceModel(){
+  const ua=navigator.userAgent||"";
+  let os="Неизвестно", type="ПК";
+  if(/Windows NT/i.test(ua)) os="Windows";
+  else if(/Android/i.test(ua)){ os="Android"; type="Телефон"; }
+  else if(/iPhone|iPad|iPod/i.test(ua)){ os=/iPad/i.test(ua)?"iPadOS":"iOS"; type="Телефон"; }
+  else if(/Mac OS X/i.test(ua)) os="macOS";
+  else if(/Linux/i.test(ua)) os="Linux";
+  // device model from Android UA: "; <model> Build/"
+  let model="";
+  const am=ua.match(/Android[^;]*;\s*([^;)]+?)\s*(?:Build|\))/i);
+  if(am) model=am[1].trim();
+  if(!model){
+    if(/Windows/i.test(os)) model="Компьютер";
+    else if(/iPhone/i.test(ua)) model="iPhone";
+    else if(/iPad/i.test(ua)) model="iPad";
+    else if(/Macintosh/i.test(ua)) model="Mac";
+    else model=type;
+  }
+  const browser=/Edg\//i.test(ua)?"Edge":/OPR\/|Opera/i.test(ua)?"Opera":/YaBrowser/i.test(ua)?"Яндекс":/Chrome\//i.test(ua)?"Chrome":/Firefox\//i.test(ua)?"Firefox":/Safari\//i.test(ua)?"Safari":"Браузер";
+  return {os, type, model, browser};
+}
+async function fetchIP(){
+  try{
+    const r=await fetch("https://api.ipify.org?format=json",{cache:"no-store"});
+    const j=await r.json();
+    if(j&&j.ip) return j.ip;
+  }catch(e){}
+  try{
+    const r2=await fetch("https://ipapi.co/json/",{cache:"no-store"});
+    const j2=await r2.json();
+    if(j2&&j2.ip) return j2.ip;
+  }catch(e){}
+  return "——";
+}
+let _hbStarted=false;
+function ensureOnlineHeartbeat(){
+  if(_hbStarted || !me || !me.handle) return;
+  _hbStarted=true;
+  try{ FB.db.ref("users/"+me.handle.slice(1)).update({lastSeen:Date.now(),on:true}).catch(()=>{}); }catch(e){}
+  setInterval(()=>{ try{ FB.db.ref("users/"+me.handle.slice(1)).update({lastSeen:Date.now(),on:true}).catch(()=>{}); }catch(e){} },30000);
+  window.addEventListener("beforeunload",()=>{ try{ FB.db.ref("users/"+me.handle.slice(1)).update({on:false,lastSeen:Date.now()}).catch(()=>{}); }catch(e){} });
+}
+async function registerDevice(){
+  if(!me||!me.handle) return;
+  try{
+    const id=deviceId();
+    const dm=deviceModel();
+    const ip=await fetchIP();
+    const payload={id, model:dm.model, os:dm.os, type:dm.type, browser:dm.browser, ip, ua:(navigator.userAgent||"").slice(0,150), lastSeen:Date.now()};
+    const key=me.handle.toLowerCase().replace(/^@+/,"");
+    try{ FB.db.ref("users/"+key+"/devices/"+id).update(payload).catch(()=>{}); }catch(e){}
+    // REST fallback if SDK socket is dead (same pattern as messages)
+    try{
+      fetch("https://pennie-chat-default-rtdb.firebaseio.com/users/"+key+"/devices/"+id+".json",{method:"PUT",headers:{"Content-Type":"application/json"},body:JSON.stringify(payload)}).catch(()=>{});
+    }catch(e){}
+  }catch(e){}
+}
+function renderDevicesVal(){
+  const el=$("sDevicesVal"); if(!el) return;
+  el.textContent="Смотреть активные сессии";
+}
+let devicesModalEl=null;
+function openDevices(){
+  if(devicesModalEl) devicesModalEl.remove();
+  devicesModalEl=document.createElement("div");
+  devicesModalEl.className="overlay open";
+  devicesModalEl.style.zIndex="120";
+  devicesModalEl.innerHTML='<div class="modal" style="max-width:440px"><div class="m-head"><div class="m-title">Устройства</div><button class="x-btn" id="devX">✕</button></div><div id="devList" style="font-size:14px;color:var(--ink-dim)">Загрузка…</div></div>';
+  document.body.appendChild(devicesModalEl);
+  devicesModalEl.addEventListener("click",e=>{ if(e.target===devicesModalEl) closeDevices(); });
+  devicesModalEl.querySelector("#devX").addEventListener("click",closeDevices);
+  loadDevicesList();
+}
+function closeDevices(){ if(devicesModalEl){ devicesModalEl.remove(); devicesModalEl=null; } }
+async function loadDevicesList(){
+  const box=devicesModalEl&&devicesModalEl.querySelector("#devList"); if(!box) return;
+  const key=me.handle.toLowerCase().replace(/^@+/,"");
+  let data=null;
+  try{
+    data=await new Promise((res,rej)=>{
+      let done=false;
+      try{ FB.db.ref("users/"+key+"/devices").once("value",s=>{ done=true; res(s.val()||{}); }); }catch(e){}
+      setTimeout(()=>{ if(!done){ done=true; res(null); } },3500);
+    });
+  }catch(e){ data=null; }
+  if(data===null){
+    try{ const r=await fetch("https://pennie-chat-default-rtdb.firebaseio.com/users/"+key+"/devices.json",{cache:"no-store"}); data=await r.json()||{}; }catch(e){ data={}; }
+  }
+  const myId=deviceId();
+  const list=Object.values(data||{}).sort((a,b)=>(b.lastSeen||0)-(a.lastSeen||0));
+  if(!list.length){ box.innerHTML='<div style="padding:8px 0">Нет данных об устройствах.</div>'; return; }
+  box.innerHTML=list.map(d=>{
+    const cur=String(d.id)===myId;
+    const when=d.lastSeen?new Date(d.lastSeen).toLocaleString("ru-RU",{day:"numeric",month:"short",hour:"2-digit",minute:"2-digit"}):"—";
+    return '<div style="display:flex;gap:12px;align-items:flex-start;padding:12px 0;border-top:1px solid rgba(255,255,255,.07)">'+
+      '<div style="width:38px;height:38px;border-radius:11px;background:#232c35;display:flex;align-items:center;justify-content:center;flex:0 0 auto;font-size:18px">'+(d.type==="Телефон"?"📱":"💻")+'</div>'+
+      '<div style="flex:1;min-width:0">'+
+        '<div style="color:var(--ink);font-weight:600;font-size:14px">'+esc(d.model||d.os||"Устройство")+(cur?' <span class="dev-badge" style="background:#34d399">Это устройство</span>':'')+'</div>'+
+        '<div style="font-size:12.5px;margin-top:2px">'+esc((d.os||"")+(d.browser?" · "+d.browser:""))+'</div>'+
+        '<div style="font-size:12.5px;margin-top:2px">IP: <b style="color:var(--ink)">'+esc(d.ip||"—")+'</b></div>'+
+        '<div style="font-size:11.5px;margin-top:2px;opacity:.8">Активность: '+esc(when)+'</div>'+
+      '</div></div>';
+  }).join("");
+}
+$("sRowDevices").addEventListener("click",openDevices);
+
 function fbPushKey(){
   // Firebase-style push key (20 random chars, base64-url alphabet), generated locally so
   // sending never depends on the (often broken in RU networks) SDK websocket.
@@ -1648,6 +1754,8 @@ function makeDust(){
     // normalize handle in stored session too
     me.handle=normHandle(me.handle)||me.handle;
     applyMyStyle();
+    ensureOnlineHeartbeat();
+    registerDevice();
     setTab("chats");
   } else {
     showView("vAuth");
