@@ -32,7 +32,7 @@ body[data-theme="violet"]{--bg:#130a20;--bg-in:#1a0e2e;--panel:#221344;--panel2:
 
 /* ============ background: black with doodle pattern (Telegram style) ============ */
 #bgFx{position:fixed;inset:0;z-index:0;overflow:hidden;pointer-events:none;background-color:#000;
-  background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='220' height='220' viewBox='0 0 220 220'><g fill='none' stroke='%23ffffff' stroke-opacity='0.14' stroke-width='1.6' stroke-linecap='round' stroke-linejoin='round'><path d='M20 34c8-10 22-10 26 0 3 8-6 14-13 14'/><path d='M150 20l14 0 0 14-14 0z'/><path d='M90 26a8 8 0 1 1 0 16 8 8 0 0 1 0-16z'/><path d='M40 90c10 0 14 10 8 16-4 4-12 2-12-4'/><path d='M120 78c6-8 18-6 20 2M126 88l10 0'/><path d='M170 96c-8-6-18 0-16 10 2 8 12 8 16 2'/><path d='M28 150c8 8 8 20-2 24-8 3-14-6-8-12'/><path d='M96 140l16 0 0 16-16 0zM104 140l0 16'/><path d='M160 150a10 10 0 1 0 12 10c1-6-4-11-9-11'/><path d='M60 190c10-6 22 2 18 12-3 8-14 6-14-2'/><path d='M140 200c6-10 20-6 20 4 0 8-10 10-14 4'/><path d='M196 40c6 4 6 12 0 16-5 3-10-2-8-7'/><path d='M8 60c4 6 2 12-4 12-5 0-6-6-2-8'/><path d='M112 200l10-10 4 12-10 4z'/></g></svg>");
+  background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='220' height='220' viewBox='0 0 220 220'><g fill='none' stroke='%23ffffff' stroke-opacity='0.28' stroke-width='1.7' stroke-linecap='round' stroke-linejoin='round'><path d='M20 34c8-10 22-10 26 0 3 8-6 14-13 14'/><path d='M150 20l14 0 0 14-14 0z'/><path d='M90 26a8 8 0 1 1 0 16 8 8 0 0 1 0-16z'/><path d='M40 90c10 0 14 10 8 16-4 4-12 2-12-4'/><path d='M120 78c6-8 18-6 20 2M126 88l10 0'/><path d='M170 96c-8-6-18 0-16 10 2 8 12 8 16 2'/><path d='M28 150c8 8 8 20-2 24-8 3-14-6-8-12'/><path d='M96 140l16 0 0 16-16 0zM104 140l0 16'/><path d='M160 150a10 10 0 1 0 12 10c1-6-4-11-9-11'/><path d='M60 190c10-6 22 2 18 12-3 8-14 6-14-2'/><path d='M140 200c6-10 20-6 20 4 0 8-10 10-14 4'/><path d='M196 40c6 4 6 12 0 16-5 3-10-2-8-7'/><path d='M8 60c4 6 2 12-4 12-5 0-6-6-2-8'/><path d='M112 200l10-10 4 12-10 4z'/></g></svg>");
   background-size:220px 220px;background-repeat:repeat}
 @keyframes nebulaFloat{0%,100%{transform:translate(0,0) scale(1)}}
 .view{position:relative;z-index:1}
@@ -143,7 +143,7 @@ input{font-family:inherit;color:var(--ink)}
 #vChat .topbar .peer-name .n{font-weight:700;font-size:15px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 #vChat .topbar .peer-name .s{font-size:12px;color:var(--ink-dim)}
 .msgs{flex:1;overflow-y:auto;overflow-x:hidden;padding:16px 14px;display:flex;flex-direction:column;gap:6px;align-items:stretch;
-  background:radial-gradient(1200px 600px at 20% -10%,rgba(84,183,233,.07),transparent 60%),radial-gradient(900px 500px at 110% 110%,rgba(160,107,240,.08),transparent 60%),var(--bg);
+  background:transparent;
   scroll-behavior:smooth;scrollbar-width:none;-ms-overflow-style:none;overscroll-behavior:contain}
 .msgs::-webkit-scrollbar{width:0!important;height:0!important;display:none!important}
 /* hide scrollbars everywhere (side white strip) */
@@ -190,7 +190,7 @@ html{overflow:hidden!important}
 .msg-row:hover .add-react{opacity:1}
 .add-react:hover{transform:scale(1.15);color:var(--ink)}
 .chat-input-bar{background:#1c242c;border-top:1px solid rgba(255,255,255,.06);padding:8px 10px;display:flex;gap:8px;flex:0 0 auto;align-items:flex-end}
-.chat-input-bar textarea{flex:1;resize:none;background:#2a333d;border:0;border-radius:20px;padding:11px 16px;font-size:15px;outline:none;color:#fff;max-height:120px;transition:background .18s}
+.chat-input-bar textarea{flex:1;resize:none;background:#2a333d;border:0;border-radius:20px;padding:11px 16px;font-family:'Inter','Segoe UI Variable','Segoe UI',system-ui,-apple-system,'Helvetica Neue',Roboto,Arial,sans-serif;font-size:15.5px;font-weight:450;letter-spacing:.1px;line-height:1.4;outline:none;color:#fff;max-height:120px;transition:background .18s}
 .chat-input-bar textarea::placeholder{color:#7d8c99}
 .chat-input-bar textarea:focus{background:#313b46}
 .glow-toggle{width:40px;height:40px;border-radius:50%;display:flex;align-items:center;justify-content:center;color:#8a99a6;flex:0 0 auto;transition:all .15s;background:transparent;border:0}
@@ -800,13 +800,30 @@ function renderDialogs(){
   const filter=chatFilter||"all";
   let arr=Object.values(dialogs).sort((a,b)=>(b.t||0)-(a.t||0));
   if(filter==="personal") arr=arr.filter(d=>d.lastIsMine);
+  // pinned Support chat — always visible, opens dialog with @lincoln (hidden from @lincoln himself)
+  const isLincolnMe = String(me&&me.handle||"").toLowerCase().replace(/^@+/,"")==="lincoln";
+  if(filter!=="personal" && !isLincolnMe){
+    const sd=dialogs["lincoln"]||{};
+    const sup=document.createElement("div");
+    sup.className="dialog support-row"+(sd.unread?" unread":"");
+    sup.innerHTML=`<div class="av" style="background:linear-gradient(135deg,#2b7fd4,#3fb0e8);color:#fff">🎧</div>
+      <div class="body">
+        <div class="row"><span class="nm">Поддержка <span class="dev-badge">Официально</span></span><span class="tm">${esc(sd.time||"")}</span></div>
+        <div class="lp">${esc(sd.preview||"Напишите нам — ответит @Lincoln")}</div>
+      </div>
+      ${sd.unread?`<div class="badge">${esc(String(sd.unread))}</div>`:""}`;
+    sup.addEventListener("click",()=>{ clearUnread("lincoln"); openInstant(me.handle,"lincoln"); });
+    el.appendChild(sup);
+  }
   if(!arr.length){
-    el.innerHTML=filter==="personal"
-      ?'<div class="list-empty">Личных сообщений пока нет.<br>Напишите собеседнику — и он появится здесь.</div>'
-      :'<div class="list-empty">Пока нет чатов.<br>Найдите собеседника по @юзернейму сверху.</div>';
+    if(filter!=="personal"){
+      return;
+    }
+    el.innerHTML='<div class="list-empty">Личных сообщений пока нет.<br>Напишите собеседнику — и он появится здесь.</div>';
     return;
   }
   arr.forEach(d=>{
+    if(String(d.handle).toLowerCase().replace(/^@+/,"")==="lincoln") return; // shown as pinned Support
     const row=document.createElement("div");
     row.className="dialog"+(d.unread?" unread":"");
     row.innerHTML=`<div class="av">${avaHtml(d.ava,d.name)}</div>
