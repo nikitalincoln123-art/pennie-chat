@@ -354,6 +354,12 @@ html{overflow:hidden!important}
 @media(max-width:600px){
   .bubble .tm{font-size:11px;padding-left:6px}
   .bubble .bline{gap:6px}
+  html,body{-webkit-text-size-adjust:100%;text-size-adjust:100%}
+  .chat-input-bar{position:relative;z-index:30}
+  .chat-input-bar textarea{font-size:16px;padding:12px 16px;-webkit-appearance:none;appearance:none}
+  .view.active{animation:none}
+  .bubble,.send-btn,.glow-toggle{-webkit-backface-visibility:hidden;backface-visibility:hidden;transform:translateZ(0)}
+  .msgs{-webkit-overflow-scrolling:touch}
 }
 </style>
 </head>
@@ -424,7 +430,6 @@ html{overflow:hidden!important}
     </button>
   </div>
   <div class="msgs" id="msgs"></div>
-  <div class="typing-ind" id="typingInd" style="display:none"><span class="dot"></span><span class="dot"></span><span class="dot"></span><span id="typingText">печатает…</span></div>
   <div class="chat-input-bar">
     <button class="glow-toggle" id="btnGlow" title="Анимированное свечение">
       <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v1M18.66 5.34l-.7.7M21 12h-1M18.66 18.66l-.7-.7M12 21v-1M5.34 18.66l.7-.7M4 12H3M5.34 5.34l.7.7" /><path d="M12 8a4 4 0 0 1 4 4 3 3 0 0 1-2 5v1h-4v-1a3 3 0 0 1-2-5 4 4 0 0 1 4-4z" /></svg>
@@ -1189,7 +1194,6 @@ function openChat(themL){
   showView("vChat");
   $("tabbar").style.display="none";
   $("peerName").textContent="@"+themL;
-  $("typingInd").style.display="none";
   $("chatText").value="";
   applyChatFX();
   // load profile for avatar/name
@@ -1220,7 +1224,6 @@ function openChat(themL){
   loadChatHistoryREST(themL,key);
   $("chatText").focus();
   startStatusPoll(themL);
-  listenTyping(themL);
 }
 let _histR={};
 function loadChatHistoryREST(themL,key){
@@ -1241,39 +1244,6 @@ function loadChatHistoryREST(themL,key){
   }).catch(()=>{});
 }
 
-let _tyListen=null, _tyFn=null, _tyTO=null;
-function listenTyping(themL){
-  if(_tyListen&&_tyFn){ try{ _tyListen.off("value",_tyFn); }catch(e){} }
-  const key=dialogKeyOf(me.handle,themL);
-  const other=String(themL).toLowerCase().replace(/^@+/,"");
-  try{
-    _tyListen=FB.db.ref("msgs/"+key+"/_typing/"+other);
-    _tyFn=snap=>{
-      const v=snap.val();
-      const ind=$("typingInd"); if(!ind) return;
-      if(v && v.t && Date.now()-v.t<5000 && v.on){
-        ind.style.display="flex";
-        const tx=$("typingText"); if(tx) tx.textContent=" печатает…";
-      } else {
-        ind.style.display="none";
-      }
-    };
-    _tyListen.on("value",_tyFn);
-  }catch(e){}
-}
-function setTyping(on){
-  if(!openChatPeer) return;
-  const key=dialogKeyOf(me.handle,openChatPeer);
-  const myKey=me.handle.toLowerCase().replace(/^@+/,"");
-  const data={on:on?true:false, t:Date.now()};
-  const url="https://pennie-chat-default-rtdb.firebaseio.com/msgs/"+key+"/_typing/"+myKey+".json";
-  try{ FB.db.ref("msgs/"+key+"/_typing/"+myKey).set(data).catch(()=>{}); }catch(e){}
-  try{ fetch(url,{method:"PUT",headers:{"Content-Type":"application/json"},body:JSON.stringify(data)}).catch(()=>{}); }catch(e){}
-  if(on){
-    if(_tyTO) clearTimeout(_tyTO);
-    _tyTO=setTimeout(()=>{ setTyping(false); },4500);
-  }
-}
 function startStatusPoll(themL){
   if(_statusTO){ clearInterval(_statusTO); _statusTO=null; }
   const poll=()=>{
@@ -1802,7 +1772,6 @@ function sendNow(){
 }
 $("btnSend").addEventListener("click",sendNow);
 $("chatText").addEventListener("keydown",e=>{ if(e.key==="Enter"&&!e.shiftKey){ e.preventDefault(); sendNow(); } });
-$("chatText").addEventListener("input",()=>{ if(typeof setTyping==="function") setTyping(true); });
 
 /* ---------- settings / profile ---------- */
 const PATTERNS=[
