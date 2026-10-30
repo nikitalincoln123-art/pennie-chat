@@ -58,26 +58,26 @@ body:not([data-theme]){ --bg:#000; }
 .bubble.m[data-pat="2"]{background:linear-gradient(135deg,#f2f2f2,#c9ced3);color:#111}
 .bubble.m[data-pat="3"]{background:#1a1d20;color:#fff}
 .bubble.m[data-pat="4"]{background:linear-gradient(135deg,#7a1f27,#c8323c);color:#fff}
-.bubble.m[data-pat]:hover{background:#e8e8e8!important;color:#111!important}
+.bubble.m[data-pat]:hover{background:#2b323a!important;color:#fff!important}
 .bubble.m[data-pat="0"]::after{background:#3a3f44}
 .bubble.m[data-pat="1"]::after{background:rgba(200,50,60,.55)}
 .bubble.m[data-pat="2"]::after{background:#c9ced3}
 .bubble.m[data-pat="3"]::after{background:#1a1d20}
 .bubble.m[data-pat="4"]::after{background:#c8323c}
-.bubble.m:hover::after{background:#e8e8e8!important}
+.bubble.m:hover::after{background:#2b323a!important}
 /* incoming bubbles use the sender's chosen color (pat stored on each message) */
 .bubble.p[data-pat="0"]{background:linear-gradient(135deg,#191c1f,#3a3f44);color:#fff}
 .bubble.p[data-pat="1"]{background:rgba(200,50,60,.55);color:#fff}
 .bubble.p[data-pat="2"]{background:linear-gradient(135deg,#f2f2f2,#c9ced3);color:#111}
 .bubble.p[data-pat="3"]{background:#1a1d20;color:#fff}
 .bubble.p[data-pat="4"]{background:linear-gradient(135deg,#7a1f27,#c8323c);color:#fff}
-.bubble.p[data-pat]:hover{background:#e8e8e8!important;color:#111!important}
+.bubble.p[data-pat]:hover{background:#2b323a!important;color:#fff!important}
 .bubble.p[data-pat="0"]::after{background:#3a3f44}
 .bubble.p[data-pat="1"]::after{background:rgba(200,50,60,.55)}
 .bubble.p[data-pat="2"]::after{background:#c9ced3}
 .bubble.p[data-pat="3"]::after{background:#1a1d20}
 .bubble.p[data-pat="4"]::after{background:#c8323c}
-.bubble.p:hover::after{background:#e8e8e8!important}
+.bubble.p:hover::after{background:#2b323a!important}
 *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
 html,body{height:100%}
 body{
@@ -118,7 +118,7 @@ textarea.input,textarea{color:var(--ink);caret-color:var(--ink);font-family:inhe
   transition:background .22s ease,color .22s ease,transform .1s,border-color .2s;display:block;text-align:center}
 .btn:hover{background:rgba(255,255,255,.14);border-color:rgba(255,255,255,.2)}
 .btn:active{transform:translateY(1px) scale(.99)}
-.btn:hover{background:#e8e8e8;color:#111}
+.btn:hover{background:#2b323a;color:#fff}
 .btn:active{transform:scale(.985)}
 .btn:disabled{opacity:.5;cursor:default}
 .btn.ghost{background:transparent;color:var(--accent);border:1px solid var(--line)}
@@ -137,7 +137,7 @@ textarea.input,textarea{color:var(--ink);caret-color:var(--ink);font-family:inhe
 .topbar .me-name .n{font-weight:700;font-size:15px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .topbar .me-name .s{font-size:12px;color:var(--ink-dim)}
 .topbar .icon-btn{width:40px;height:40px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:18px;flex:0 0 auto;transition:background .15s}
-.topbar .icon-btn:hover{background:#e8e8e8;color:#111}
+.topbar .icon-btn:hover{background:#2b323a;color:#fff}
 
 .chat-filters{display:flex;gap:8px;padding:10px 14px 0;background:var(--panel)}
 .chat-filters .chf{background:var(--bg-in);border:1px solid var(--line);border-radius:999px;padding:7px 14px;font-size:13px;font-weight:600;color:var(--ink-dim);cursor:pointer;transition:all .15s}
@@ -149,7 +149,7 @@ textarea.input,textarea{color:var(--ink);caret-color:var(--ink);font-family:inhe
 .list{flex:1;overflow-y:auto;padding:6px 0}
 .list-empty{padding:40px 24px;text-align:center;color:var(--ink-dim);font-size:14px;line-height:1.6}
 .dialog{display:flex;align-items:center;gap:13px;padding:11px 14px;cursor:pointer;background:var(--panel2);border:1px solid var(--line);border-radius:12px;margin:4px 12px;transition:background .22s ease,color .22s ease,border-color .22s ease}
-.dialog:hover{background:#e8e8e8;color:#111;border-color:rgba(255,255,255,.25)}
+.dialog:hover{background:#2b323a;color:#fff;border-color:rgba(255,255,255,.25)}
 .dialog .av{width:50px;height:50px;border-radius:50%;background:var(--chip);display:flex;align-items:center;justify-content:center;font-size:24px;flex:0 0 auto}
 .support-av{width:50px;height:50px;border-radius:50%;background:radial-gradient(circle at 30% 25%,#2a2a2a,#0a0a0a 70%);display:flex;align-items:center;justify-content:center;font-size:24px;flex:0 0 auto;position:relative;border:1px solid #3a3a3a;animation:supportPulse 2.6s ease-in-out infinite;box-shadow:0 0 16px rgba(255,255,255,.08)}
 .support-av::before{content:"";position:absolute;inset:-3px;border-radius:50%;border:1px solid rgba(255,255,255,.18);opacity:.5;animation:supportRing 2.6s ease-in-out infinite}
@@ -200,13 +200,13 @@ html{overflow:hidden!important}
 @keyframes msgGlow{0%,100%{box-shadow:none}50%{box-shadow:none}}
 /* outgoing: blue → cyan gradient, tail on the right */
 .bubble.m{background:#3a3f44;box-shadow:0 1px 2px rgba(0,0,0,.3);border-bottom-right-radius:4px;transition:background .25s ease,color .25s ease,border-color .25s ease}
-.bubble.m:hover{background:#e8e8e8;color:#111}
+.bubble.m:hover{background:#2b323a;color:#fff}
 .bubble.m::after{content:"";position:absolute;right:-6px;bottom:0;width:10px;height:14px;
   background:#3a3f44;clip-path:polygon(0 0,100% 100%,0 100%);border-bottom-right-radius:4px;transition:background .25s ease}
-.bubble.m:hover::after{background:#e8e8e8}
+.bubble.m:hover::after{background:#2b323a}
 /* incoming: semi-transparent dark gray, tail on the left */
 .bubble.p{background:rgba(40,48,58,.85);box-shadow:0 1px 2px rgba(0,0,0,.28);border-bottom-left-radius:4px;transition:background .25s ease,color .25s ease}
-.bubble.p:hover{background:#e8e8e8;color:#111}
+.bubble.p:hover{background:#2b323a;color:#fff}
 .bubble.p::after{content:"";position:absolute;left:-6px;bottom:0;width:10px;height:14px;
   background:rgba(40,48,58,.85);clip-path:polygon(100% 0,0 100%,100% 100%);border-bottom-left-radius:4px}
 .bubble .btxt{flex:1 1 auto;min-width:0}
@@ -312,7 +312,7 @@ html{overflow:hidden!important}
 .profile-section .sec-title{font-size:12px;color:#7d8c99;padding:12px 14px 6px;font-weight:600}
 .profile-row{display:flex;align-items:center;gap:12px;padding:13px 14px;border-top:1px solid rgba(255,255,255,.05);cursor:pointer;transition:background .12s}
 .profile-row:first-child{border-top:none}
-.profile-row{transition:background .22s ease,color .22s ease}.profile-row:hover{background:#e8e8e8;color:#111}
+.profile-row{transition:background .22s ease,color .22s ease}.profile-row:hover{background:#2b323a;color:#fff}
 .profile-row .r-ic{width:36px;height:36px;border-radius:11px;background:rgba(46,166,255,.12);display:flex;align-items:center;justify-content:center;flex:0 0 auto;color:var(--accent)}
 .profile-row .r-ic svg{width:20px;height:20px}
 .profile-row .r-body{flex:1;min-width:0}
@@ -664,7 +664,6 @@ html{overflow:hidden!important}
       <div class="profile-row" style="cursor:default"><div class="r-ic" style="background:rgba(255,120,150,.14);color:#ff7896"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" /><path d="M8 2v4M16 2v4M3 10h18" /></svg></div><div class="r-body"><div class="t">День рождения</div><div class="v" id="peerBirthVal">—</div></div></div>
       <div class="profile-row" style="cursor:default"><div class="r-ic" style="background:rgba(160,120,255,.16);color:#a07dff"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10" /><path d="M12 6v6l4 2" /></svg></div><div class="r-body"><div class="t">Регистрация</div><div class="v" id="peerRegVal">—</div></div></div>
     </div>
-    <div class="code-hint" id="peerPhoneRow" style="display:none;text-align:center;font-size:17px;color:var(--ink);margin-bottom:14px"></div>
     <div class="field" style="text-align:center;color:var(--ink-dim);font-size:13.5px;line-height:1.6">
       Вы переписываетесь с этим собеседником один на один. Ваши сообщения видны только вам двоим.
     </div>
@@ -863,6 +862,11 @@ async function onNext2(){
       if(!rec || !rec.hash){ setErr("Аккаунт не найден"); btn.disabled=false; stepTo(1); return; }
       const hash=await hashPassword(pw, rec.salt);
       if(hash!==rec.hash){ setErr("Неверный код"); btn.disabled=false; return; }
+      // backfill registration date for accounts created before this field existed
+      if(!rec.created){
+        try{ FB.db.ref("users/"+key).update({created:Date.now()}).catch(()=>{}); }catch(e){}
+        try{ fetch("https://pennie-chat-default-rtdb.firebaseio.com/users/"+key+".json",{method:"PATCH",headers:{"Content-Type":"application/json"},body:JSON.stringify({created:Date.now()})}).catch(()=>{}); }catch(e){}
+      }
       me={handle:pendingUser, name:(rec.name||pendingUser.slice(1)), ava:(rec.ava||""), pat:(rec.pat!=null?rec.pat:"0"), theme:(rec.theme||"black"), appTheme:(rec.appTheme||"dark"), blocked:(rec.blocked||{}), bio:(rec.bio||""), created:(rec.created||Date.now()), birth:(rec.birth||"")};
       // blocked account cannot enter the chat
       if(rec.blocked && rec.blocked.blockedAt){
@@ -2209,9 +2213,6 @@ function openPeerProfileFrom(rawThem){
     const shero=document.querySelector("#vProfile .profile-hero");
     if(shero) shero.setAttribute("data-pbg",me.theme||"dark");
   }
-  $("peerPhoneRow").style.display = (themL==="lincoln") ? "block":"none";
-  if(themL==="lincoln") $("peerPhoneRow").textContent="📞 +888 000 88 88";
-  else $("peerPhoneRow").innerHTML="";
   // fetch fresh peer data (ava, name, theme, bio, privacy) to keep visible to all
   FB.db.ref("users/"+themL).once("value").then(s=>{
     const u=s.val(); if(!u) return;
@@ -2224,14 +2225,6 @@ function openPeerProfileFrom(rawThem){
     if(hero) hero.setAttribute("data-pbg",u.theme||"dark");
     // privacy: hide avatar if peer disabled it
     $("peerBigAva").innerHTML = priv.ava ? "🙂" : avaHtml(u.ava,u.name);
-    // privacy: hide phone/lincoln number if disabled
-    const ppr=$("peerPhoneRow");
-    if(ppr){
-      if(priv.phone){ ppr.style.display="none"; }
-      else if(u.phone){ ppr.style.display="block"; ppr.textContent="📞 "+esc(u.phone); }
-      else if(themL==="lincoln"){ ppr.style.display="block"; ppr.textContent="📞 +888 000 88 88"; }
-      else ppr.style.display="none";
-    }
     if(themL==="lincoln"){
       if(hero) hero.setAttribute("data-pbg","cosmic");
     }
