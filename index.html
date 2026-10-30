@@ -1208,6 +1208,7 @@ function openChat(themL){
   myListenRef=ref;
   ref.on("value",myListenFn);
   // reset unread/preview cleanup not needed
+  const _msgsEl=$("msgs"); if(_msgsEl) _msgsEl.innerHTML=""; // fresh slate when opening a chat
   renderChat(themL,{});
   // reliably load existing history via REST too (so messages always appear on open)
   loadChatHistoryREST(themL,key);
@@ -1254,73 +1255,137 @@ function snapToObj(snap){
   return o;
 }
 
+function buildMsgEl(themL,m){
+  const mine=m.from===me.handle;
+  const wrap=document.createElement("div");
+  wrap.className="msg-row "+(mine?"m":"p");
+  wrap.dataset.key=m.__key;
+  const b=document.createElement("div");
+  b.className="bubble "+(mine?"m":"p")+(m.glow?" glow":"");
+  if(m.pat!=null) b.setAttribute("data-pat",String(m.pat)); else if(mine) b.setAttribute("data-pat",(me.pat!=null?me.pat:"0"));
+  const bl=document.createElement("div"); bl.className="bline";
+  if(m.kind==="photo" && m.img){
+    const im=document.createElement("img");
+    im.src=m.img; im.alt="Фото";
+    im.style.cssText="max-width:240px;max-height:240px;border-radius:10px;display:block;margin-bottom:4px";
+    bl.appendChild(im);
+  } else {
+    const tx=document.createElement("div"); tx.className="btxt"; tx.textContent=m.text; bl.appendChild(tx);
+  }
+  const t=document.createElement("span"); t.className="tm"; t.textContent=fmtTime(m.t);
+  bl.appendChild(t);
+  b.appendChild(bl);
+  wrap.appendChild(b);
+  // reactions
+  const rr=m.reacts||{};
+  const rk=Object.keys(rr);
+  if(rk.length){
+    const row=document.createElement("div"); row.className="reacts";
+    rk.forEach(e=>{
+      const s=document.createElement("button"); s.className="react"+( (rr[e]&&rr[e].mine)?" on":"");
+      s.setAttribute("data-re","1"); s.dataset.key=m.__key; s.dataset.e=e;
+      s.innerHTML=`<span>${esc(e)}</span><span class="rc">${esc(String(rr[e].n))}</span>`;
+      row.appendChild(s);
+    });
+    wrap.appendChild(row);
+  }
+  // hover/action to add reaction (on peer messages highlight)
+  if(!mine){
+    const marker=document.createElement("button");
+    marker.className="add-react"; marker.dataset.key=m.__key; marker.setAttribute("aria-label","Реакция");
+    marker.textContent="+";
+    wrap.insertBefore(marker, wrap.firstChild);
+  } else if(m.kind!=="photo"){
+    // own text message: right-click / long-press to edit
+    wrap.setAttribute("data-edit",m.__key);
+    wrap.classList.add("editable-msg");
+    if(m.edited) b.setAttribute("data-edited","1");
+    if(m.edited){ const tm=b.querySelector(".tm"); if(tm) tm.textContent=fmtTime(m.t)+" · ред."; }
+  }
+  return wrap;
+}
+
 function renderChat(themL,list){
   const el=$("msgs");
   const isBlockedSender = (me.blocked && me.blocked[themL]);
   const items=Object.values(list).sort((a,b)=>(a.t||0)-(b.t||0));
-  el.innerHTML="";
-  let lastDay=null;
-  let shown=false;
-  items.forEach(m=>{
+  const existing=el.querySelectorAll(".msg-row[data-key]");
+  const gotKeys={};
+  existing.forEach(n=>{ gotKeys[n.dataset.key]=n; });
+  // track if we rebuilt everything (needed only on fresh open / chat switch)
+  let anyMissing=false;
+  const known=Object.keys(gotKeys).length;
+  items.forEach((m,idx)=>{
     const mine=m.from===me.handle;
-    // skip incoming messages from a blocked sender (keep my own)
     if(!mine && isBlockedSender) return;
-    shown=true;
+    const key=m.__key;
     const mk=new Date(m.t).getDate();
-    if(mk!==lastDay){ lastDay=mk; const c=document.createElement("div"); c.className="day-chip"; c.textContent=new Date(m.t).toLocaleDateString("ru-RU",{day:"numeric",month:"long"}); el.appendChild(c); }
-    const wrap=document.createElement("div");
-    wrap.className="msg-row "+(mine?"m":"p");
-    wrap.dataset.key=m.__key;
-    const b=document.createElement("div");
-    b.className="bubble "+(mine?"m":"p")+(m.glow?" glow":"");
-    if(m.pat!=null) b.setAttribute("data-pat",String(m.pat)); else if(mine) b.setAttribute("data-pat",(me.pat!=null?me.pat:"0"));
-    const bl=document.createElement("div"); bl.className="bline";
-    if(m.kind==="photo" && m.img){
-      const im=document.createElement("img");
-      im.src=m.img; im.alt="Фото";
-      im.style.cssText="max-width:240px;max-height:240px;border-radius:10px;display:block;margin-bottom:4px";
-      bl.appendChild(im);
-    } else {
-      const tx=document.createElement("div"); tx.className="btxt"; tx.textContent=m.text; bl.appendChild(tx);
+    const prevDate=items[idx-1]?new Date(items[idx-1].t).getDate():-1;
+    if(gotKeys[key]){
+      // message already rendered — just refresh its content in place (cheap, no re-render)
+      const w=gotKeys[key];
+      // update date-chip ordering + time if edited
+      const b=w.querySelector(".bubble");
+      const tm=b?b.querySelector(".tm"):null;
+      if(tm){
+        const newT=m.edited?fmtTime(m.t)+" · ред.":fmtTime(m.t);
+        if(tm.textContent!==newT) tm.textContent=newT;
+        if(m.edited&&b) b.setAttribute("data-edited","1");
+      }
+      // refresh text if changed (edited)
+      const tx=b?b.querySelector(".btxt"):null;
+      if(tx && tx.textContent!==String(m.text||"")){ tx.textContent=String(m.text||""); }
+      // remove old reactions and rebuild if changed
+      const oldReacts=w.querySelector(".reacts");
+      const rr=m.reacts||{};
+      const rk=Object.keys(rr);
+      const hasReacts=rk.length>0;
+      if(!hasReacts && oldReacts){ oldReacts.remove(); }
+      else if(hasReacts){
+        if(oldReacts){
+          const curCount=oldReacts.querySelectorAll(".react").length;
+          if(curCount!==rk.length){
+            oldReacts.remove();
+            const row=document.createElement("div"); row.className="reacts";
+            rk.forEach(e=>{
+              const s=document.createElement("button"); s.className="react"+( (rr[e]&&rr[e].mine)?" on":"");
+              s.setAttribute("data-re","1"); s.dataset.key=key; s.dataset.e=e;
+              s.innerHTML=`<span>${esc(e)}</span><span class="rc">${esc(String(rr[e].n))}</span>`;
+              row.appendChild(s);
+            });
+            w.appendChild(row);
+          }
+        } else {
+          const row=document.createElement("div"); row.className="reacts";
+          rk.forEach(e=>{
+            const s=document.createElement("button"); s.className="react"+( (rr[e]&&rr[e].mine)?" on":"");
+            s.setAttribute("data-re","1"); s.dataset.key=key; s.dataset.e=e;
+            s.innerHTML=`<span>${esc(e)}</span><span class="rc">${esc(String(rr[e].n))}</span>`;
+            row.appendChild(s);
+          });
+          w.appendChild(row);
+        }
+      }
+      return;
     }
-    const t=document.createElement("span"); t.className="tm"; t.textContent=fmtTime(m.t);
-    bl.appendChild(t);
-    b.appendChild(bl);
-    wrap.appendChild(b);
-    // reactions
-    const rr=m.reacts||{};
-    const rk=Object.keys(rr);
-    if(rk.length){
-      const row=document.createElement("div"); row.className="reacts";
-      rk.forEach(e=>{
-        const s=document.createElement("button"); s.className="react"+( (rr[e]&&rr[e].mine)?" on":"");
-        s.setAttribute("data-re","1"); s.dataset.key=m.__key; s.dataset.e=e;
-        s.innerHTML=`<span>${esc(e)}</span><span class="rc">${esc(String(rr[e].n))}</span>`;
-        row.appendChild(s);
-      });
-      wrap.appendChild(row);
+    anyMissing=true;
+    // new message — append (and ensure a day chip if the boundary changed)
+    if(mk!==(items[idx-1]?new Date(items[idx-1].t).getDate():-1) && idx>0){
+      // day boundary: insert a chip before
+      const chip=document.createElement("div");
+      chip.className="day-chip";
+      chip.textContent=new Date(m.t).toLocaleDateString("ru-RU",{day:"numeric",month:"long"});
+      el.appendChild(chip);
     }
-    // hover/action to add reaction (on peer messages highlight)
-    if(!mine){
-      const marker=document.createElement("button");
-      marker.className="add-react"; marker.dataset.key=m.__key; marker.setAttribute("aria-label","Реакция");
-      marker.textContent="+";
-      wrap.insertBefore(marker, wrap.firstChild);
-    } else if(m.kind!=="photo"){
-      // own text message: right-click / long-press to edit
-      wrap.setAttribute("data-edit",m.__key);
-      const txt=(m.text||"");
-      wrap.classList.add("editable-msg");
-      if(m.edited) b.setAttribute("data-edited","1");
-      if(m.edited){ const tm=b.querySelector(".tm"); if(tm) tm.textContent=fmtTime(m.t)+" · ред."; }
-    }
-    el.appendChild(wrap);
+    el.appendChild(buildMsgEl(themL,m));
   });
-  try{
-    el.scrollTo({top:el.scrollHeight,behavior:"auto"});
-    setTimeout(()=>{ try{ el.scrollTo({top:el.scrollHeight,behavior:"auto"}); }catch(e){} },30);
-    setTimeout(()=>{ try{ el.scrollTop=el.scrollHeight; }catch(e){} },120);
-  }catch(e){ try{ el.scrollTop=el.scrollHeight; }catch(e2){} }
+  // scroll to bottom (with a few retries since images can load late) — only bounce when new content arrives
+  if(anyMissing || known===0){
+    try{
+      el.scrollTo({top:el.scrollHeight,behavior:"auto"});
+      setTimeout(()=>{ try{ el.scrollTop=el.scrollHeight; }catch(e){} },60);
+    }catch(e){ try{ el.scrollTop=el.scrollHeight; }catch(e2){} }
+  }
   if(typeof applyChatFX==="function") applyChatFX();
 }
 function lastSeenText(ts){
