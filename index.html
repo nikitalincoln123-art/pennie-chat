@@ -975,6 +975,7 @@ function renderChat(themL,list){
     }
     el.appendChild(wrap);
   });
+  try{ el.scrollTop=el.scrollHeight; }catch(e){}
 }
 function fmtTime(t){
   return new Date(t).toLocaleTimeString("ru-RU",{hour:"2-digit",minute:"2-digit"});
@@ -1149,6 +1150,7 @@ function sendNow(){
       .catch(failSend);
   }catch(e){ failSend(); }
   updateDialogFromMessages(openChatPeer,{x:{from:me.handle,text:t,t:msg.t}});
+  const msgsEl=$("msgs"); if(msgsEl){ try{ msgsEl.scrollTop=msgsEl.scrollHeight; }catch(e){} }
 }
 $("btnSend").addEventListener("click",sendNow);
 $("chatText").addEventListener("keydown",e=>{ if(e.key==="Enter"&&!e.shiftKey){ e.preventDefault(); sendNow(); } });
