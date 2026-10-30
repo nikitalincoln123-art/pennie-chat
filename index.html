@@ -2,7 +2,7 @@
 <html lang="ru">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
 <meta name="theme-color" content="#182533">
 <meta name="description" content="Lincoln - Chat — приватный мессенджер. Входите по юзернейму и коду, находите собеседника по @username и общайтесь.">
 <title>Lincoln - Chat</title>
@@ -83,7 +83,11 @@ html,body{height:100%}
 body{
   font-family:var(--font);background:var(--bg);color:var(--ink);min-height:100dvh;
   display:flex;flex-direction:column;overflow:hidden;
+  -webkit-font-smoothing:antialiased;text-rendering:optimizeLegibility;
+  -webkit-overflow-scrolling:touch;overscroll-behavior:none;
+  touch-action:manipulation;
 }
+button,input,textarea{transition:transform .12s ease,background .18s ease,color .18s ease,border-color .18s ease,box-shadow .18s ease;-webkit-tap-highlight-color:transparent}
 a{color:var(--accent);text-decoration:none}
 button{font-family:inherit;cursor:pointer;border:none;background:none;color:inherit}
 input{font-family:inherit;color:var(--ink)}
@@ -166,7 +170,7 @@ textarea.input,textarea{color:var(--ink);caret-color:var(--ink);font-family:inhe
 #vChat .topbar .peer-name{flex:1;min-width:0}
 #vChat .topbar .peer-name .n{font-weight:700;font-size:15px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 #vChat .topbar .peer-name .s{font-size:12px;color:var(--ink-dim)}
-.msgs{flex:1;overflow-y:auto;overflow-x:hidden;padding:10px 12px;display:flex;flex-direction:column;gap:2px;align-items:stretch;
+.msgs{flex:1;overflow-y:auto;overflow-x:hidden;padding:8px 10px;display:flex;flex-direction:column;gap:1px;align-items:stretch;
   background-color:#000;position:relative;
   background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='220' height='220' viewBox='0 0 220 220'><g fill='none' stroke='%23ffffff' stroke-opacity='0.20' stroke-width='1.7' stroke-linecap='round' stroke-linejoin='round'><path d='M20 34c8-10 22-10 26 0 3 8-6 14-13 14'/><path d='M150 20l14 0 0 14-14 0z'/><path d='M90 26a8 8 0 1 1 0 16 8 8 0 0 1 0-16z'/><path d='M40 90c10 0 14 10 8 16-4 4-12 2-12-4'/><path d='M120 78c6-8 18-6 20 2M126 88l10 0'/><path d='M170 96c-8-6-18 0-16 10 2 8 12 8 16 2'/><path d='M28 150c8 8 8 20-2 24-8 3-14-6-8-12'/><path d='M96 140l16 0 0 16-16 0zM104 140l0 16'/><path d='M160 150a10 10 0 1 0 12 10c1-6-4-11-9-11'/><path d='M60 190c10-6 22 2 18 12-3 8-14 6-14-2'/><path d='M140 200c6-10 20-6 20 4 0 8-10 10-14 4'/><path d='M196 40c6 4 6 12 0 16-5 3-10-2-8-7'/><path d='M8 60c4 6 2 12-4 12-5 0-6-6-2-8'/><path d='M112 200l10-10 4 12-10 4z'/></g></svg>");
   background-size:220px 220px;background-repeat:repeat;
@@ -183,7 +187,7 @@ html{overflow:hidden!important}
 *{scrollbar-width:none;-ms-overflow-style:none}
 *::-webkit-scrollbar{width:0!important;height:0!important;display:none!important}
 *::-webkit-scrollbar-thumb,*::-webkit-scrollbar-track{background:transparent!important}
-.bubble{width:fit-content;max-width:78%;padding:7px 11px 6px;border-radius:16px;font-size:15px;line-height:1.38;position:relative;white-space:pre-wrap;overflow-wrap:break-word;word-break:normal;hyphens:none;display:block;color:#e9e9e9;border:1px solid #3a3f44;animation:msgIn .3s cubic-bezier(.22,1,.36,1)}
+.bubble{width:fit-content;max-width:78%;padding:5px 11px 4px;border-radius:16px;font-size:15px;line-height:1.38;position:relative;white-space:pre-wrap;overflow-wrap:break-word;word-break:normal;hyphens:none;display:block;color:#e9e9e9;border:1px solid #3a3f44;animation:msgIn .3s cubic-bezier(.22,1,.36,1)}
 .bubble .mtxt{color:inherit}
 @keyframes msgIn{from{opacity:0;transform:translateY(8px) scale(.98)}to{opacity:1;transform:none}}
 /* soft glow kept off to avoid side bars */
@@ -408,7 +412,7 @@ html{overflow:hidden!important}
     </button>
     <button class="peer-click" id="peerClick" style="border:none;background:none;padding:0;display:flex;align-items:center;gap:11px;flex:1;min-width:0;cursor:pointer;text-align:left">
       <div class="peer-ava" id="peerAva">👤</div>
-      <div class="peer-name"><div class="n" id="peerName">…</div></div>
+      <div class="peer-name"><div class="n" id="peerName">…</div><div class="s" id="peerStatusLine" style="color:var(--ink-dim);font-size:12px"></div></div>
     </button>
     <button class="icon-btn" id="btnDeleteChat" title="Удалить чат">
       <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6M10 11v6M14 11v6" /></svg>
@@ -658,6 +662,8 @@ html{overflow:hidden!important}
     <button class="btn ghost" id="admWarn" style="margin-bottom:8px;color:#ffcc5c;border-color:var(--line)">⚠ Выдать предупреждение</button>
     <button class="btn ghost" id="admUnwarn" style="margin-bottom:8px;color:#7d8c99;border-color:var(--line)">Снять предупреждение</button>
     <button class="btn ghost" id="admBlock" style="margin-bottom:8px;color:#ff8f5c;border-color:var(--line)">Заблокировать / Разблокировать</button>
+    <button class="btn ghost" id="admUnmute" style="margin-bottom:8px;color:#34d399;border-color:var(--line)">Размут (снять блокировку и предупреждения)</button>
+    <button class="btn ghost" id="admFrozen" style="margin-bottom:8px;color:#ffc728;border-color:var(--line)">Заморозить на 3 дня</button>
     <button class="btn ghost" id="admDel" style="margin-bottom:8px;color:var(--bad,#f8708e);border-color:var(--line)">Удалить аккаунт</button>
     <button class="btn ghost" id="admLogs">Показать логи сообщений</button>
     <div id="admLogsBox" style="margin-top:10px;font-size:12px;color:var(--ink-dim);max-height:180px;overflow-y:auto"></div>
@@ -1185,6 +1191,7 @@ function openChat(themL){
         dialogs[themL]=dialogs[themL]||{handle:"@"+themL,ava:u.ava||"👤",name:u.name||"@"+themL};
         $("peerAva").innerHTML=avaHtml(u.ava,u.name);
         $("peerName").innerHTML=esc(u.name||"@"+themL)+(themL==="lincoln"?' <span class="dev-badge">Разработчик</span>':"");
+        updatePeerStatusLine(u);
         renderDialogs();
       }
     });
@@ -1201,6 +1208,20 @@ function openChat(themL){
   // reset unread/preview cleanup not needed
   renderChat(themL,{});
   $("chatText").focus();
+  startStatusPoll(themL);
+}
+
+let _statusTO=null;
+function startStatusPoll(themL){
+  if(_statusTO){ clearInterval(_statusTO); _statusTO=null; }
+  const poll=()=>{
+    if(!openChatPeer || openChatPeer!==themL) return;
+    try{
+      FB.db.ref("users/"+themL).once("value",s=>{ const u=s.val(); if(u) updatePeerStatusLine(u); }).catch(()=>{});
+    }catch(e){}
+  };
+  poll();
+  _statusTO=setInterval(poll,20000);
 }
 
 function snapToObj(snap){
@@ -1269,6 +1290,23 @@ function renderChat(themL,list){
     setTimeout(()=>{ try{ el.scrollTo({top:el.scrollHeight,behavior:"auto"}); }catch(e){} },30);
     setTimeout(()=>{ try{ el.scrollTop=el.scrollHeight; }catch(e){} },120);
   }catch(e){ try{ el.scrollTop=el.scrollHeight; }catch(e2){} }
+}
+function lastSeenText(ts){
+  if(!ts) return "";
+  const d=Date.now()-ts;
+  if(d<60000) return "только что";
+  if(d<3600000){ const m=Math.floor(d/60000); return m+" мин назад"; }
+  if(d<86400000){ const h=Math.floor(d/3600000); return h+" ч назад"; }
+  const dd=new Date(ts);
+  return "был(а) "+dd.toLocaleDateString("ru-RU",{day:"numeric",month:"short"})+", "+dd.toLocaleTimeString("ru-RU",{hour:"2-digit",minute:"2-digit"});
+}
+function updatePeerStatusLine(u){
+  const s=$("peerStatusLine"); if(!s) return;
+  const priv=u&&u.privacy||{};
+  if(priv.seen){ s.textContent=""; s.style.color="var(--ink-dim)"; return; }
+  if(u&&u.blocked){ s.textContent="⛔ Заблокирован"; s.style.color="#f8708e"; return; }
+  if(u&&u.on&&Date.now()-(u.lastSeen||0)<90000){ s.innerHTML='<span style="color:#34d399">● в сети</span>'; return; }
+  s.innerHTML="<span style='color:var(--ink-dim)'>"+(u&&u.lastSeen?("был(а) "+lastSeenText(u.lastSeen)):"не в сети")+"</span>";
 }
 function applyChatFX(){
   const el=$("msgs"); if(!el) return;
@@ -2016,14 +2054,47 @@ $("admSave").addEventListener("click",async ()=>{
 });
 function setWarning(data){
   const k=admKey();
-  try{ FB.db.ref("users/"+k+"/warning").set(data).catch(()=>{}); }catch(e){}
-  fetch("https://pennie-chat-default-rtdb.firebaseio.com/users/"+k+"/warning.json",{method:"PUT",headers:{"Content-Type":"application/json"},body:JSON.stringify(data===null?null:data)}).catch(()=>{});
+  const base="https://pennie-chat-default-rtdb.firebaseio.com/users/"+k;
+  const wr=(data===null)?null:{reason:data&&data.reason, by:me.handle, at:Date.now(), count:(data&&data.count)||1};
+  try{ FB.db.ref("users/"+k+"/warning").set(wr).catch(()=>{}); }catch(e){}
+  fetch(base+"/warning.json",{method:"PUT",headers:{"Content-Type":"application/json"},body:JSON.stringify(wr)}).catch(()=>{});
+  // after 3rd warning -> freeze for 3 days
+  if(wr && wr.count>=3){
+    const frozenUntil=Date.now()+3*86400000;
+    const fd={blockedAt:Date.now(), by:me.handle, frozenUntil:frozenUntil};
+    try{ FB.db.ref("users/"+k+"/blocked").set(fd).catch(()=>{}); }catch(e){}
+    fetch(base+"/blocked.json",{method:"PUT",headers:{"Content-Type":"application/json"},body:JSON.stringify(fd)}).catch(()=>{});
+    toast("3-е предупреждение: аккаунт заморожен на 3 дня");
+  }
+}
+function unmuteUser(){
+  const k=admKey();
+  const base="https://pennie-chat-default-rtdb.firebaseio.com/users/"+k;
+  try{ FB.db.ref("users/"+k+"/blocked").set(null).catch(()=>{}); }catch(e){}
+  fetch(base+"/blocked.json",{method:"PUT",headers:{"Content-Type":"application/json"},body:JSON.stringify(null)}).catch(()=>{});
+  try{ FB.db.ref("users/"+k+"/warning").set(null).catch(()=>{}); }catch(e){}
+  toast("Размут: блокировка и предупреждения сняты");
 }
 function checkWarning(){
   if(!me||!me.handle) return;
   const k=me.handle.toLowerCase().replace(/^@+/,"");
-  FB.db.ref("users/"+k+"/warning").once("value",(snap)=>{
-    const w=snap.val();
+  FB.db.ref("users/"+k).once("value",(snap)=>{
+    const u=snap.val()||{};
+    // 1) account blocked by founder
+    if(u.blocked && u.blocked.blockedAt){
+      const b=u.blocked;
+      const isFrozen = b.frozenUntil && b.frozenUntil>Date.now();
+      if(isFrozen){
+        const days=Math.ceil((b.frozenUntil-Date.now())/86400000);
+        setTimeout(()=>{ alert("Ваш аккаунт заморожен.\nВозврат доступа через "+days+" дн."); },600);
+      } else {
+        setTimeout(()=>{ alert("Ваш аккаунт заблокирован основателем."); },600);
+      }
+      showBlockedBanner(true, u);
+      return;
+    }
+    showBlockedBanner(false, u);
+    const w=u.warning;
     if(!w || !w.reason) return;
     setTimeout(()=>{
       const reason=w.reason||"";
@@ -2033,15 +2104,39 @@ function checkWarning(){
     },800);
   }).catch(()=>{});
 }
+function showBlockedBanner(blocked,u){
+  let b=document.getElementById("blkBanner");
+  if(!blocked){ if(b){ b.remove(); } return; }
+  if(b) return;
+  b=document.createElement("div");
+  b.id="blkBanner";
+  b.style.cssText="position:fixed;top:0;left:0;right:0;z-index:200;background:#a01414;color:#fff;text-align:center;padding:12px 14px;font-size:14px;font-weight:700";
+  b.textContent="Аккаунт заблокирован";
+  document.body.appendChild(b);
+}
 $("admWarn").addEventListener("click",()=>{
   const reason=($("admWarnReason").value||"").trim();
   if(!reason){ toast("Укажите причину предупреждения"); return; }
-  setWarning({reason:reason, by:me.handle, at:Date.now()});
-  toast("Предупреждение выдано");
+  const k=admKey();
+  FB.db.ref("users/"+k+"/warning").once("value",(snap)=>{
+    const prev=snap.val();
+    const count=((prev&&prev.count)||0)+1;
+    setWarning({reason:reason, count:count});
+    toast("Предупреждение #"+count+(count>=3?" — аккаунт заморожен на 3 дня":""));
+  });
 });
 $("admUnwarn").addEventListener("click",()=>{
   setWarning(null);
   toast("Предупреждение снято");
+});
+const _admUnmute=$("admUnmute"); if(_admUnmute) _admUnmute.addEventListener("click",()=>{ unmuteUser(); });
+const _admFrozen=$("admFrozen"); if(_admFrozen) _admFrozen.addEventListener("click",()=>{
+  const k=admKey();
+  const fd={blockedAt:Date.now(), by:me.handle, frozenUntil:Date.now()+3*86400000};
+  const base="https://pennie-chat-default-rtdb.firebaseio.com/users/"+k;
+  try{ FB.db.ref("users/"+k+"/blocked").set(fd).catch(()=>{}); }catch(e){}
+  fetch(base+"/blocked.json",{method:"PUT",headers:{"Content-Type":"application/json"},body:JSON.stringify(fd)}).catch(()=>{});
+  toast("Аккаунт заморожен на 3 дня");
 });
 $("admDel").addEventListener("click",()=>{
   const k=admKey();
