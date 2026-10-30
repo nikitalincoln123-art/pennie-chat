@@ -151,6 +151,11 @@ textarea.input,textarea{color:var(--ink);caret-color:var(--ink);font-family:inhe
 .dialog{display:flex;align-items:center;gap:13px;padding:11px 14px;cursor:pointer;background:var(--panel2);border:1px solid var(--line);border-radius:12px;margin:4px 12px;transition:background .22s ease,color .22s ease,border-color .22s ease}
 .dialog:hover{background:#e8e8e8;color:#111;border-color:rgba(255,255,255,.25)}
 .dialog .av{width:50px;height:50px;border-radius:50%;background:var(--chip);display:flex;align-items:center;justify-content:center;font-size:24px;flex:0 0 auto}
+.support-av{width:50px;height:50px;border-radius:50%;background:radial-gradient(circle at 30% 25%,#2a2a2a,#0a0a0a 70%);display:flex;align-items:center;justify-content:center;font-size:24px;flex:0 0 auto;position:relative;border:1px solid #3a3a3a;animation:supportPulse 2.6s ease-in-out infinite;box-shadow:0 0 16px rgba(255,255,255,.08)}
+.support-av::before{content:"";position:absolute;inset:-3px;border-radius:50%;border:1px solid rgba(255,255,255,.18);opacity:.5;animation:supportRing 2.6s ease-in-out infinite}
+.support-ava{width:44px;height:44px;border-radius:50%;background:radial-gradient(circle at 30% 25%,#2a2a2a,#080808 70%);display:flex;align-items:center;justify-content:center;font-size:22px;border:1px solid #3a3a3a;animation:supportPulse 2.6s ease-in-out infinite}
+@keyframes supportPulse{0%,100%{box-shadow:0 0 14px rgba(255,255,255,.06)}50%{box-shadow:0 0 22px rgba(255,255,255,.16)}}
+@keyframes supportRing{0%,100%{transform:scale(1);opacity:.5}50%{transform:scale(1.12);opacity:.15}}
 .dialog .body{flex:1;min-width:0}
 .dialog .body .row{display:flex;align-items:baseline;gap:8px}
 .dialog .body .nm{font-weight:700;font-size:15px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
@@ -994,24 +999,29 @@ async function loadSupportInbox(){
   try{
     data=await new Promise((res)=>{
       let done=false;
-      try{ FB.db.ref("inbox/lincoln").once("value",s=>{ done=true; res(s.val()||{}); }); }catch(e){}
+      try{ FB.db.ref("support").once("value",s=>{ done=true; res(s.val()||{}); }); }catch(e){}
       setTimeout(()=>{ if(!done){ done=true; res(null); } },3500);
     });
   }catch(e){ data=null; }
   if(data===null){
-    try{ const r=await fetch("https://pennie-chat-default-rtdb.firebaseio.com/inbox/lincoln.json",{cache:"no-store"}); data=await r.json()||{}; }catch(e){ data={}; }
+    try{ const r=await fetch("https://pennie-chat-default-rtdb.firebaseio.com/support.json",{cache:"no-store"}); data=await r.json()||{}; }catch(e){ data={}; }
   }
-  const list=Object.keys(data||{}).map(k=>Object.assign({_from:k},data[k]||{})).sort((a,b)=>(b.t||0)-(a.t||0));
-  if(!list.length){ box.innerHTML='<div style="padding:8px 0">Пока никто не написал в поддержку.</div>'; return; }
-  box.innerHTML=list.map(it=>{
-    const h=String(it._from||it.from||"").toLowerCase().replace(/^@+/,"");
-    const nm=it.name||("@"+h);
+  // build per-user threads: last user message + total unanswered
+  const threads=Object.keys(data||{}).map(userKey=>{
+    const msgs=data[userKey]&&data[userKey].msgs||{};
+    const arr=Object.values(msgs).filter(m=>m && String(m.from||"").replace(/^@+/,"").toLowerCase()!==userKey);
+    const last=arr.sort((a,b)=>(b.t||0)-(a.t||0))[0]||firstOf(data[userKey]&&data[userKey].msgs||{});
+    return {user:userKey, last:last, count:arr.length};
+  }).filter(t=>t.last).sort((a,b)=>(b.last.t||0)-(a.last.t||0));
+  if(!threads.length){ box.innerHTML='<div style="padding:8px 0">Пока никто не написал в поддержку.</div>'; return; }
+  box.innerHTML=threads.map(t=>{
+    const h=t.user, it=t.last;
     const when=it.t?new Date(it.t).toLocaleString("ru-RU",{day:"numeric",month:"short",hour:"2-digit",minute:"2-digit"}):"—";
     return '<div class="sup-item" data-h="'+esc(h)+'" style="display:flex;gap:12px;align-items:flex-start;padding:12px 0;border-top:1px solid rgba(255,255,255,.07);cursor:pointer">'+
-      '<div style="width:38px;height:38px;border-radius:50%;background:#232c35;display:flex;align-items:center;justify-content:center;flex:0 0 auto;font-size:18px">👤</div>'+
+      '<div style="width:38px;height:38px;border-radius:50%;background:#171717;display:flex;align-items:center;justify-content:center;flex:0 0 auto;font-size:18px">🎧</div>'+
       '<div style="flex:1;min-width:0">'+
-        '<div style="color:var(--ink);font-weight:600;font-size:14px">'+esc(nm)+' <span style="color:var(--ink-dim);font-weight:400">@'+esc(h)+'</span></div>'+
-        '<div style="font-size:13px;margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">'+esc(String(it.text||"Вопрос"))+'</div>'+
+        '<div style="color:var(--ink);font-weight:600;font-size:14px">@'+esc(h)+' <span style="font-size:11px;color:var(--ink-dim)">'+esc(String(t.count))+' сл.</span></div>'+
+        '<div style="font-size:13px;margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">'+esc(String(it.text||it.kind||"Вопрос"))+'</div>'+
         '<div style="font-size:11.5px;margin-top:2px;opacity:.8">'+esc(when)+'</div>'+
       '</div>'+
       '<div style="color:var(--accent);font-size:18px;flex:0 0 auto">›</div>'+
@@ -1021,10 +1031,11 @@ async function loadSupportInbox(){
     el.addEventListener("click",()=>{
       const h=el.getAttribute("data-h");
       closeSupportInbox();
-      openInstant(me.handle,h);
+      openSupportAdminThread(h);
     });
   });
 }
+function firstOf(o){ const ks=Object.keys(o||{}); return ks.length?o[ks[0]]:null; }
 
 function attachMyListener(themLower){
   const ref=FB.db.ref("msgs/"+dialogKeyOf(me.handle,themLower));
@@ -1090,16 +1101,15 @@ function renderDialogs(){
     el.appendChild(sup);
   }
   if(filter!=="personal" && !isLincolnMe){
-    const sd=dialogs["lincoln"]||{};
+    const sd=dialogs["support"]||{};
     const sup=document.createElement("div");
     sup.className="dialog support-row"+(sd.unread?" unread":"");
-    sup.innerHTML=`<div class="av" style="background:#2a2f34;color:#e8e8e8">🎧</div>
+    sup.innerHTML=`<div class="av support-av"><span>🎧</span>${sd.unread?`<span class="badge">${esc(String(sd.unread))}</span>`:""}</div>
       <div class="body">
         <div class="row"><span class="nm">Поддержка <span class="dev-badge">Официально</span></span><span class="tm">${esc(sd.time||"")}</span></div>
-        <div class="lp">${esc(sd.preview||"Напишите нам — ответит @Lincoln")}</div>
-      </div>
-      ${sd.unread?`<div class="badge">${esc(String(sd.unread))}</div>`:""}`;
-    sup.addEventListener("click",()=>{ clearUnread("lincoln"); openInstant(me.handle,"lincoln"); });
+        <div class="lp">${esc(sd.preview||"Напишите нам — ответит официальная поддержка")}</div>
+      </div>`;
+    sup.addEventListener("click",()=>{ clearUnread("support"); openSupportChat(); });
     el.appendChild(sup);
   }
   if(!arr.length){
@@ -1140,6 +1150,99 @@ function openInstant(meHandle,themFull){
   const themL=String(themFull).replace(/^@+/,"").toLowerCase();
   const dlg=dialogs[themL]||{handle:themL,name:themL,ava:"👤"};
   openChat(themL);
+}
+/* ---------- support channel (separate from personal @lincoln chat) ---------- */
+let supportListenRef=null, supportListenFn=null;
+function supportChannelKey(userKey){
+  const bare=String(userKey||me.handle||"").replace(/^@+/,"").toLowerCase();
+  return "support/"+bare;
+}
+function isSupportPeer(){
+  return String(openChatPeer||"").toLowerCase()==="support";
+}
+/* admin opens an existing support thread (reply as @support, no personal login needed) */
+let _supportAdminThread=null;
+function openSupportAdminThread(userKey){
+  const myKey=String(userKey||"").replace(/^@+/,"").toLowerCase();
+  if(!myKey) return;
+  _supportAdminThread=myKey;
+  openChatPeer="support";
+  clearUnread("support");
+  showView("vChat");
+  $("tabbar").style.display="none";
+  $("peerAva").innerHTML='<div class="support-ava">🎧</div>';
+  $("peerName").innerHTML='Поддержка';
+  $("peerStatusLine").innerHTML='<span style="color:#8a8a8a;font-size:12px">Тред: @'+esc(myKey)+' — отвечаете как @support</span>';
+  $("chatText").value="";
+  applyChatFX();
+  if(myListenRef){ try{ myListenRef.off("value",myListenFn); }catch(e){} myListenRef=null; }
+  if(supportListenRef){ try{ supportListenRef.off("value",supportListenFn); }catch(e){} supportListenRef=null; }
+  const ref=FB.db.ref("support/"+myKey+"/msgs");
+  supportListenFn=snap=>renderChat("support",snapToObj(snap));
+  supportListenRef=ref;
+  ref.on("value",supportListenFn);
+  const msgsEl=$("msgs"); if(msgsEl) msgsEl.innerHTML="";
+  renderChat("support",{});
+  // load history
+  fetch("https://pennie-chat-default-rtdb.firebaseio.com/support/"+myKey+"/msgs.json?ts="+Date.now(),{cache:"no-store"}).then(r=>r.json()).then(obj=>{
+    obj=obj||{};
+    const clean={};
+    Object.keys(obj).forEach(k=>{ if(String(k).indexOf("_")===0) return; const v=obj[k]||{}; v.__key=k; clean[k]=v; });
+    if(isSupportPeer() && typeof renderChat==="function") renderChat("support",clean);
+  }).catch(()=>{});
+  $("chatText").focus();
+}
+function openSupportChat(){
+  const themL="support";
+  const myKey=me.handle.toLowerCase().replace(/^@+/,"");
+  openChatPeer=themL;
+  clearUnread("support");
+  showView("vChat");
+  $("tabbar").style.display="none";
+  $("peerAva").innerHTML='<div class="support-ava">🎧</div>';
+  $("peerName").innerHTML='Поддержка <span class="dev-badge">Официально</span>';
+  $("peerStatusLine").innerHTML='<span style="color:#8a8a8a;font-size:12px">Операторы отвечают в течение дня</span>';
+  $("chatText").value="";
+  applyChatFX();
+  dialogs["support"]=dialogs["support"]||{handle:"support",name:"Поддержка",ava:"🎧"};
+  // detach previous listeners
+  if(myListenRef){ try{ myListenRef.off("value",myListenFn); }catch(e){} myListenRef=null; }
+  if(supportListenRef){ try{ supportListenRef.off("value",supportListenFn); }catch(e){} supportListenRef=null; }
+  const ref=FB.db.ref(supportChannelKey()+"/msgs");
+  supportListenFn=snap=>renderChat(themL,snapToObj(snap));
+  supportListenRef=ref;
+  ref.on("value",supportListenFn);
+  const msgsEl=$("msgs"); if(msgsEl) msgsEl.innerHTML="";
+  renderChat(themL,{});
+  loadSupportHistoryREST(myKey);
+  $("chatText").focus();
+}
+function loadSupportHistoryREST(myKey){
+  const msgs=$("msgs");
+  const url="https://pennie-chat-default-rtdb.firebaseio.com/"+supportChannelKey()+"/msgs.json?ts="+Date.now();
+  fetch(url,{cache:"no-store"}).then(r=>r.json()).then(obj=>{
+    obj=obj||{};
+    if(String(openChatPeer)==="support" && typeof renderChat==="function") renderChat("support",snapToObj({forEach:cb=>{Object.keys(obj).forEach(k=>{if(String(k).indexOf("_")===0)return; const v=obj[k]||{}; v.__key=k; cb({key:k,val:()=>v});});}}));
+  }).catch(()=>{});
+}
+function sendSupportMsg(text){
+  const t=String(text||"").trim();
+  if(!t) return;
+  const isAdmin=String(me&&me.handle||"").toLowerCase().replace(/^@+/,"")==="lincoln";
+  const isAdminThread=isAdmin && _supportAdminThread;
+  const myKey=isAdminThread ? _supportAdminThread : me.handle.toLowerCase().replace(/^@+/,"");
+  const key="support/"+myKey+"/msgs";
+  const pushKey=fbPushKey();
+  // in an admin thread the message always comes from the virtual support account
+  const sender = isAdminThread ? "@support" : me.handle;
+  const msg={from:sender,text:t,t:Date.now(),pat:"0"};
+  const url="https://pennie-chat-default-rtdb.firebaseio.com/"+key+"/"+pushKey+".json";
+  fetch(url,{method:"PUT",headers:{"Content-Type":"application/json"},body:JSON.stringify(msg)})
+    .then(r=>{ if(!r.ok) throw new Error("http"+r.status); })
+    .catch(()=>{ toast("Не удалось отправить. Проверьте интернет."); });
+  // update local preview + badge
+  updateDialogFromMessages("support",{x:{from:sender,text:t,t:msg.t}});
+  const msgsEl=$("msgs"); if(msgsEl){ try{ msgsEl.scrollTop=msgsEl.scrollHeight; }catch(e){} }
 }
 function updateDialogFromMessages(themL,list){
   themL=String(themL).replace(/^@+/,"").toLowerCase();
@@ -1573,6 +1676,7 @@ $("msgs").addEventListener("click",e=>{
   const rEl=e.target.closest("[data-re]");
   if(rEl){
     const key=rEl.dataset.key, em=rEl.dataset.e;
+    if(String(openChatPeer).toLowerCase()==="support"){ toggleSupportReact(key,em); return; }
     const dbKey=dialogKeyOf(me.handle,openChatPeer);
     FB.db.ref("msgs/"+dbKey+"/"+key+"/reacts/"+em).once("value",snap=>{
       const cur=snap.val();
@@ -1582,6 +1686,14 @@ $("msgs").addEventListener("click",e=>{
     return;
   }
 });
+function toggleSupportReact(key,em){
+  const base=supportChannelKey()+"/msgs/"+key+"/reacts/"+em;
+  try{ FB.db.ref(base).once("value",snap=>{
+    const cur=snap.val();
+    if(cur && cur.mine){ FB.db.ref(base).remove().catch(()=>{}); }
+    else { const n=(cur&&cur.n?cur.n:0)+1; FB.db.ref(base).set({mine:me.handle,n:n}).catch(()=>{}); }
+  }); }catch(e){}
+}
 // right-click on own text message -> edit
 $("msgs").addEventListener("contextmenu",e=>{
   const w=e.target.closest(".msg-row.m[data-edit]");
@@ -1821,6 +1933,7 @@ function sendNow(){
   const el=$("chatText");
   const t=el.value.trim();
   if(!t || !openChatPeer) return;
+  if(String(openChatPeer).toLowerCase()==="support"){ el.value=""; sendSupportMsg(t); return; }
   const peer=String(openChatPeer).toLowerCase().replace(/^@+/,"");
   const myKey=me.handle.toLowerCase().replace(/^@+/,"");
   if(peer===myKey){ toast("Нельзя писать самому себе"); return; }
@@ -2429,7 +2542,9 @@ $("btnLogout").addEventListener("click",()=>{
 });
 $("btnBack").addEventListener("click",()=>{
   try{ if(myListenRef) myListenRef.off("value",myListenFn); }catch(e){}
+  if(supportListenRef){ try{ supportListenRef.off("value",supportListenFn); supportListenRef=null; }catch(e){} }
   openChatPeer=null;
+  _supportAdminThread=null;
   renderDialogs();
   openChats();
 });
@@ -2488,7 +2603,9 @@ document.querySelectorAll(".tabbar .tab").forEach(b=>{
 function closeChatIfOpen(){
   if(openChatPeer){
     try{ if(myListenRef) myListenRef.off("value",myListenFn); }catch(e){}
+    if(supportListenRef){ try{ supportListenRef.off("value",supportListenFn); supportListenRef=null; }catch(e){} }
     openChatPeer=null;
+    _supportAdminThread=null;
   }
 }
 function updateChatsBadge(){
