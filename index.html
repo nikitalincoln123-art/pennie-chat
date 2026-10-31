@@ -358,10 +358,8 @@ html{overflow:hidden!important}
 .profile-hero .big-ava{width:110px;height:110px;border-radius:50%;margin:0 auto 14px;background:#1a1a1a;display:flex;align-items:center;justify-content:center;overflow:hidden;font-size:40px;border:3px solid #5a616a;box-shadow:0 2px 10px rgba(0,0,0,.4)}
 .profile-hero .big-ava img{width:100%;height:100%;object-fit:cover}
 .profile-hero .p-name{font-size:22px;font-weight:800;word-break:break-word;padding:0 8px}
-.founder-star{display:inline-block;vertical-align:middle;width:20px;height:20px;margin-left:8px;transform:rotate(35deg);background:linear-gradient(180deg,#ffdf6e,#e6b93c 45%,#8a6b14);border-radius:3px;box-shadow:0 3px 6px rgba(0,0,0,.4),inset 0 1px 2px rgba(255,255,255,.5),inset 0 -2px 3px rgba(0,0,0,.35);position:relative;top:-1px}
-.founder-star::before,.founder-star::after{content:"";position:absolute;top:0;background:inherit;box-shadow:inherit;width:20px;height:20px;border-radius:3px}
-.founder-star::before{left:calc(50% - 10px);transform:rotate(60deg)}
-.founder-star::after{left:calc(50% - 10px);transform:rotate(120deg)}
+.founder-star{display:inline-flex;align-items:center;justify-content:center;flex:none;width:20px;height:20px;margin-left:8px}
+.founder-star svg{width:100%;height:100%;display:block;filter:drop-shadow(0 1px 1px rgba(0,0,0,.3))}
 .profile-hero .p-handle{font-size:14px;color:var(--ink-dim);margin-top:3px}
 .founder-row{display:flex;justify-content:center;margin-top:9px}
 .founder-badge{display:inline-flex;align-items:center;gap:7px;padding:5px 13px;border-radius:999px;background:rgba(230,185,60,.16);border:1px solid rgba(230,185,60,.5);color:#ffd95e;font-size:12px;font-weight:700;line-height:1}
@@ -577,7 +575,7 @@ html{overflow:hidden!important}
       <input type="file" id="pAvaFile" accept="image/*" style="display:none">
       <div class="p-name" id="pName">…</div>
       <div class="p-handle" id="pHandle">@…</div>
-      <div class="founder-row" id="pFounder" style="display:none"><span class="founder-badge"><span class="founder-star"></span>Основатель проекта</span></div>
+      <div class="founder-row" id="pFounder" style="display:none"><span class="founder-badge"><span class="founder-star"><svg viewBox="0 0 24 24"><defs><lineargradient id="fs-g" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#ffe58a" /><stop offset=".5" stop-color="#f0c044" /><stop offset="1" stop-color="#c99a2e" /></lineargradient></defs><path d="M12 1.6l2.47 5.7 5.96.5-4.5 3.96 1.32 5.72L12 14.85l-5.25 2.63 1.32-5.72-4.5-3.96 5.96-.5z" fill="url(#fs-g)" stroke="#7a5a10" stroke-width="1" stroke-linejoin="round" /></svg></span>Основатель проекта</span></div>
       <div class="p-status" id="pStatus">● в сети</div>
       <div class="profile-actions">
         <button class="act" id="pActPhoto"><span class="act-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z" /><circle cx="12" cy="13" r="4" /></svg></span><span>Выбрать<br>фото</span></button>
