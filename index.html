@@ -495,13 +495,16 @@ html{overflow:hidden!important}
 <div class="view" id="vChats">
   <div class="topbar">
     <div class="me-name"><div class="n" id="chatsTitle">Чаты</div><div class="s" id="devSub" style="font-size:11px;color:#ffc728;font-weight:600">⚙ Чат находится на обновлении во время его работы.</div></div>
+    <button class="icon-btn" id="btnSearchUser" title="Поиск по юзернейму" aria-label="Поиск">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7" /><path d="M21 21l-4.3-4.3" /></svg>
+    </button>
     <span id="verBadge" style="font-size:12px;font-weight:800;color:#fff;letter-spacing:.3px;padding:0 4px;flex:0 0 auto">Lincoln-Chat</span>
   </div>
   <div class="chat-filters" id="chatFilters">
     <button class="chf sel" data-f="all">Все чаты</button>
     <button class="chf" data-f="personal">Личные</button>
   </div>
-  <div class="searchbar">
+  <div class="searchbar" id="userSearchBar" style="display:none">
     <input class="search-input" id="searchUser" placeholder="Введите @user" autocomplete="off" spellcheck="false">
   </div>
   <div id="searchResult"></div>
@@ -2110,6 +2113,15 @@ if(mine){
 
 /* ---------- search ---------- */
 let searchTO=null;
+function toggleUserSearch(force){
+  const bar=$("userSearchBar");
+  if(!bar) return;
+  const show = (force!==undefined) ? !!force : (bar.style.display!=="block");
+  bar.style.display = show ? "block":"none";
+  if(show){ $("searchUser").focus(); }
+  else { $("searchUser").value=""; $("searchResult").innerHTML=""; }
+}
+$("btnSearchUser").addEventListener("click",()=>toggleUserSearch());
 $("searchUser").addEventListener("input",()=>{
   clearTimeout(searchTO);
   searchTO=setTimeout(doSearch,250);
