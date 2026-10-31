@@ -1,6 +1,19 @@
 <!DOCTYPE html>
 <html lang="ru">
 <head>
+<script>
+window.__errs=[];
+window.addEventListener("error",function(ev){ try{ window.__errs.push(String((ev&&ev.message)||"error")); showErr(String((ev&&ev.message)||"error")); }catch(e){} return false; });
+window.addEventListener("unhandledrejection",function(ev){ try{ var r=(ev&&ev.reason); var m=(r&&r.message)?r.message:String(r); window.__errs.push(m); showErr(m); }catch(e){} });
+function showErr(msg){
+  try{
+    var d=document.getElementById("__errBox");
+    if(!d){ d=document.createElement("div"); d.id="__errBox"; d.style.cssText="position:fixed;top:0;left:0;right:0;z-index:99999;background:#a01414;color:#fff;font:12px/1.5 monospace;padding:10px 14px;white-space:pre-wrap;max-height:40vh;overflow:auto"; document.body.appendChild(d); }
+    d.textContent +="\n"+String(msg);
+  }catch(e){}
+}
+</script>
+</head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
 <meta name="theme-color" content="#182533">
@@ -413,7 +426,7 @@ html{overflow:hidden!important}
   .msgs{-webkit-overflow-scrolling:touch}
 }
 </style>
-</head>
+
 <body>
 
 <div id="bgFx" aria-hidden="true">
