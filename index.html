@@ -12,6 +12,20 @@ function showErr(msg){
     d.textContent +="\n"+String(msg);
   }catch(e){}
 }
+function toast(msg,type,dur){
+  try{
+    type=type||"info"; if(!dur)dur=2600;
+    var box=document.getElementById("toastBox");
+    if(!box){ box=document.createElement("div"); box.id="toastBox"; document.body.appendChild(box); }
+    while(box.children.length>=3) box.removeChild(box.firstChild);
+    var ic=document.createElement("span"); ic.className="t-ic"; ic.textContent=type==="ok"?"✓":type==="err"?"✗":"i";
+    var el=document.createElement("div"); el.className="toast "+type;
+    el.appendChild(ic);
+    var tx=document.createElement("span"); tx.textContent=String(msg); el.appendChild(tx);
+    box.appendChild(el);
+    setTimeout(function(){ el.classList.add("leaving"); setTimeout(function(){ if(el.parentNode) el.parentNode.removeChild(el); },230); },dur);
+  }catch(e){}
+}
 </script>
 </head>
 <meta charset="UTF-8">
@@ -307,9 +321,9 @@ html{overflow:hidden!important}
 .confirm-bar .btn{width:auto;padding:9px 16px;font-size:14px;border-radius:10px}
 
 /* ============ settings modal ============ */
-.overlay{position:fixed;inset:0;background:rgba(0,0,0,.55);z-index:50;display:none;align-items:center;justify-content:center;padding:18px;animation:fadeIn .2s ease}
+.overlay{position:fixed;inset:0;background:rgba(8,12,16,.62);backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);z-index:50;display:none;align-items:center;justify-content:center;padding:18px;animation:fadeIn .22s ease}
 .overlay.open{display:flex}
-.overlay .modal{animation:modalIn .22s cubic-bezier(.2,.9,.3,1)}
+.overlay .modal{animation:modalIn .26s cubic-bezier(.18,.89,.32,1.08)}
 @keyframes fadeIn{from{opacity:0}to{opacity:1}}
 @keyframes modalIn{from{opacity:0;transform:translateY(14px) scale(.97)}to{opacity:1;transform:none}}
 .modal{background:rgba(24,30,36,.82);backdrop-filter:blur(18px);-webkit-backdrop-filter:blur(18px);border:1px solid rgba(255,255,255,.09);border-radius:22px;width:100%;max-width:420px;max-height:88vh;overflow-y:auto;padding:22px;box-shadow:0 18px 50px rgba(0,0,0,.6)}
@@ -452,6 +466,37 @@ html{overflow:hidden!important}
   .bubble,.send-btn,.glow-toggle{-webkit-backface-visibility:hidden;backface-visibility:hidden;transform:translateZ(0)}
   .msgs{-webkit-overflow-scrolling:touch}
 }
+</style>
+<style>
+#toastBox{position:fixed;left:50%;bottom:calc(20px + env(safe-area-inset-bottom));transform:translateX(-50%);z-index:99995;display:flex;flex-direction:column;align-items:center;gap:8px;pointer-events:none;max-width:min(92vw,420px)}
+.toast{pointer-events:auto;display:flex;align-items:center;gap:10px;background:rgba(26,33,41,.92);backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);border:1px solid rgba(255,255,255,.12);color:#fff;border-radius:14px;padding:11px 16px;font-size:13.5px;font-weight:600;line-height:1.35;box-shadow:0 12px 34px rgba(0,0,0,.55);animation:toastIn .24s cubic-bezier(.2,.9,.3,1)} 
+.toast.leaving{animation:toastOut .22s ease forwards}
+.toast .t-ic{flex:none;width:22px;height:22px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:800}
+.toast.ok .t-ic{background:rgba(52,211,153,.2);color:#34d399}
+.toast.err .t-ic{background:rgba(239,68,68,.2);color:#f87171}
+.toast.info .t-ic{background:rgba(46,166,255,.2);color:#6cc3ff}
+@keyframes toastIn{from{opacity:0;transform:translateY(14px) scale(.96)}}
+@keyframes toastOut{to{opacity:0;transform:translateY(10px) scale(.97)}}
+</style>
+<style>
+*{-webkit-tap-highlight-color:transparent}
+button{cursor:pointer}
+:focus-visible{outline:2px solid rgba(46,166,255,.7);outline-offset:2px}
+@media(hover:hover){
+  .tabbar .tab:hover{color:#dce7ef}
+  .bubble{transition:transform .18s ease,box-shadow .18s ease}
+  .bubble:hover{transform:translateY(-1px)}
+  .bubble.m:hover{box-shadow:0 6px 18px rgba(46,166,255,.25)}
+  .bubble.p:hover{box-shadow:0 6px 16px rgba(0,0,0,.4)}
+  .dialog:hover{transform:translateY(-1px)}
+  .send-btn:hover{box-shadow:0 6px 18px rgba(46,166,255,.35)}
+}
+.tabbar .tab{transition:color .2s ease,transform .14s ease}
+.tabbar .tab.sel span{text-shadow:0 0 12px rgba(255,255,255,.4)}
+.input:focus,textarea:focus{box-shadow:0 0 0 3px rgba(46,166,255,.15)}
+.modal::-webkit-scrollbar{width:8px}
+.modal::-webkit-scrollbar-thumb{background:rgba(255,255,255,.18);border-radius:4px;border:2px solid transparent;background-clip:padding-box}
+@media(prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
 </style>
 
 <body>
