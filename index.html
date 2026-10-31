@@ -805,7 +805,10 @@ html{overflow:hidden!important}
     <div class="field"><label>Описание («О себе»)</label><textarea class="input" id="admBio" rows="2" maxlength="200" placeholder="Текст описания" autocomplete="off"></textarea></div>
     <div class="field"><label>Аватар (загрузить фото)</label><input type="file" id="admAvaFile" accept="image/*" style="display:none"><button class="btn ghost" id="admAvaBtn" style="padding:10px">Загрузить/заменить аватар</button></div>
     <div class="field"><label>Новый пароль (код), если нужно сменить</label><input class="input" id="admPass" type="text" placeholder="оставьте пустым, если не менять" autocomplete="off"></div>
+    <div class="field"><label>Сменить @юзернейм</label><input class="input" id="admHandle" maxlength="19" placeholder="новый ник без @" autocomplete="off"></div>
     <div class="field"><label>Причина предупреждения</label><input class="input" id="admWarnReason" maxlength="180" placeholder="например: спам, оскорбления" autocomplete="off"></div>
+    <button class="btn ghost" id="admResetAva" style="margin-bottom:8px;color:#8ab4ff;border-color:var(--line)">Сбросить аватар (убрать фото)</button>
+    <button class="btn ghost" id="admSetName" style="margin-bottom:8px;color:#5ff0b4;border-color:var(--line)">Сменить @юзернейм</button>
     <button class="btn" id="admSave" style="margin-bottom:8px">Сохранить изменения</button>
     <button class="btn ghost" id="admWarn" style="margin-bottom:8px;color:#ffcc5c;border-color:var(--line)">⚠ Выдать предупреждение</button>
     <button class="btn ghost" id="admUnwarn" style="margin-bottom:8px;color:#7d8c99;border-color:var(--line)">Снять предупреждение</button>
@@ -2926,6 +2929,36 @@ const _admFrozen=$("admFrozen"); if(_admFrozen) _admFrozen.addEventListener("cli
   try{ FB.db.ref("users/"+k+"/blocked").set(fd).catch(()=>{}); }catch(e){}
   fetch(base+"/blocked.json",{method:"PUT",headers:{"Content-Type":"application/json"},body:JSON.stringify(fd)}).catch(()=>{});
   toast("Аккаунт заморожен на 3 дня");
+});
+// reset avatar (remove photo) for the account
+const _admResetAva=$("admResetAva");
+if(_admResetAva) _admResetAva.addEventListener("click",()=>{
+  const k=admKey();
+  if(!confirm("Убрать фото у @"+_admTarget+"?")) return;
+  try{ FB.db.ref("users/"+k+"/ava").set("").catch(()=>{}); }catch(e){}
+  try{ fetch("https://pennie-chat-default-rtdb.firebaseio.com/users/"+k+"/ava.json",{method:"PUT",headers:{"Content-Type":"application/json"},body:JSON.stringify("")}).catch(()=>{}); }catch(e){}
+  toast("Аватар очищен");
+});
+// change @username (migrate the user record key)
+const _admSetName=$("admSetName");
+if(_admSetName) _admSetName.addEventListener("click",async()=>{
+  const k=admKey();
+  const newn=($("admHandle").value||"").trim().replace(/^@+/,"").toLowerCase();
+  if(!newn){ toast("Введите новый @юзернейм"); return; }
+  if(!/^[a-z0-9_]{1,19}$/.test(newn)){ toast("Ник: a-z, цифры, _, до 19 символов"); return; }
+  if(newn===k){ toast("Это текущий ник"); return; }
+  const cur=await new Promise(res=>{ let done=false; try{ FB.db.ref("users/"+newn).once("value",s=>{done=true;res(s.val()||null);}); }catch(e){} setTimeout(()=>{ if(!done){done=true;res("__timedout");} },3000); });
+  if(cur && cur!=="__timedout"){ toast("Этот ник уже занят"); return; }
+  if(!confirm("Перенести аккаунт @"+_admTarget+" → @"+newn+"?")) return;
+  try{ FB.db.ref("users/"+k).once("value",s=>{
+    const d=s.val();
+    if(d){ FB.db.ref("users/"+newn).set(d).then(()=>FB.db.ref("users/"+k).remove().catch(()=>{})).catch(()=>{}); }
+  }).catch(()=>{}); }catch(e){}
+  fetch("https://pennie-chat-default-rtdb.firebaseio.com/users/"+k+".json").then(r=>r.json()).then(d=>{
+    if(d){ fetch("https://pennie-chat-default-rtdb.firebaseio.com/users/"+newn+".json",{method:"PUT",body:JSON.stringify(d)}).then(()=>fetch("https://pennie-chat-default-rtdb.firebaseio.com/users/"+k+".json",{method:"DELETE"})).catch(()=>{}); }
+  }).catch(()=>{});
+  _admTarget="@"+newn;
+  toast("Юзернейм изменён на @"+newn);
 });
 $("admDel").addEventListener("click",()=>{
   const k=admKey();
