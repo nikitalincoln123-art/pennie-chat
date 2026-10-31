@@ -34,7 +34,7 @@ body[data-theme="violet"]{--bg:#130a20;--bg-in:#1a0e2e;--panel:#221344;--panel2:
 #bgFx{position:fixed;inset:0;z-index:0;overflow:hidden;pointer-events:none;background-color:#000;
   background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='220' height='220' viewBox='0 0 220 220'><g fill='none' stroke='%23ffffff' stroke-opacity='0.28' stroke-width='1.7' stroke-linecap='round' stroke-linejoin='round'><path d='M20 34c8-10 22-10 26 0 3 8-6 14-13 14'/><path d='M150 20l14 0 0 14-14 0z'/><path d='M90 26a8 8 0 1 1 0 16 8 8 0 0 1 0-16z'/><path d='M40 90c10 0 14 10 8 16-4 4-12 2-12-4'/><path d='M120 78c6-8 18-6 20 2M126 88l10 0'/><path d='M170 96c-8-6-18 0-16 10 2 8 12 8 16 2'/><path d='M28 150c8 8 8 20-2 24-8 3-14-6-8-12'/><path d='M96 140l16 0 0 16-16 0zM104 140l0 16'/><path d='M160 150a10 10 0 1 0 12 10c1-6-4-11-9-11'/><path d='M60 190c10-6 22 2 18 12-3 8-14 6-14-2'/><path d='M140 200c6-10 20-6 20 4 0 8-10 10-14 4'/><path d='M196 40c6 4 6 12 0 16-5 3-10-2-8-7'/><path d='M8 60c4 6 2 12-4 12-5 0-6-6-2-8'/><path d='M112 200l10-10 4 12-10 4z'/></g></svg>");
   background-size:220px 220px;background-repeat:repeat}
-@keyframes nebulaFloat{0%,100%{transform:translate(0,0) scale(1)}}
+
 .view{position:relative;z-index:1}
 .overlay{z-index:50}
 .modal{z-index:51}
@@ -146,7 +146,7 @@ textarea.input,textarea{color:var(--ink);caret-color:var(--ink);font-family:inhe
 .search-input{width:100%;background:var(--bg-in);border:1px solid var(--line);border-radius:12px;padding:11px 15px;font-size:15px;outline:none}
 .search-input:focus{border-color:var(--accent)}
 
-.list{flex:1;overflow-y:auto;padding:6px 0}
+.list{flex:1;overflow-y:auto;padding:6px 0;-webkit-overflow-scrolling:touch;overscroll-behavior:contain}
 .list-empty{padding:40px 24px;text-align:center;color:var(--ink-dim);font-size:14px;line-height:1.6}
 .dialog{display:flex;align-items:center;gap:13px;padding:11px 14px;cursor:pointer;background:var(--panel2);border:1px solid var(--line);border-radius:12px;margin:4px 12px;transition:background .22s ease,color .22s ease,border-color .22s ease}
 .dialog:hover{background:#2b323a;color:#fff;border-color:rgba(255,255,255,.25)}
@@ -199,7 +199,7 @@ html{overflow:hidden!important}
 @keyframes msgIn{from{opacity:0;transform:translateY(8px) scale(.98)}to{opacity:1;transform:none}}
 /* soft glow kept off to avoid side bars */
 .bubble.glow{animation:msgIn .3s cubic-bezier(.22,1,.36,1);will-change:auto}
-@keyframes msgGlow{0%,100%{box-shadow:none}50%{box-shadow:none}}
+
 /* outgoing: blue → cyan gradient, tail on the right */
 .bubble.m{background:#3a3f44;box-shadow:0 1px 2px rgba(0,0,0,.3);border-bottom-right-radius:4px;transition:background .25s ease,color .25s ease,border-color .25s ease}
 .bubble.m:hover{background:#2b323a;color:#fff}
@@ -283,7 +283,7 @@ html{overflow:hidden!important}
 .tabbar .tab:active{transform:scale(.95)}
 
 /* ============ profile view ============ */
-.profile-scroll{flex:1;overflow-y:auto}
+.profile-scroll{flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;overscroll-behavior:contain}
 .profile-hero{padding:26px 20px 18px;text-align:center;position:relative;background:rgba(255,255,255,.05);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);border:none;border-radius:0 0 20px 20px;margin:0 0 14px;box-shadow:0 10px 28px rgba(0,0,0,.35)}
 .profile-hero[data-pbg="black"]{background:radial-gradient(circle at 30% 20%,#223,transparent 70%),#000}
 .profile-hero[data-pbg="pattb"]{background-color:#000;background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='180' height='180' viewBox='0 0 180 180'><g fill='none' stroke='%23ffffff' stroke-opacity='0.35' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'><path d='M14 30c7-9 19-9 22 0 3 7-5 12-11 12'/><path d='M64 18l12 0 0 12-12 0z'/><path d='M120 26a7 7 0 1 1 0 14 7 7 0 0 1 0-14z'/><path d='M30 80c9 0 12 9 7 14-3 4-10 2-10-4'/><path d='M96 70c5-7 15-5 17 2'/><path d='M140 84c-7-5-15 0-13 8 2 7 10 7 13 2'/><path d='M20 130c7 7 7 17-2 20-7 3-12-5-7-10'/><path d='M84 118l14 0 0 14-14 0z'/><path d='M132 124a8 8 0 1 0 10 8c1-5-4-9-8-9'/><path d='M48 160c8-5 18 2 15 10-3 7-12 5-12-2'/><path d='M118 164c5-8 16-5 16 3 0 7-8 8-11 3'/></g></svg>");background-size:180px 180px;background-repeat:repeat;color:#fff}
@@ -864,7 +864,6 @@ async function onNext1(){
   $("codeLabel").textContent = exists ? "Ваш код" : "Придумайте код (минимум 4 символа)";
   $("codeHint").style.display = exists ? "none":"block";
   $("codeHint").textContent = "Код хешируется в браузере и нигде не хранится открыто. Запомните его — он ваш единственный доступ к этому @юзернейму.";
-  $("btnNext2text_holder") && null;
   $("authCode").value=""; setErr("");
   stepTo(2);
   $("authCode").focus();
@@ -1313,7 +1312,7 @@ function sendSupportMsg(text){
     .catch(()=>{ toast("Не удалось отправить. Проверьте интернет."); });
   // update local preview + badge
   updateDialogFromMessages("support",{x:{from:sender,text:t,t:msg.t}});
-  const msgsEl=$("msgs"); if(msgsEl){ try{ msgsEl.scrollTop=msgsEl.scrollHeight; }catch(e){} }
+  const msgsEl=$("msgs"); if(msgsEl){ try{ msgsEl.scrollTo({top:msgsEl.scrollHeight,behavior:"smooth"}); }catch(e){ try{ msgsEl.scrollTop=msgsEl.scrollHeight; }catch(e2){} } }
 }
 function updateDialogFromMessages(themL,list){
   themL=String(themL).replace(/^@+/,"").toLowerCase();
@@ -2122,7 +2121,7 @@ function sendNow(){
     fetch("https://pennie-chat-default-rtdb.firebaseio.com/inbox/"+peer+"/"+myKey+".json",{method:"PUT",headers:{"Content-Type":"application/json"},body:JSON.stringify(inbox)}).catch(()=>{});
   }catch(e){}
   updateDialogFromMessages(openChatPeer,{x:{from:me.handle,text:t,t:msg.t}});
-  const msgsEl=$("msgs"); if(msgsEl){ try{ msgsEl.scrollTop=msgsEl.scrollHeight; }catch(e){} }
+  const msgsEl=$("msgs"); if(msgsEl){ try{ msgsEl.scrollTo({top:msgsEl.scrollHeight,behavior:"smooth"}); }catch(e){ try{ msgsEl.scrollTop=msgsEl.scrollHeight; }catch(e2){} } }
 }
 $("btnSend").addEventListener("click",sendNow);
 $("chatText").addEventListener("keydown",e=>{ if(e.key==="Enter"&&!e.shiftKey){ e.preventDefault(); sendNow(); } });
