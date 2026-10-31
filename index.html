@@ -1488,8 +1488,8 @@ function renderPinnedBar(){
     bar.style.display="flex";
     if(title) title.textContent="Закреплённое сообщение";
     if(author) author.textContent=capHandle(p.from);
-    txt.textContent=(p.isPhoto?"📎 Фото":p.text)||"📎 Фото";
-    if(!p.isPhoto){ txt.style.whiteSpace="normal"; txt.style.maxHeight="2.6em"; txt.style.overflow="hidden"; }
+    txt.textContent=(p.text&&p.text.trim()) ? p.text : "📎 Фото";
+    if(p.text&&p.text.trim()){ txt.style.whiteSpace="normal"; txt.style.maxHeight="2.6em"; txt.style.overflow="hidden"; }
     else { txt.style.whiteSpace="nowrap"; txt.style.maxHeight=""; txt.style.overflow=""; }
   } else {
     bar.style.display="none";
