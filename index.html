@@ -940,6 +940,22 @@ $("authCode").addEventListener("keydown",e=>{ if(e.key==="Enter") onNext2(); });
 
 /* ---------- chats list ---------- */
 let dialogs={}, dialogRefs=[];
+let deletedChats={};
+try{ deletedChats=JSON.parse(localStorage.getItem("pennie_deleted_chats_"+String(me&&me.handle||"").toLowerCase().replace(/^@+/,"")))||{}; }catch(e){ deletedChats={}; }
+function isChatDeleted(name){
+  const n=String(name).replace(/^@+/,"").toLowerCase();
+  return !!deletedChats[n];
+}
+function markChatDeleted(name){
+  const n=String(name).replace(/^@+/,"").toLowerCase();
+  deletedChats[n]=Date.now();
+  try{ localStorage.setItem("pennie_deleted_chats_"+String(me&&me.handle||"").toLowerCase().replace(/^@+/,""), JSON.stringify(deletedChats)); }catch(e){}
+}
+function unmarkChatDeleted(name){
+  const n=String(name).replace(/^@+/,"").toLowerCase();
+  delete deletedChats[n];
+  try{ localStorage.setItem("pennie_deleted_chats_"+String(me&&me.handle||"").toLowerCase().replace(/^@+/,""), JSON.stringify(deletedChats)); }catch(e){}
+}
 
 function openChats(){
   showView("vChats");
@@ -969,6 +985,7 @@ function pollInboxREST(){
       Object.keys(data).forEach(senderKey=>{
         const it=data[senderKey]||{}; if(!it.t) return;
         const themL=String(senderKey).toLowerCase();
+        if(isChatDeleted(themL)) return; // chat removed by the user
         const known=dialogs[themL];
         if(!known){ dialogs[themL]={handle:themL,name:(it.name||"@"+themL),ava:(it.ava||"👤"),t:0}; }
         const cur=dialogs[themL];
@@ -1004,6 +1021,7 @@ function listenInbox(){
         const it=data[senderKey]||{};
         if(!it.t) return;
         const themL=String(senderKey).toLowerCase();
+        if(isChatDeleted(themL)) return; // chat removed by the user
         const known=dialogs[themL];
         // register a new dialog the first time this sender writes
         dialogs[themL]=dialogs[themL]||{handle:themL, name:(it.name||"@"+themL), ava:(it.ava||"👤"), t:0};
@@ -1343,25 +1361,44 @@ function deleteChatNow(){
   if(!openChatPeer) return;
   const them=String(openChatPeer).toLowerCase().replace(/^@+/,"");
   const myKey=me.handle.toLowerCase().replace(/^@+/,"");
+  if(them==="support"){
+    if(!confirm("Удалить чат с поддержкой?")) return;
+    delete dialogs["support"];
+    try{ localStorage.setItem("pennie_dialogs_"+me.handle, JSON.stringify(dialogs)); }catch(e){}
+    try{ if(supportListenRef) supportListenRef.off("value",supportListenFn); supportListenRef=null; }catch(e){}
+    openChatPeer=null;
+    renderDialogs();
+    setTab("chats");
+    toast("Чат с поддержкой удалён");
+    return;
+  }
   const key=dialogKeyOf(me.handle,them);
   const choice=confirm("Удалить чат с @"+them+"?\n\n· «ОК» — удалить у себя\n· «Отмена» — не удалять");
   if(!choice) return;
+  // remember this chat is deleted for me so inbox polling won't bring it back
+  markChatDeleted(them);
   // remove from local dialogs (self)
   delete dialogs[them];
   try{ localStorage.setItem("pennie_dialogs_"+me.handle, JSON.stringify(dialogs)); }catch(e){}
-  // detach listener
-  try{ if(myListenRef) myListenRef.off("value",myListenFn); }catch(e){}
-  // remove from my msgs node (self-side)
-  try{ FB.db.ref("msgs/"+key+"/_self_"+myKey).remove().catch(()=>{}); }catch(e){}
+  // detach all listeners so the chat doesn't come back instantly
+  try{ if(myListenRef){ myListenRef.off("value",myListenFn); myListenRef=null; } }catch(e){}
+  try{ if(supportListenRef){ supportListenRef.off("value",supportListenFn); supportListenRef=null; } }catch(e){}
+  dialogRefs.forEach(d=>{ try{ d.ref.off("value",d.fn); }catch(e){} });
+  dialogRefs=[];
   // back to chats
   openChatPeer=null;
   renderDialogs();
   setTab("chats");
   toast("Чат удалён");
 }
+// allow opening a chat that was previously deleted (used e.g. from search / contacts)
+function restoreChatIfNeeded(themL){
+  if(isChatDeleted(themL)) unmarkChatDeleted(themL);
+}
 $("btnDeleteChat").addEventListener("click",deleteChatNow);
 function openChat(themL){
   themL=String(themL).replace(/^@+/,"").toLowerCase();
+  if(themL!=="support"){ restoreChatIfNeeded(themL); }
   openChatPeer=themL;
   clearUnread(themL);
   showView("vChat");
