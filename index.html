@@ -1087,13 +1087,15 @@ function firstOf(o){ const ks=Object.keys(o||{}); return ks.length?o[ks[0]]:null
 function attachMyListener(themLower){
   const ref=FB.db.ref("msgs/"+dialogKeyOf(me.handle,themLower));
   const onVal=snap=>{
+    // IMPORTANT: always convert to keyed object so every message has a stable __key.
+    // Passing the raw snap value (no __key) made every message share the same "undefined"
+    // key, so the incremental render would overwrite an earlier message with the newest one.
+    const list=snapToObj(snap);
     if(openChatPeer===themLower){
-      const list=snap.val()||{};
       renderChat(themLower,list);
-      // also update dialog preview
       updateDialogFromMessages(themLower,list);
     } else {
-      updateDialogFromMessages(themLower,snap.val()||{});
+      updateDialogFromMessages(themLower,list);
     }
   };
   ref.on("value",onVal);
