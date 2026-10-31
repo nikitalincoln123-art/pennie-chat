@@ -3190,8 +3190,9 @@ function populateBirthSelects(current){
   }
   // years from 1930 to current year
   let optsY="<option value=''>Год</option>";
-  for(let yy=selY||curY; yy>=1930; yy--){ optsY+="<option value='"+yy+"'>"+yy+"</option>"; }
-  y.innerHTML=optsY; y.value=selY;
+  for(let yy=curY; yy>=1930; yy--){ optsY+="<option value='"+yy+"'>"+yy+"</option>"; }
+  y.innerHTML=optsY;
+  y.value = selY && selY>=1930 && selY<=curY ? selY : String(curY);
   // months
   let optsM="<option value=''>Месяц</option>";
   MONTHS_RU.forEach((mm,idx)=>{ optsM+="<option value='"+(idx+1)+"'>"+mm+"</option>"; });
