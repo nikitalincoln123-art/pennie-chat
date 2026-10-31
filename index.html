@@ -1277,6 +1277,8 @@ function isSupportPeer(){
   return String(openChatPeer||"").toLowerCase()==="support";
 }
 /* admin opens an existing support thread (reply as @support, no personal login needed) */
+let openChatPeer=null, chatMsgsEl=null, myListenRef=null, myListenFn=null;
+let _statusTO=null, _histR={};
 let _supportAdminThread=null;
 function openSupportAdminThread(userKey){
   const myKey=String(userKey||"").replace(/^@+/,"").toLowerCase();
@@ -1575,7 +1577,6 @@ function openChat(themL){
   $("chatText").focus();
   startStatusPoll(themL);
 }
-let _histR={};
 function loadChatHistoryREST(themL,key){
   const tag=String(themL)+"/"+key;
   const msgs=$("msgs");
