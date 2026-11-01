@@ -639,6 +639,9 @@ button{cursor:pointer}
 <div class="view" id="vChats">
   <div class="topbar">
     <div class="me-name"><div class="n" id="chatsTitle">Чаты</div><div class="s" id="devSub" style="font-size:11px;color:#ffc728;font-weight:600">⚙ Чат находится на обновлении во время его работы.</div></div>
+    <button class="icon-btn" id="btnNewGroup" title="Создать группу" aria-label="Новая группа" style="margin-left:auto">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" /><circle cx="9" cy="7" r="4" /><path d="M23 21v-2a4 4 0 0 0-3-3.87" /><path d="M16 3.13a4 4 0 0 1 0 7.75" /></svg>
+    </button>
     <button class="icon-btn" id="btnSearchUser" title="Поиск по юзернейму" aria-label="Поиск">
       <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7" /><path d="M21 21l-4.3-4.3" /></svg>
     </button>
@@ -654,6 +657,7 @@ button{cursor:pointer}
   <div class="chat-filters" id="chatFilters">
     <button class="chf sel" data-f="all">Все чаты</button>
     <button class="chf" data-f="personal">Личные</button>
+    <button class="chf" data-f="starred">Избранные</button>
   </div>
   <div class="searchbar" id="userSearchBar" style="display:none">
     <input class="search-input" id="searchUser" placeholder="Введите @user" autocomplete="off" spellcheck="false">
@@ -1010,6 +1014,7 @@ button{cursor:pointer}
     <div style="display:flex;gap:8px;margin-top:10px">
       <button class="btn ghost" id="btnSharePeer" style="flex:1;width:auto;border-color:var(--line)">Поделиться</button>
       <button class="btn ghost" id="btnPinPeer" style="flex:1;width:auto;border-color:var(--line)">Закрепить</button>
+      <button class="btn ghost" id="btnStarPeer" style="flex:1;width:auto;border-color:var(--line)">В избранное</button>
     </div>
     <button class="btn ghost" id="btnBlockPeer" style="margin-top:10px;color:var(--bad,#f8708e);border-color:var(--line)">Заблокировать</button>
     <button class="btn ghost" id="btnAdminPeer" style="margin-top:10px;color:#ffcc5c;border-color:var(--line);display:none">⚙ Управление (админ)</button>
@@ -1474,6 +1479,253 @@ $("authCode").addEventListener("keydown",e=>{ if(e.key==="Enter") onNext2(); });
 
 /* ---------- chats list ---------- */
 let dialogs={}, dialogRefs=[];
+/* ---------- groups & channels ---------- */
+let groupDialogs={}, groupRefs=[], myGroups={};
+function isGroupHandle(h){ return String(h||"").toLowerCase().replace(/^@+/,"").indexOf("g")===0 && /^g[a-f0-9]{16,}$/.test(String(h).replace(/^@+/,"").toLowerCase()); }
+function groupIdFromHandle(h){ return String(h||"").replace(/^@+/,"").replace(/^g/,"").toLowerCase(); }
+function groupHandleFromId(id){ return "g"+String(id).toLowerCase(); }
+function groupMsgsKey(id){ return "msgs/group"+String(id).toLowerCase(); }
+function groupMetaKey(id){ return "groups/"+String(id).toLowerCase(); }
+function saveGroupDialogs(){ try{ localStorage.setItem("pennie_groups_"+_myKey(),JSON.stringify(groupDialogs)); }catch(e){} }
+function loadGroupDialogs(){ try{ groupDialogs=JSON.parse(localStorage.getItem("pennie_groups_"+_myKey()))||{}; }catch(e){ groupDialogs={}; } Object.keys(groupDialogs).forEach(k=>{ groupDialogs[k].handle="g"+String(groupDialogs[k].gid||k); }); }
+function attachGroupListener(gid){
+  try{
+    const ref=FB.db.ref(groupMsgsKey(gid));
+    const onVal=snap=>{
+      const h=groupHandleFromId(gid);
+      const list=snapToObj(snap);
+      if(openChatPeer===h){ renderChat(h,list); updateGroupFromMessages(gid,list,true); }
+      else { updateGroupFromMessages(gid,list,false); }
+    };
+    ref.on("value",onVal);
+    groupRefs.push({ref,fn:onVal,gid});
+  }catch(e){}
+}
+function listenMyGroups(){
+  groupRefs.forEach(d=>{ try{ d.ref.off("value",d.fn); }catch(e){} });
+  groupRefs=[];
+  Object.keys(groupDialogs).forEach(k=>{ const id=String(groupDialogs[k].gid||k); if(id) attachGroupListener(id); });
+}
+function groupNameOf(id){ const d=groupDialogs[id]; return (d&&d.name)||"Группа"; }
+function openGroupChat(handle){
+  const gid=groupIdFromHandle(handle);
+  openChatPeer=handle;
+  const g=groupDialogs[gid]||{name:"Группа",ava:"#"};
+  if(g.unread){ g.unread=0; saveGroupDialogs(); renderDialogs(); }
+  showView("vChat");
+  try{ document.body.classList.add("has-open-chat"); }catch(e){}
+  $("tabbar").style.display="none";
+  $("peerName").innerHTML=esc(g.name||"Группа")+' <span style="font-size:11px;color:var(--ink-dim);font-weight:500">'+(g&&g.kind==="channel"?"канал":"группа")+'</span>';
+  $("peerAva").innerHTML=esc(g.ava||"#");
+  const _gpn=$("peerName"); if(_gpn){ _gpn.style.cursor="pointer"; _gpn.onclick=()=>{ try{ openGroupInfo(handle); }catch(e){} }; }
+  const canPost = !(g&&g.kind==="channel") || canPostChannel(handle);
+  const composer=document.querySelector(".chat-input-bar"); if(composer){ composer.style.display = canPost ? "" : "none"; }
+  loadDraftFor(handle); renderPinnedBar(); renderScheduledBar(); applyChatFX(); ensureChatScroll();
+  setTimeout(()=>{ try{ renderGroupPin(handle); }catch(e){} },300);
+  const msgsEl=$("msgs"); if(msgsEl) msgsEl.innerHTML="";
+  if(myListenRef){ try{ myListenRef.off("value",myListenFn); }catch(e){} }
+  const ref=FB.db.ref(groupMsgsKey(gid));
+  myListenFn=snap=>{ renderChat(handle,snapToObj(snap)); };
+  myListenRef=ref; ref.on("value",myListenFn);
+  renderChat(handle,{});
+  loadChatHistoryREST(handle,groupMsgsKey(gid));
+  $("chatText").focus();
+}
+function openGroupInfo(handle){
+  const gid=groupIdFromHandle(handle);
+  let g=groupDialogs[gid];
+  const overlay=document.createElement("div"); overlay.className="overlay open"; overlay.style.zIndex="120";
+  overlay.innerHTML='<div class="modal" style="max-width:440px"><div class="m-head"><div class="m-title">'+(g?(esc(g.name)||"Группа"):"Группа")+'</div><button class="x-btn" id="gInfoX">✕</button></div><div id="gInfoBody" style="font-size:14px">Загрузка…</div></div>';
+  document.body.appendChild(overlay);
+  overlay.addEventListener("click",e=>{ if(e.target===overlay) overlay.remove(); });
+  overlay.querySelector("#gInfoX").addEventListener("click",()=>overlay.remove());
+  const body=overlay.querySelector("#gInfoBody");
+  const base=String(handle).replace(/^@+/,"").toLowerCase();
+  const metaRef=String(handle).toLowerCase().replace(/^@+/,"").replace(/^g/,"");
+  FB.db.ref("groups/"+metaRef).once("value").then(s=>{
+    const meta=s.val()||{};
+    g=groupDialogs[gid]=groupDialogs[gid]||{gid:gid};
+    g.name=meta.name||g.name||"Группа"; g.ava=meta.ava||g.ava||"#"; g.members=meta.members||{}; g.owner=meta.owner||""; g.admins=meta.admins||{}; g.kind=meta.kind||"group"; g.desc=meta.desc||"";
+    const meL=_myKey();
+    const myRole = meta.owner===meL?"owner":(meta.admins&&meta.admins[meL]?"admin":(meta.members&&meta.members[meL]?"member":null));
+    const membersArr=Object.keys(g.members||{});
+    const names={};
+    membersArr.forEach(u=>{ names[u]=u; try{ FB.db.ref("users/"+u).once("value").then(sn=>{ const v=sn.val(); if(v&&v.name) names[u]=v.name; }); }catch(e){} });
+    let html='<div style="display:flex;align-items:center;gap:10px;margin-bottom:12px"><div style="width:42px;height:42px;border-radius:50%;background:#2b3a55;display:flex;align-items:center;justify-content:center;font-weight:700;color:#fff">'+esc(g.ava||"#")+'</div><div><div style="font-weight:700;font-size:16px">'+esc(g.name||"Группа")+'</div><div style="font-size:12px;color:var(--ink-dim)">'+membersArr.length+' участников</div></div></div>';
+    if(g.desc) html+='<div style="font-size:13px;color:var(--ink-dim);margin-bottom:10px">'+esc(g.desc)+'</div>';
+    if(myRole && myRole!=="member") html+='<div style="font-size:12.5px;color:var(--ink-dim);margin-bottom:10px">Вы '+(myRole==="owner"?"создатель":"администратор")+' группы</div>';
+    html+='<div style="font-size:12px;font-weight:700;color:var(--ink-dim);text-transform:uppercase;letter-spacing:.4px;margin-bottom:6px">Участники</div>';
+    html+='<div style="display:flex;flex-direction:column;gap:4px">'+membersArr.map(u=>{
+      const role = u===g.owner?"👑":(g.admins&&g.admins[u]?"🛡":"");
+      const badge = u===g.owner?"создатель":(g.admins&&g.admins[u]?"админ":"");
+      return '<div style="display:flex;align-items:center;gap:8px;padding:7px 4px;border-radius:8px"><div style="width:30px;height:30px;border-radius:50%;background:#2b3a55;display:flex;align-items:center;justify-content:center;color:#fff;font-size:13px">'+esc(names[u]===u?"":names[u].charAt(0).toUpperCase())||"?"+'</div><div style="flex:1;min-width:0"><div style="font-size:14px;font-weight:600">'+role+' '+esc(capHandle(u))+'</div>'+(badge?'<div style="font-size:11px;color:var(--ink-dim)">'+badge+'</div>':'')+'</div></div>';
+    }).join("")+'</div>';
+    body.innerHTML=html;
+    if(g.kind==="channel" && myRole !== "owner" && myRole !== "admin"){
+      const subBtn=document.createElement("button"); subBtn.className="btn"; subBtn.style.cssText="width:100%;margin-top:10px";
+      const isSub = !!(g.members&&g.members[meL]);
+      subBtn.textContent = isSub ? "Отписаться от канала" : "Подписаться на канал";
+      subBtn.addEventListener("click",()=>{
+        if(isSub){ unsubscribeChannel(handle); } else { subscribeChannel(handle); }
+        setTimeout(()=>overlay.remove(),600);
+      });
+      body.appendChild(subBtn);
+    }
+    if(myRole==="owner" || myRole==="admin"){
+      const manage=document.createElement("div"); manage.style.cssText="margin-top:12px;padding-top:10px;border-top:1px solid rgba(255,255,255,.08)";
+      const addBtn=document.createElement("button"); addBtn.className="btn"; addBtn.style.cssText="width:100%;margin-bottom:6px"; addBtn.textContent="+ Добавить участника";
+      addBtn.addEventListener("click",()=>{
+        const who=prompt("@юзернейм нового участника:"); if(!who) return;
+        const b=String(who).replace(/^@+/,"").toLowerCase(); if(!b) return;
+        const g=groupDialogs[gid]; if(!g) return;
+        if(g.members&&g.members[b]){ toast("Уже участник","info"); return; }
+        g.members=g.members||{}; g.members[b]="member";
+        FB.db.ref("groups/"+gid+"/members/"+b).set("member").then(()=>{ toast("Участник добавлен","ok"); openGroupInfo(handle); }).catch(()=>{ toast("Ошибка","err"); });
+      });
+      manage.appendChild(addBtn);
+      body.appendChild(manage);
+    }
+  }).catch(()=>{ body.innerHTML='<div style="color:var(--ink-dim)">Не удалось загрузить группу.</div>'; });
+}
+function sendGroupMsg(t,el){
+  const gid=groupIdFromHandle(openChatPeer);
+  const g=groupDialogs[gid]; if(!g){ toast("Группа не найдена","err"); return; }
+  const meL=String(me&&me.handle||"").replace(/^@+/,"").toLowerCase();
+  const role=(g.members&&g.members[meL])||(g.owner===meL?"owner":(g.admins&&g.admins[meL]?"admin":null));
+  if(!role){ toast("Вы не состоите в группе","err"); return; }
+  if(g.kind==="channel" && !(g.admins&&g.admins[meL]) && g.owner!==meL){ toast("Публиковать могут только админы канала","err"); return; }
+  const msg={from:me.handle,text:t,t:Date.now(),pat:(me.pat!=null?me.pat:"0"),glow:glowOn?true:undefined};
+  const pushKey=fbPushKey();
+  const url="https://pennie-chat-default-rtdb.firebaseio.com/"+groupMsgsKey(gid)+"/"+pushKey+".json";
+  fetch(url,{method:"PUT",headers:{"Content-Type":"application/json"},body:JSON.stringify(msg)}).then(r=>{ if(!r.ok) throw 0; }).catch(()=>{ toast("Нет связи — сообщение не отправлено","err"); });
+  el.value=""; cancelReply();
+  try{ playSound("send"); }catch(e){}
+  updateGroupFromMessages(gid,{x:{from:me.handle,text:t,t:msg.t}},true);
+  const bar=$("scheduledBar"); if(bar) bar.style.display="none";
+}
+function loadMyGroups(){
+  try{
+    FB.db.ref("groups").once("value").catch(()=>{}).then(snap=>{
+      const obj=snap?snap.val()||{}:{};
+      const my=_myKey();
+      Object.keys(obj).forEach(id=>{
+        const meta=obj[id]||{};
+        const isMember=(meta.members&&meta.members[my])||meta.owner===my;
+        if(isMember){
+          if(!groupDialogs[id]){ groupDialogs[id]={gid:id,name:meta.name||"Группа",ava:meta.ava||"#",t:meta.created||0}; }
+          groupDialogs[id].name=meta.name||groupDialogs[id].name;
+          groupDialogs[id].ava=meta.ava||groupDialogs[id].ava;
+          groupDialogs[id].members=meta.members||{};
+          groupDialogs[id].owner=meta.owner||"";
+          groupDialogs[id].admins=meta.admins||{};
+          groupDialogs[id].kind=meta.kind||"group";
+          attachGroupListener(id);
+        }
+      });
+      saveGroupDialogs(); renderDialogs();
+    });
+  }catch(e){}
+}
+function createGroup(name,members){
+  const gid=fbPushKey().slice(0,20);
+  const meL=_myKey();
+  const meta={gid:gid,name:String(name||"").trim()||"Группа",kind:"group",owner:meL,members:{},admins:{},created:Date.now(),desc:""};
+  meta.members[meL]="owner";
+  (members||[]).forEach(u=>{ const b=String(u).replace(/^@+/,"").toLowerCase(); if(b && b!==meL && !meta.members[b]) meta.members[b]="member"; });
+  const url="https://pennie-chat-default-rtdb.firebaseio.com/groups/"+gid+".json";
+  fetch(url,{method:"PUT",headers:{"Content-Type":"application/json"},body:JSON.stringify(meta)}).then(r=>{
+    if(!r.ok) throw 0;
+    groupDialogs[gid]={gid:gid,name:meta.name,ava:"#",t:meta.created,members:meta.members,owner:meL,admins:{},kind:"group"};
+    saveGroupDialogs(); listenMyGroups(); renderDialogs();
+    toast("Группа создана","ok");
+    openGroupChat(groupHandleFromId(gid));
+  }).catch(()=>{ toast("Не удалось создать группу","err"); });
+}
+function createChannel(name,desc){
+  const gid=fbPushKey().slice(0,20);
+  const meL=_myKey();
+  const meta={gid:gid,name:String(name||"").trim()||"Канал",kind:"channel",owner:meL,members:{},admins:{},created:Date.now(),desc:String(desc||"").trim()};
+  meta.members[meL]="owner";
+  const url="https://pennie-chat-default-rtdb.firebaseio.com/groups/"+gid+".json";
+  fetch(url,{method:"PUT",headers:{"Content-Type":"application/json"},body:JSON.stringify(meta)}).then(r=>{
+    if(!r.ok) throw 0;
+    groupDialogs[gid]={gid:gid,name:meta.name,ava:"#",t:meta.created,members:meta.members,owner:meL,admins:{},kind:"channel",desc:meta.desc};
+    saveGroupDialogs(); listenMyGroups(); renderDialogs();
+    toast("Канал создан","ok");
+    openGroupChat(groupHandleFromId(gid));
+  }).catch(()=>{ toast("Не удалось создать канал","err"); });
+}
+function subscribeChannel(handle){
+  const gid=groupIdFromHandle(handle);
+  const meL=_myKey();
+  FB.db.ref("groups/"+gid+"/members/"+meL).set("member").then(()=>{
+    const g=groupDialogs[gid]; if(g){ g.members=g.members||{}; g.members[meL]="member"; }
+    saveGroupDialogs(); attachGroupListener(gid); renderDialogs();
+    toast("Вы подписаны на канал","ok");
+  }).catch(()=>{ toast("Не удалось подписаться","err"); });
+}
+function unsubscribeChannel(handle){
+  const gid=groupIdFromHandle(handle);
+  const meL=_myKey();
+  FB.db.ref("groups/"+gid+"/members/"+meL).remove().then(()=>{
+    if(groupDialogs[gid]){ delete groupDialogs[gid].members[meL]; if(groupDialogs[gid].owner===meL) groupDialogs[gid].owner=""; }
+    saveGroupDialogs(); renderDialogs();
+    toast("Вы отписались от канала");
+  }).catch(()=>{ toast("Ошибка","err"); });
+}
+function isChannel(handle){ const g=groupDialogs[groupIdFromHandle(handle)]; return !!(g&&g.kind==="channel"); }
+function canPostChannel(handle){
+  const gid=groupIdFromHandle(handle);
+  const g=groupDialogs[gid]; if(!g) return false;
+  const meL=_myKey();
+  return g.owner===meL || !!(g.admins&&g.admins[meL]);
+}
+function canManageGroup(handle){
+  const gid=groupIdFromHandle(handle);
+  const g=groupDialogs[gid]; if(!g) return false;
+  const meL=_myKey();
+  return g.owner===meL || !!(g.admins&&g.admins[meL]);
+}
+function pinGroupMsg(handle,key,text,from){
+  const gid=groupIdFromHandle(handle);
+  FB.db.ref("groups/"+gid+"/pinned").set({key:key,text:text,from:from,t:Date.now()})
+    .then(()=>{ toast("Сообщение закреплено","ok"); renderGroupPin(handle); })
+    .catch(()=>{ toast("Ошибка пина","err"); });
+}
+function unpinGroupMsg(handle){
+  const gid=groupIdFromHandle(handle);
+  FB.db.ref("groups/"+gid+"/pinned").remove().then(()=>{ toast("Пин снят"); renderGroupPin(handle); }).catch(()=>{});
+}
+function renderGroupPin(handle){
+  const gid=groupIdFromHandle(handle);
+  const b=$("pinnedBar"), txt=$("pinnedText"), author=$("pinnedAuthor");
+  if(!b||!txt) return;
+  if(!openChatPeer || !isGroupHandle(openChatPeer) || groupIdFromHandle(openChatPeer)!==gid){ return; }
+  FB.db.ref("groups/"+gid+"/pinned").once("value").then(s=>{
+    const p=s.val();
+    if(p){
+      b.style.display="flex";
+      if($("pinnedTitle")) $("pinnedTitle").textContent="Закреплено";
+      if(author) author.textContent=capHandle(p.from||"");
+      txt.textContent=(p.text&&p.text.trim())?p.text:"📎 Сообщение";
+      txt.style.whiteSpace="normal"; txt.style.maxHeight="2.6em"; txt.style.overflow="hidden";
+      b.onclick=()=>{
+        const el=document.querySelector('.msg-row[data-key="'+String(p.key)+'"]');
+        if(el){ el.scrollIntoView({behavior:"smooth",block:"center"}); el.classList.add("flash-pin"); setTimeout(()=>el.classList.remove("flash-pin"),1600); }
+        else toast("Сообщение уже удалено");
+      };
+    } else { b.style.display="none"; }
+  }).catch(()=>{});
+}
+function updateGroupFromMessages(gid,list,isOpen){
+  const d=groupDialogs[gid]; if(!d) return;
+  const arr=Object.values(list).sort((a,b)=>(a.t||0)-(b.t||0));
+  const last=arr[arr.length-1];
+  if(last){ d.preview=String(last.text||""); d.t=last.t; d.time=fmtTime(last.t); }
+  if(!isOpen && last && (d._lastSeenT||0) < last.t){ d.unread=(d.unread||0)+1; }
+  if(isOpen){ d._lastSeenT=last?last.t:(d._lastSeenT||0); d.unread=0; }
+  saveGroupDialogs(); renderDialogs();
+}
 let deletedChats={};
 try{ deletedChats=JSON.parse(localStorage.getItem("pennie_deleted_chats_"+String(me&&me.handle||"").toLowerCase().replace(/^@+/,"")))||{}; }catch(e){ deletedChats={}; }
 function isChatDeleted(name){
@@ -1501,6 +1753,8 @@ function openChats(){
   $("searchResult").innerHTML="";
   loadDialogs();
   listenMyChats();
+  loadGroupDialogs();
+  loadMyGroups();
   listenInbox();
   pollInboxREST();
   handleDeepLink();
@@ -1724,6 +1978,20 @@ function toggleChatPin(h){
   renderDialogs();
   toast(p[key]?"Чат закреплён":"Закрепление снято");
 }
+function starredChats(){
+  try{ if(_starredChats) return _starredChats; _starredChats=JSON.parse(localStorage.getItem("pennie_dstar_"+_myKey()))||null; }catch(e){ _starredChats=null; }
+  if(!_starredChats){ _starredChats={}; try{ localStorage.setItem("pennie_dstar_"+_myKey(),"{}"); }catch(e){} }
+  return _starredChats;
+}
+function isDialStarred(h){ return !!starredChats()[String(h).replace(/^@+/,"").toLowerCase()]; }
+function toggleDialStar(h){
+  let s=starredChats(); const key=String(h).replace(/^@+/,"").toLowerCase();
+  if(s[key]) delete s[key]; else s[key]=Date.now();
+  try{ localStorage.setItem("pennie_dstar_"+_myKey(),JSON.stringify(s)); }catch(e){}
+  _starredChats=null;
+  renderDialogs();
+  toast(s[key]?"Добавлено в избранное":"Убрано из избранного");
+}
 function renderDialogs(){
   const el=$("dialogs"); el.innerHTML="";
   const filter=chatFilter||"all";
@@ -1733,6 +2001,7 @@ function renderDialogs(){
     return (b.t||0)-(a.t||0);
   });
   if(filter==="personal") arr=arr.filter(d=>d.lastIsMine);
+  if(filter==="starred") arr=arr.filter(d=>isDialStarred(d.handle));
   // pinned Support chat — always visible, opens dialog with @lincoln (hidden from @lincoln himself)
   const isLincolnMe = String(me&&me.handle||"").toLowerCase().replace(/^@+/,"")==="lincoln";
   if(filter!=="personal" && isLincolnMe){
@@ -1759,6 +2028,24 @@ function renderDialogs(){
     sup.addEventListener("click",()=>{ clearUnread("support"); openSupportChat(); });
     el.appendChild(sup);
   }
+  // groups & channels always rendered (unless personal filter)
+  if(filter!=="personal"){
+    const gids=Object.values(groupDialogs).sort((a,b)=>(b.t||0)-(a.t||0));
+    gids.forEach(g=>{
+      const h=g.handle||groupHandleFromId(g.gid);
+      const row=document.createElement("div");
+      row.className="dialog"+(g.unread?" unread":"");
+      row.innerHTML=`<div class="av" style="background:#2b3a55;color:#fff;font-weight:700">${esc(g.ava||"#")}</div>
+        <div class="body">
+          <div class="row"><span class="nm">${esc(g.name||"Группа")}</span><span class="tm">${esc(g.time||"")}</span></div>
+          <div class="lp">${esc(g.preview||"Групповой чат")}</div>
+        </div>
+        ${g.unread?`<div class="badge">${esc(String(g.unread))}</div>`:""}`;
+      row.addEventListener("click",()=>{ clearUnread(h); openChat(h); });
+      row.addEventListener("contextmenu",ev=>{ ev.preventDefault(); try{ openGroupInfo(h); }catch(e){} });
+      el.appendChild(row);
+    });
+  }
   if(!arr.length){
     if(filter!=="personal"){
       return;
@@ -1772,7 +2059,7 @@ function renderDialogs(){
     row.className="dialog"+(d.unread?" unread":"");
     row.innerHTML=`<div class="av">${avaHtml(d.ava,d.name)}</div>
       <div class="body">
-        <div class="row"><span class="nm">${isChatPinned(d.handle)?'<span style="color:#e6b93c;margin-right:3px">📌</span>':""}${esc(d.name||d.handle)}${roleBadge(d)}</span><span class="tm">${esc(d.time||"")}</span></div>
+        <div class="row"><span class="nm">${isChatPinned(d.handle)?'<span style="color:#e6b93c;margin-right:3px">📌</span>':""}${isDialStarred(d.handle)?'<span style="color:#3b82f6;margin-right:3px;font-size:12px">★</span>':""}${esc(d.name||d.handle)}${roleBadge(d)}</span><span class="tm">${esc(d.time||"")}</span></div>
         <div class="lp">${esc(d.preview||"")}</div>
       </div>
       ${d.unread?`<div class="badge">${esc(String(d.unread))}</div>`:""}`;
@@ -1788,6 +2075,22 @@ $("chatFilters").addEventListener("click",e=>{
   const b=e.target.closest(".chf"); if(!b) return;
   $("chatFilters").querySelectorAll(".chf").forEach(x=>x.classList.remove("sel"));
   b.classList.add("sel"); chatFilter=b.dataset.f; renderDialogs();
+});
+$("btnNewGroup").addEventListener("click",()=>{
+  const kind=prompt("Создать группу или канал?\n1 — группа\n2 — канал","1");
+  if(kind===null) return;
+  if(String(kind).trim()==="2"){
+    const name=prompt("Название канала:"); if(name===null) return;
+    const n=String(name||"").trim(); if(!n){ toast("Название не может быть пустым","err"); return; }
+    const desc=prompt("Описание канала:")||"";
+    createChannel(n,desc);
+    return;
+  }
+  const name=prompt("Название группы:"); if(name===null) return;
+  const n=String(name||"").trim(); if(!n){ toast("Название не может быть пустым","err"); return; }
+  const members=prompt("Добавить участников (через пробел или запятую, @юзернеймы):","");
+  const list=(members||"").split(/[\s,;]+/).filter(Boolean);
+  createGroup(n,list);
 });
 function dialogKeyOf(a,b){
   const x=String(a).replace(/^@+/,"").toLowerCase();
@@ -1827,7 +2130,7 @@ function ensureChatScroll(){
       if(el.scrollTop < 80){
         _msgLimit[String(openChatPeer)]=L+DEFAULT_MSG_LIMIT;
         // re-render to reveal older messages
-        const key=dialogKeyOf(me.handle,openChatPeer);
+        const key=isGroupHandle(openChatPeer) ? groupMsgsKey(groupIdFromHandle(openChatPeer)) : dialogKeyOf(me.handle,openChatPeer);
         const ref=FB.db.ref("msgs/"+key);
         ref.once("value",snap=>{
           if(openChatPeer) renderChat(openChatPeer,snapToObj(snap));
@@ -2215,11 +2518,13 @@ function restoreChatIfNeeded(themL){
 $("btnDeleteChat").addEventListener("click",deleteChatNow);
 function openChat(themL){
   themL=String(themL).replace(/^@+/,"").toLowerCase();
+  if(isGroupHandle(themL)){ openGroupChat(themL); return; }
   if(themL!=="support"){ restoreChatIfNeeded(themL); }
   openChatPeer=themL;
   clearUnread(themL);
   showView("vChat");
   try{ document.body.classList.add("has-open-chat"); }catch(e){}
+  const _composer=document.querySelector(".chat-input-bar"); if(_composer){ _composer.style.display=""; }
   $("tabbar").style.display="none";
   $("peerName").textContent=capHandle(themL);
   loadDraftFor(themL);
@@ -2375,6 +2680,15 @@ function buildMsgEl(themL,m){
     f.className="fwd-label";
     f.innerHTML='<svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12h14"/><path d="M12 6l6 6-6 6"/></svg> <span>Переслано от '+(m.fwdFrom===me.handle?"Вас":capHandle(m.fwdFrom))+'</span>';
     bl.appendChild(f);
+  }
+  if(!mine && isGroupHandle(themL) && m.from){
+    const gn=document.createElement("div");
+    gn.className="g-sender";
+    gn.textContent=capHandle(m.from);
+    gn.style.cssText="font-size:12px;font-weight:700;color:#e6b93c;margin-bottom:2px;cursor:pointer";
+    gn.title="@"+String(m.from).replace(/^@+/,"");
+    gn.addEventListener("click",()=>{ try{ openPeerFromList(String(m.from).replace(/^@+/,"")); }catch(e){} });
+    bl.appendChild(gn);
   }
   if(m.kind==="audio" && m.audio){
     const ap=document.createElement("div"); ap.className="audio-msg";
@@ -2839,7 +3153,7 @@ $("msgs").addEventListener("contextmenu",e=>{
   if(!openChatPeer) return;
   const key=w.getAttribute("data-key");
   const mine=w.classList.contains("m");
-  const dbKey=dialogKeyOf(me.handle,openChatPeer);
+  const dbKey=isGroupHandle(openChatPeer) ? groupMsgsKey(groupIdFromHandle(openChatPeer)) : dialogKeyOf(me.handle,openChatPeer);
   // remove an existing menu, then build one at the cursor position
   closeMsgMenu();
   const menu=document.createElement("div");
@@ -2877,6 +3191,13 @@ if(mine){
       const pinned=getPin(openChatPeer);
       if(pinned && pinned.key===key){ add("unpin","Снять закрепление",()=>unsetPin(openChatPeer)); }
       else { add("pin","Закрепить",()=>setPin(openChatPeer,key,m.text||"",m.from,m.kind==="photo")); }
+      if(isGroupHandle(openChatPeer) && canManageGroup(openChatPeer)){
+        FB.db.ref(groupMetaKey(groupIdFromHandle(openChatPeer))+"/pinned").once("value",s=>{
+          const gp=s.val();
+          if(gp && gp.key===key){ add("unpin","Снять пин (группа)",()=>unpinGroupMsg(openChatPeer)); }
+          else if(!gp){ add("pin","Закрепить в группе",()=>pinGroupMsg(openChatPeer,key,m.text||"",m.from)); }
+        });
+      }
       if(!isDel){ add("trash","Удалить у себя",()=>{ if(confirm("Удалить это сообщение только у вас?")) deleteMsgForSelf(openChatPeer,key); },"#ff7b7b"); }
     });
   } else {
@@ -2889,6 +3210,13 @@ if(mine){
       const pinned=getPin(openChatPeer);
       if(pinned && pinned.key===key){ add("unpin","Снять закрепление",()=>unsetPin(openChatPeer)); }
       else { add("pin","Закрепить",()=>setPin(openChatPeer,key,m.text||"",m.from||openChatPeer,m.kind==="photo")); }
+      if(isGroupHandle(openChatPeer) && canManageGroup(openChatPeer)){
+        FB.db.ref(groupMetaKey(groupIdFromHandle(openChatPeer))+"/pinned").once("value",s=>{
+          const gp=s.val();
+          if(gp && gp.key===key){ add("unpin","Снять пин (группа)",()=>unpinGroupMsg(openChatPeer)); }
+          else if(!gp){ add("pin","Закрепить в группе",()=>pinGroupMsg(openChatPeer,key,m.text||"",m.from||openChatPeer)); }
+        });
+      }
       if(m.kind==="photo"){ add("trash","Удалить у всех",()=>{ if(confirm("Удалить это фото у всех?")) deleteMsgForAll(openChatPeer,key); },"#ff7b7b"); }
       else if(!isDel){ add("trash","Удалить у всех",()=>{ if(confirm("Удалить это сообщение у всех?")) deleteMsgForAll(openChatPeer,key); },"#ff7b7b"); }
     });
@@ -3469,6 +3797,7 @@ function sendNow(){
   const t=el.value.trim();
   if(!t || !openChatPeer) return;
   if(String(openChatPeer).toLowerCase()==="support"){ el.value=""; sendSupportMsg(t); return; }
+  if(isGroupHandle(openChatPeer)){ sendGroupMsg(t,el); return; }
   const peer=String(openChatPeer).toLowerCase().replace(/^@+/,"");
   const myKey=me.handle.toLowerCase().replace(/^@+/,"");
   if(peer===myKey){ toast("Нельзя писать самому себе"); return; }
@@ -3975,6 +4304,7 @@ function openPeerProfileFrom(rawThem){
   $("peerBigName").textContent=d.name||"@"+themL;
   $("peerBigHandle").textContent=capHandle(themL);
   const _pb2=$("btnPinPeer"); if(_pb2){ _pb2.style.display = isSelf ? "none":"block"; _pb2.textContent = isChatPinned(themL) ? "Открепить":"Закрепить"; }
+  const _sb2=$("btnStarPeer"); if(_sb2){ _sb2.style.display = isSelf ? "none":"block"; _sb2.textContent = isDialStarred(themL) ? "Убрать ★":"В избранное"; }
   $("peerBigHandle").setAttribute("data-copy",String(themL).replace(/^@+/,""));
   $("peerBigHandle").style.cursor="pointer";
   $("peerBigHandle").title="Нажмите, чтобы скопировать юзернейм";
@@ -4367,6 +4697,14 @@ $("btnPinPeer").addEventListener("click",()=>{
     if(!h) return;
     toggleChatPin(h);
     const b=$("btnPinPeer"); if(b) b.textContent=isChatPinned(h)?"Открепить":"Закрепить";
+  }catch(e){}
+});
+$("btnStarPeer").addEventListener("click",()=>{
+  try{
+    const h=String(_admTarget||openChatPeer||"").replace(/^@+/,"");
+    if(!h) return;
+    toggleDialStar(h);
+    const b=$("btnStarPeer"); if(b) b.textContent=isDialStarred(h)?"Убрать ★":"В избранное";
   }catch(e){}
 });
 function shareProfile(themLower){
