@@ -527,6 +527,21 @@ button{cursor:pointer}
   #vChats{width:300px;flex:0 0 300px}
 }
 </style>
+<style>
+/* desktop nav tabs in the left rail */
+@media(min-width:900px){
+  .desk-nav{display:flex;gap:4px;padding:8px 10px 4px;flex:0 0 auto}
+  .desk-nav .dn{display:flex;flex-direction:column;align-items:center;gap:2px;flex:1;padding:7px 4px;background:none;border:none;color:var(--ink-dim);font-weight:600;font-size:11px;cursor:pointer;border-radius:10px;transition:background .15s,color .15s}
+  .desk-nav .dn svg{width:22px;height:22px}
+  .desk-nav .dn:hover{background:rgba(255,255,255,.06);color:var(--ink)}
+  .desk-nav .dn.sel{color:var(--ink)}
+  .desk-nav .dn.sel svg{color:var(--accent)}
+}
+@media(max-width:899.9px){
+  .desk-nav{display:none}
+}
+</style>
+
 
 <body>
 
@@ -571,6 +586,12 @@ button{cursor:pointer}
       <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7" /><path d="M21 21l-4.3-4.3" /></svg>
     </button>
     <span id="verBadge" style="font-size:12px;font-weight:800;color:#fff;letter-spacing:.3px;padding:0 4px;flex:0 0 auto">Lincoln-Chat</span>
+  </div>
+  <div class="desk-nav" id="deskNavi">
+    <button class="dn sel" data-tab="chats"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M21 11.5a8.4 8.4 0 0 1-9 8.4 8.6 8.6 0 0 1-3.6-.7L3 21l1.8-5.2A8.4 8.4 0 1 1 21 11.5z" /></svg><span>Чаты</span></button>
+    <button class="dn" data-tab="contacts"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2" /><circle cx="9" cy="7" r="4" /><path d="M22 21v-2a4 4 0 0 0-3-3.9" /></svg><span>Контакты</span></button>
+    <button class="dn" data-tab="settings"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3" /><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.9l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.9-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1.1-1.5 1.7 1.7 0 0 0-1.9.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.9 1.7 1.7 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1a1.7 1.7 0 0 0 1.5-1.1 1.7 1.7 0 0 0-.3-1.9l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.9.3H9a1.7 1.7 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.9-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.9V9a1.7 1.7 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1z" /></svg><span>Настройки</span></button>
+    <button class="dn" data-tab="profile"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="3.4" /><path d="M5 20a7 7 0 0 1 14 0" /></svg><span>Профиль</span></button>
   </div>
   <div class="chat-filters" id="chatFilters">
     <button class="chf sel" data-f="all">Все чаты</button>
@@ -3803,6 +3824,7 @@ let currentTab="chats";
 function setTab(tab){
   currentTab=tab;
   document.querySelectorAll(".tabbar .tab").forEach(b=>b.classList.toggle("sel",b.dataset.tab===tab));
+  document.querySelectorAll(".desk-nav .dn").forEach(b=>b.classList.toggle("sel",b.dataset.tab===tab));
   // hide whole-view tabs; chat view is separate
   const allTabs=["chats","contacts","settings","profile"];
   allTabs.forEach(t=>{ const v=$(TAB_VIEWS[t]); if(v){ v.classList.remove("active"); } });
@@ -3878,6 +3900,9 @@ const _sRowMsgSize=$("sRowMsgSize"); if(_sRowMsgSize) _sRowMsgSize.addEventListe
   toast("Размер сообщений: "+(MSG_SIZES.find(x=>x[0]===next)[1]));
 });
 document.querySelectorAll(".tabbar .tab").forEach(b=>{
+  b.addEventListener("click",()=>{ closeChatIfOpen(); setTab(b.dataset.tab); });
+});
+document.querySelectorAll(".desk-nav .dn").forEach(b=>{
   b.addEventListener("click",()=>{ closeChatIfOpen(); setTab(b.dataset.tab); });
 });
 function closeChatIfOpen(){
