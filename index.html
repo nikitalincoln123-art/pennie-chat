@@ -54,12 +54,17 @@ body[data-density="compact"] .bubble{padding-top:6px;padding-bottom:6px}
 body[data-density="compact"] .msg-row{margin:1px 0}
 body[data-density="compact"] .msgs{gap:2px}
 body[data-density="compact"] .profile-row{padding:9px 14px}
+/* ============ message font size ============ */
+body[data-msgsize="sm"] .bubble{font-size:13.5px}
+body[data-msgsize="sm"] .chat-input-bar textarea{font-size:14.5px}
+body[data-msgsize="lg"] .bubble{font-size:16.5px;line-height:1.45}
+body[data-msgsize="lg"] .chat-input-bar textarea{font-size:16.5px}
 /* ============ chat themes (backgrounds) ============ */
 body[data-theme="dark"]{--bg:#000000;--bg-in:#0d0f11;--panel:#141719;--panel2:#202427;--chip:#262b2f;--line:#2e3439;--ink:#f1f3f5;--ink-dim:#8b949c;--accent:#2ea6ff}
 body[data-theme="black"]{--bg:#000000;--bg-in:#0a0a0a;--panel:#121212;--panel2:#1d1d1d;--chip:#282828;--line:#2c2c2c;--ink:#fff;--ink-dim:#9a9a9a;--accent:#2ea6ff;--panel3:#111;--topbar-bg:#000}
-body[data-theme="white"]{--bg:#f0f2f5;--bg-in:#ffffff;--panel:#ffffff;--panel2:#e8ebf0;--chip:#e0e4ea;--line:#d5dae2;--ink:#15181d;--ink-dim:#5b6470;--accent:#1c6feb}
+body[data-theme="white"]{--bg:#f0f2f5;--bg-in:#ffffff;--panel:#ffffff;--panel2:#e6eaf0;--chip:#dfe3ea;--line:#c9d0da;--ink:#13181e;--ink-dim:#4d5662;--accent:#1c6feb;--ok:#0d8a4d}
 body[data-theme="gold"]{--bg:#1a1507;--bg-in:#241d0a;--panel:#2b2310;--panel2:#372c14;--chip:#45361a;--line:#4d3d16;--ink:#fdf3d7;--ink-dim:#d6bd82;--accent:#e6b93c}
-body[data-theme="marsh"]{--bg:#101609;--bg-in:#161f0e;--panel:#1c2713;--panel2:#24331a;--chip:#2e4022;--line:#34481f;--ink:#f0f6e6;--ink-dim:#a8c08a;--accent:#8fbf5a}
+body[data-theme="marsh"]{--bg:#101609;--bg-in:#161f0e;--panel:#1c2713;--panel2:#24331a;--chip:#2e4022;--line:#34481f;--ink:#f4faea;--ink-dim:#b6cf9c;--accent:#96cc66;--ok:#5bd46b}
 body[data-theme="sky"]{--bg:#0a1420;--bg-in:#0e1c2e;--panel:#14283c;--panel2:#1a334d;--chip:#234a6b;--line:#22405e;--ink:#eaf6ff;--ink-dim:#9cc2e0;--accent:#4db6f0}
 body[data-theme="violet"]{--bg:#130a20;--bg-in:#1a0e2e;--panel:#221344;--panel2:#2c1a56;--chip:#3c256e;--line:#342056;--ink:#f4edff;--ink-dim:#c2a8ec;--accent:#a06bf0}
 
@@ -280,6 +285,7 @@ html{overflow:hidden!important}
 .role-badge.admin{background:linear-gradient(135deg,#6ea0f5,#2a5bc4);color:#fff;box-shadow:0 2px 8px rgba(110,160,245,.32);border:1px solid rgba(255,255,255,.18)}
 .role-badge.founder{background:linear-gradient(135deg,#ffdf6e,#e6b93c 60%,#b78a1c);color:#241a00;box-shadow:0 2px 10px rgba(230,185,60,.4);border:1px solid rgba(255,255,255,.3)}
 .day-chip{align-self:center;font-size:11.5px;color:var(--ink-dim);background:rgba(255,255,255,.05);border:1px solid var(--line);padding:4px 14px;border-radius:999px;margin:10px 0}
+.msgs .day-chip{position:sticky;top:8px;z-index:5;background:rgba(13,15,17,.82);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px)}
 .msg-row{display:flex;flex-direction:column;width:100%;max-width:100%;min-width:0}
 .msg-row.m{align-items:flex-end}
 .msg-row.p{align-items:flex-start}
@@ -506,6 +512,20 @@ button{cursor:pointer}
 .modal::-webkit-scrollbar{width:8px}
 .modal::-webkit-scrollbar-thumb{background:rgba(255,255,255,.18);border-radius:4px;border:2px solid transparent;background-clip:padding-box}
 @media(prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+</style>
+<style>
+/* ===== desktop: 2-column layout ===== */
+@media(min-width:900px){
+  body{flex-direction:row;align-items:stretch}
+  #vChats{width:360px;flex:0 0 360px;border-right:1px solid var(--line);z-index:10}
+  #vChat{flex:1;min-width:0;border-left:1px solid var(--line)}
+  /* when a chat is open on desktop, show the list and the chat side by side */
+  body.has-open-chat #vChats{display:flex}
+  #tabbar{display:none!important}
+}
+@media(min-width:900px) and (max-width:1100px){
+  #vChats{width:300px;flex:0 0 300px}
+}
 </style>
 
 <body>
@@ -751,6 +771,11 @@ button{cursor:pointer}
         <div class="profile-row" id="sRowDensity">
           <div class="r-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M4 5h16M4 12h16M4 19h16" /></svg></div>
           <div class="r-body"><div class="t">Плотность интерфейса</div><div class="v" id="densityVal">Уютный</div></div>
+          <div class="chev"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 6l6 6-6 6" /></svg></div>
+        </div>
+        <div class="profile-row" id="sRowMsgSize">
+          <div class="r-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M4 7h16M4 12h16M4 17h10" /></svg></div>
+          <div class="r-body"><div class="t">Размер сообщений</div><div class="v" id="msgSizeVal">Средний</div></div>
           <div class="chev"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 6l6 6-6 6" /></svg></div>
         </div>
         <div class="profile-row" id="sRowAppTheme">
@@ -1771,6 +1796,7 @@ function openChat(themL){
   openChatPeer=themL;
   clearUnread(themL);
   showView("vChat");
+  try{ document.body.classList.add("has-open-chat"); }catch(e){}
   $("tabbar").style.display="none";
   $("peerName").textContent=capHandle(themL);
   loadDraftFor(themL);
@@ -3107,7 +3133,9 @@ const PATTERNS=[
 const THEMES=[
   {id:"black",label:"Чисто чёрный",g:"#000"},
   {id:"pattb",label:"Чёрный → узор",g:"#0a0a0a"},
+  {id:"white",label:"Светлый",g:"#f0f2f5"},
   {id:"gold",label:"Золотой",g:"#2a2310"},
+  {id:"marsh",label:"Мятный",g:"#101609"},
   {id:"sky",label:"Небесный",g:"#0a1826"},
   {id:"violet",label:"Фиолетовый",g:"#170e28"}
 ];
@@ -3314,6 +3342,7 @@ function applyMyStyle(){
   // global app theme stays dark/light from a separate pref (me.appTheme); personal me.theme only shows in profile hero
   document.body.dataset.theme = me.appTheme||"dark";
   document.body.dataset.density = me.density==="compact" ? "compact":"cozy";
+  document.body.dataset.msgsize = (me.msgsize||"md")==="lg"?"lg":((me.msgsize||"md")==="sm"?"sm":"md");
 }
 /* app theme toggle (dark / pure black) */
 function renderAppThemeVal(){
@@ -3763,6 +3792,7 @@ $("btnBack").addEventListener("click",()=>{
   if(supportListenRef){ try{ supportListenRef.off("value",supportListenFn); supportListenRef=null; }catch(e){} }
   openChatPeer=null;
   _supportAdminThread=null;
+  try{ document.body.classList.remove("has-open-chat"); }catch(e){}
   renderDialogs();
   openChats();
 });
@@ -3827,6 +3857,25 @@ const _sRowDensity=$("sRowDensity"); if(_sRowDensity) _sRowDensity.addEventListe
   renderDensityVal();
   try{ FB.db.ref("users/"+me.handle.slice(1)).update({density:me.density}).catch(()=>{}); }catch(e){}
   toast(me.density==="compact"?"Компактный режим":"Уютный режим");
+});
+const MSG_SIZES=[["md","Средний"],["lg","Крупный"],["sm","Мелкий"]];
+function renderMsgSizeVal(){
+  const el=$("msgSizeVal"); if(el){
+    const cur=me.msgsize||"md";
+    const f=MSG_SIZES.find(x=>x[0]===cur);
+    el.textContent = f?f[1]:"Средний";
+  }
+  document.body.dataset.msgsize = (me.msgsize||"md")==="lg"?"lg":((me.msgsize||"md")==="sm"?"sm":"md");
+}
+const _sRowMsgSize=$("sRowMsgSize"); if(_sRowMsgSize) _sRowMsgSize.addEventListener("click",()=>{
+  const cur=me.msgsize||"md";
+  const idx=MSG_SIZES.findIndex(x=>x[0]===cur);
+  const next=MSG_SIZES[(idx+1)%MSG_SIZES.length][0];
+  me.msgsize=next;
+  saveSession();
+  renderMsgSizeVal();
+  try{ FB.db.ref("users/"+me.handle.slice(1)).update({msgsize:me.msgsize}).catch(()=>{}); }catch(e){}
+  toast("Размер сообщений: "+(MSG_SIZES.find(x=>x[0]===next)[1]));
 });
 document.querySelectorAll(".tabbar .tab").forEach(b=>{
   b.addEventListener("click",()=>{ closeChatIfOpen(); setTab(b.dataset.tab); });
