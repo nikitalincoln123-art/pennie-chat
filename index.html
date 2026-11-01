@@ -483,6 +483,38 @@ html{overflow:hidden!important}
 }
 </style>
 <style>
+/* ============ MOBILE RESPONSIVE ============ */
+@media(max-width:899.9px){
+  body{row-gap:0}
+  /* chat input bar: keep 4 side buttons compact so nothing wraps */
+  .chat-input-bar{gap:6px;padding:8px 8px;align-items:flex-end}
+  .chat-input-bar .glow-toggle{width:36px;height:36px;flex:0 0 36px}
+  .chat-input-bar .glow-toggle svg{width:19px;height:19px}
+  .chat-input-bar textarea{min-width:0;padding:10px 13px;font-size:16px;max-height:110px}
+  .chat-input-bar .send-btn{width:40px;height:40px;flex:0 0 40px}
+  /* reply/scheduled/pinned bars fuller width */
+  #replyBar,#scheduledBar,#pinnedBar{margin:0;border-radius:0}
+  /* tabbar: comfy tappable */
+  .tabbar{padding:4px 0 calc(6px + env(safe-area-inset-bottom))}
+  .tabbar .tab{padding:5px 0;gap:2px}
+  .tabbar .tab svg{width:23px;height:23px}
+  /* message bubbles: max width a bit tighter on narrow phones */
+  .bubble{max-width:86%}
+  /* topbar compact */
+  .topbar{padding:10px 12px;gap:9px}
+  .topbar .icon-btn{width:36px;height:36px}
+  /* chat area padding */
+  .msgs{padding:8px 8px}
+  /* desktop nav hidden on mobile (lower tab used) */
+  .desk-nav{display:none!important}
+}
+@media(max-width:380px){
+  .chat-input-bar .glow-toggle{width:32px;height:32px;flex-basis:32px}
+  .chat-input-bar{gap:4px}
+  .bubble{max-width:92%}
+}
+</style>
+<style>
 #toastBox{position:fixed;left:50%;bottom:calc(20px + env(safe-area-inset-bottom));transform:translateX(-50%);z-index:99995;display:flex;flex-direction:column;align-items:center;gap:8px;pointer-events:none;max-width:min(92vw,420px)}
 .toast{pointer-events:auto;display:flex;align-items:center;gap:10px;background:rgba(26,33,41,.92);backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);border:1px solid rgba(255,255,255,.12);color:#fff;border-radius:14px;padding:11px 16px;font-size:13.5px;font-weight:600;line-height:1.35;box-shadow:0 12px 34px rgba(0,0,0,.55);animation:toastIn .24s cubic-bezier(.2,.9,.3,1)} 
 .toast.leaving{animation:toastOut .22s ease forwards}
@@ -940,7 +972,8 @@ button{cursor:pointer}
     </div>
     <button class="btn" id="btnWritePeer">Написать сообщение</button>
     <div style="display:flex;gap:8px;margin-top:10px">
-      <button class="btn ghost" id="btnSharePeer" style="flex:1;width:auto;border-color:var(--line)">Поделиться профилем</button>
+      <button class="btn ghost" id="btnSharePeer" style="flex:1;width:auto;border-color:var(--line)">Поделиться</button>
+      <button class="btn ghost" id="btnPinPeer" style="flex:1;width:auto;border-color:var(--line)">Закрепить</button>
     </div>
     <button class="btn ghost" id="btnBlockPeer" style="margin-top:10px;color:var(--bad,#f8708e);border-color:var(--line)">Заблокировать</button>
     <button class="btn ghost" id="btnAdminPeer" style="margin-top:10px;color:#ffcc5c;border-color:var(--line);display:none">⚙ Управление (админ)</button>
@@ -1431,10 +1464,29 @@ function loadDialogs(){
   try{ Object.keys(dialogs).forEach(k=>attachMyListener(k)); }catch(e){}
 }
 
+let _pinnedChats=null;
+function pinnedChats(){
+  try{ if(_pinnedChats) return _pinnedChats; _pinnedChats=JSON.parse(localStorage.getItem("pennie_dpin_"+_myKey()))||null; }catch(e){ _pinnedChats=null; }
+  if(!_pinnedChats){ _pinnedChats={}; try{ localStorage.setItem("pennie_dpin_"+_myKey(),"{}"); }catch(e){} }
+  return _pinnedChats;
+}
+function isChatPinned(h){ return !!pinnedChats()[String(h).replace(/^@+/,"").toLowerCase()]; }
+function toggleChatPin(h){
+  let p=pinnedChats(); const key=String(h).replace(/^@+/,"").toLowerCase();
+  if(p[key]) delete p[key]; else p[key]=Date.now();
+  try{ localStorage.setItem("pennie_dpin_"+_myKey(),JSON.stringify(p)); }catch(e){}
+  _pinnedChats=null;
+  renderDialogs();
+  toast(p[key]?"Чат закреплён":"Закрепление снято");
+}
 function renderDialogs(){
   const el=$("dialogs"); el.innerHTML="";
   const filter=chatFilter||"all";
-  let arr=Object.values(dialogs).sort((a,b)=>(b.t||0)-(a.t||0));
+  let arr=Object.values(dialogs).sort((a,b)=>{
+    const pa=isChatPinned(a.handle)?1:0, pb=isChatPinned(b.handle)?1:0;
+    if(pa!==pb) return pb-pa;
+    return (b.t||0)-(a.t||0);
+  });
   if(filter==="personal") arr=arr.filter(d=>d.lastIsMine);
   // pinned Support chat — always visible, opens dialog with @lincoln (hidden from @lincoln himself)
   const isLincolnMe = String(me&&me.handle||"").toLowerCase().replace(/^@+/,"")==="lincoln";
@@ -1475,7 +1527,7 @@ function renderDialogs(){
     row.className="dialog"+(d.unread?" unread":"");
     row.innerHTML=`<div class="av">${avaHtml(d.ava,d.name)}</div>
       <div class="body">
-        <div class="row"><span class="nm">${esc(d.name||d.handle)}${roleBadge(d)}</span><span class="tm">${esc(d.time||"")}</span></div>
+        <div class="row"><span class="nm">${isChatPinned(d.handle)?'<span style="color:#e6b93c;margin-right:3px">📌</span>':""}${esc(d.name||d.handle)}${roleBadge(d)}</span><span class="tm">${esc(d.time||"")}</span></div>
         <div class="lp">${esc(d.preview||"")}</div>
       </div>
       ${d.unread?`<div class="badge">${esc(String(d.unread))}</div>`:""}`;
@@ -1484,6 +1536,7 @@ function renderDialogs(){
     el.appendChild(row);
   });
 }
+$("dialogs").addEventListener("contextmenu",()=>{});
 
 let chatFilter="all";
 $("chatFilters").addEventListener("click",e=>{
@@ -3601,7 +3654,7 @@ function openPeerProfileFrom(rawThem){
   const d=dialogs[themL]||{handle:themL,name:themL,ava:"👤",theme:"dark"};
   _admTarget=themL;
   showAdminFor(themL);
-  // hide "block" button when viewing your own profile
+  // hide "block"/"pin" buttons when viewing your own profile
   const isSelf = (themL===String(me.handle).toLowerCase().replace(/^@+/,""));
   const blkBtn=$("btnBlockPeer");
   if(blkBtn){ blkBtn.style.display = isSelf ? "none":"block"; }
@@ -3618,6 +3671,7 @@ function openPeerProfileFrom(rawThem){
   $("peerBigAva").innerHTML=avaHtml(d.ava,d.name);
   $("peerBigName").textContent=d.name||"@"+themL;
   $("peerBigHandle").textContent=capHandle(themL);
+  const _pb2=$("btnPinPeer"); if(_pb2){ _pb2.style.display = isSelf ? "none":"block"; _pb2.textContent = isChatPinned(themL) ? "Открепить":"Закрепить"; }
   $("peerBigHandle").setAttribute("data-copy",String(themL).replace(/^@+/,""));
   $("peerBigHandle").style.cursor="pointer";
   $("peerBigHandle").title="Нажмите, чтобы скопировать юзернейм";
@@ -3973,6 +4027,14 @@ $("peerOverlay").addEventListener("click",e=>{ if(e.target===$("peerOverlay")) $
 $("btnWritePeer").addEventListener("click",()=>{ $("peerOverlay").classList.remove("open"); $("chatText").focus(); });
 $("btnSharePeer").addEventListener("click",()=>{
   try{ shareProfile(String(_admTarget||"").replace(/^@+/,"")); }catch(e){}
+});
+$("btnPinPeer").addEventListener("click",()=>{
+  try{
+    const h=String(_admTarget||openChatPeer||"").replace(/^@+/,"");
+    if(!h) return;
+    toggleChatPin(h);
+    const b=$("btnPinPeer"); if(b) b.textContent=isChatPinned(h)?"Открепить":"Закрепить";
+  }catch(e){}
 });
 function shareProfile(themLower){
   try{
