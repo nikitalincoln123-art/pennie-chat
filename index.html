@@ -683,6 +683,9 @@ button{cursor:pointer}
 <!-- ============ PROFILE VIEW ============ -->
 <div class="view" id="vProfile">
   <div class="topbar">
+    <button class="icon-btn" id="btnBackProfile" title="Назад к чатам" aria-label="Назад">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6" /></svg>
+    </button>
     <div class="me-name" style="display:flex;align-items:baseline;gap:10px"><div class="n">Профиль</div></div>
   </div>
   <div class="profile-scroll">
@@ -721,6 +724,9 @@ button{cursor:pointer}
 <!-- ============ CONTACTS VIEW ============ -->
 <div class="view" id="vContacts">
   <div class="topbar">
+    <button class="icon-btn" id="btnBackContacts" title="Назад к чатам" aria-label="Назад">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6" /></svg>
+    </button>
     <div class="me-name"><div class="n">Контакты</div></div>
   </div>
   <div class="searchbar">
@@ -733,6 +739,9 @@ button{cursor:pointer}
 <!-- ============ SETTINGS VIEW ============ -->
 <div class="view" id="vSettings">
   <div class="topbar">
+    <button class="icon-btn" id="btnBackSettings" title="Назад к чатам" aria-label="Назад">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6" /></svg>
+    </button>
     <div class="me-name"><div class="n">Настройки</div></div>
   </div>
   <div class="profile-scroll">
@@ -3905,6 +3914,13 @@ document.querySelectorAll(".tabbar .tab").forEach(b=>{
 document.querySelectorAll(".desk-nav .dn").forEach(b=>{
   b.addEventListener("click",()=>{ closeChatIfOpen(); setTab(b.dataset.tab); });
 });
+function goBackToChats(){
+  closeChatIfOpen();
+  setTab("chats");
+}
+const _bpc=$("btnBackProfile"); if(_bpc) _bpc.addEventListener("click",goBackToChats);
+const _bcc=$("btnBackContacts"); if(_bcc) _bcc.addEventListener("click",goBackToChats);
+const _bsc=$("btnBackSettings"); if(_bsc) _bsc.addEventListener("click",goBackToChats);
 function closeChatIfOpen(){
   if(openChatPeer){
     try{ if(myListenRef) myListenRef.off("value",myListenFn); }catch(e){}
