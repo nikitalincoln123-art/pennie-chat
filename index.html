@@ -1,4 +1,4 @@
-<!DOCTYPE html>﻿
+<!DOCTYPE html>
 <html lang="ru">
 <head>
 <script>
@@ -557,6 +557,7 @@ button{cursor:pointer}
 .gift-card[data-r="rare"]::before{content:"";position:absolute;inset:-60%;background:conic-gradient(from 0deg,#cfeaff,#5db9ff,#2a5aff,#5db9ff,#cfeaff);filter:blur(34px);opacity:.35;animation:giftSpin 8s linear infinite;z-index:0;pointer-events:none}
 @keyframes giftSpin{to{transform:rotate(360deg)}}
 .gift-ic{font-size:46px;line-height:1;filter:drop-shadow(0 6px 12px rgba(0,0,0,.45));position:relative;z-index:1;animation:giftFloat 3.2s ease-in-out infinite;transform-origin:center}
+.gift-card-qty{position:absolute;top:8px;right:8px;z-index:3;background:rgba(0,0,0,.45);backdrop-filter:blur(4px);color:#fff;font-size:10.5px;font-weight:800;padding:2px 8px;border-radius:999px;border:1px solid rgba(255,255,255,.25)}
 .gift-ic svg{width:52px;height:52px;filter:drop-shadow(0 4px 10px rgba(0,0,0,.4))}
 @keyframes giftFloat{0%,100%{transform:translateY(0)}50%{transform:translateY(-6px)}}
 .gift-meta{position:relative;z-index:2;background:rgba(10,12,16,.55);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);border-radius:12px;padding:7px 9px;border:1px solid rgba(255,255,255,.14)}
@@ -1090,19 +1091,20 @@ function roleBadge(u, handleOb){
 /* ============ Lincoln Gifts (original NFT-style gifts catalog) ============ */
 const GIFT_RARITY={common:{label:"Обычный",color:"#8e9aa6"},rare:{label:"Раритет",color:"#5db9ff"},legendary:{label:"Легендарный",color:"#ffd35e"}};
 const GIFT_CATALOG=[
-  {id:"crystal",name:"Хрустальный шар",rarity:"rare",price:2000,grad:"radial-gradient(circle at 35% 30%,#cfeaff,#6db7ff 45%,#1f4f8f)",icon:"🔮",svg:'<svg viewBox="0 0 48 48" fill="none"><ellipse cx="24" cy="26" rx="15" ry="17" fill="url(#gg1)"/><ellipse cx="24" cy="26" rx="15" ry="17" stroke="#fff" stroke-width="1.6" stroke-opacity=".6"/><path d="M16 44h16M24 9V3M18 13l-3-4M30 13l3-4" stroke="#fff" stroke-width="1.6" stroke-linecap="round" stroke-opacity=".7"/><ellipse cx="24" cy="24" rx="6" ry="7" fill="#fff" fill-opacity=".5"/><defs><radialGradient id="gg1" cx=".35" cy=".3" r="1"><stop stop-color="#eaf6ff"/><stop offset="1" stop-color="#3f8fd6"/></radialGradient></defs></svg>'},
-  {id:"phoenix",name:"Пламя Феникса",rarity:"legendary",price:12000,grad:"linear-gradient(160deg,#ffd966,#ff7b2c 45%,#b33422)",icon:"🔥",svg:'<svg viewBox="0 0 48 48" fill="none"><path d="M24 44c0-10 4-15 10-18-2 6-4 9-7 11 6-2 12-8 13-17 0 0 4 12-1 22-1 2-3 3-4 3 9 0 12-9 9-19 4 8 3 19-5 20-4 0-6-1-8-3-9 7-19 2-22-6-2-5 1-8 5-10 8-5 13-11 14-18-7 6-17 15-20 25-1-3-1-12 9-18-3 0-8 4-9 10-2-5 0-10 4-12 8-6 14-9 17-17 5 11-3 22-11 27-3 2-15 7-9 13z" fill="url(#gg2)"/><defs><linearGradient id="gg2" x1="0" y1="0" x2="0" y2="1"><stop stop-color="#fff3c4"/><stop offset="1" stop-color="#ff6a00"/></linearGradient></defs></svg>'},
-  {id:"crown",name:"Императорская корона",rarity:"legendary",price:25000,grad:"linear-gradient(160deg,#fff3c4,#f0c044 50%,#8a6b14)",icon:"👑",svg:'<svg viewBox="0 0 48 48" fill="none"><path d="M6 18l9 7 9-11 9 11 9-7-3 20H9z" fill="url(#gg3)" stroke="#fff" stroke-width="1.6" stroke-opacity=".55"/><path d="M24 7v4M24 7l2.5 2.5M24 7l-2.5 2.5M17 11l2 3M31 11l-2 3M24 39l-3 3M24 39l3 3" stroke="#fff" stroke-width="1.6" stroke-linecap="round" stroke-opacity=".7"/><defs><linearGradient id="gg3" x1="0" y1="0" x2="0" y2="1"><stop stop-color="#fff3c4"/><stop offset="1" stop-color="#c9932a"/></linearGradient></defs></svg>'},
-  {id:"lotus",name:"Цветущий лотос",rarity:"rare",price:3500,grad:"radial-gradient(circle at 50% 30%,#ffe9f4,#f7a8d0 55%,#a4508a)",icon:"🌸",svg:'<svg viewBox="0 0 48 48" fill="none"><path d="M24 40c0-6-2-11-6-15 0 0-6 12-10 14 4 1 10 1 16 1zM24 40c0-6 2-11 6-15 0 0 6 12 10 14-4 1-10 1-16 1zM24 3c-6 5-6 13 0 18 6-5 6-13 0-18z" fill="url(#gg4)"/><path d="M24 40V12" stroke="#fff" stroke-width="1.4" stroke-opacity=".5"/><defs><radialGradient id="gg4" cx=".5" cy=".3" r="1"><stop stop-color="#fff4fa"/><stop offset="1" stop-color="#e07ab0"/></radialGradient></defs></svg>'},
-  {id:"nova",name:"Звёздная сверхновая",rarity:"legendary",price:18000,grad:"radial-gradient(circle at 50% 30%,#ffffff,#c06bff 45%,#3a1f6b)",icon:"⭐",svg:'<svg viewBox="0 0 48 48" fill="none"><path d="M24 3l3.2 7.2 7.8.7-5.9 5.2 1.7 7.6L24 20.5l-6.8 3.2 1.7-7.6-5.9-5.2 7.8-.7z" fill="url(#gg5)"/><path d="M24 3l3.2 7.2 7.8.7-5.9 5.2 1.7 7.6L24 20.5l-6.8 3.2 1.7-7.6-5.9-5.2 7.8-.7z" fill="url(#gg5b)"/><circle cx="24" cy="14" r="2" fill="#fff"/><defs><radialGradient id="gg5" cx=".5" cy=".35" r=".6"><stop stop-color="#fff"/><stop offset="1" stop-color="#a45bff"/></radialGradient><linearGradient id="gg5b" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#fff" stop-opacity=".5"/><stop offset="1" stop-color="#fff" stop-opacity="0"/></linearGradient></defs></svg>'},
-  {id:"amethyst",name:"Аметистовый кристалл",rarity:"rare",price:4000,grad:"linear-gradient(160deg,#e6d6ff,#9a6bff 50%,#4a2a8a)",icon:"💎",svg:'<svg viewBox="0 0 48 48" fill="none"><path d="M24 2l16 12-16 32L8 14z" fill="url(#gg6)" stroke="#fff" stroke-width="1.6" stroke-opacity=".55"/><path d="M8 14h32M24 2L12 14l12 32 12-32z" stroke="#fff" stroke-width="1" stroke-opacity=".35"/><path d="M17 14l7-8M25 14l7-8" stroke="#fff" stroke-width="1.4" stroke-opacity=".5"/><defs><linearGradient id="gg6" x1="0" y1="0" x2="0" y2="1"><stop stop-color="#efe0ff"/><stop offset="1" stop-color="#7a44c9"/></linearGradient></defs></svg>'},
-  {id:"cherry",name:"Сакура в цвету",rarity:"common",price:800,grad:"linear-gradient(165deg,#ffe6ee,#ff9db8 50%,#c75a80)",icon:"🌸",svg:'<svg viewBox="0 0 48 48" fill="none"><path d="M24 44c0-6-2-10-5-13 3 2 5 3 5 7-2-6 0-10 0-10s2 4 0 10c0-4 2-5 5-7-3 3-5 7-5 13z" fill="url(#gg7)"/><path d="M24 31l3-8 8 2-6 6zM24 31l-3-8-8 2 6 6z" fill="url(#gg7)" stroke="#fff" stroke-width="1" stroke-opacity=".5"/><path d="M24 44V24" stroke="#8a4a6a" stroke-width="2"/><defs><radialGradient id="gg7" cx=".5" cy=".4" r=".7"><stop stop-color="#fff4f8"/><stop offset="1" stop-color="#ef7fae"/></radialGradient></defs></svg>'},
-  {id:"engine",name:"Золотой двигатель",rarity:"common",price:1200,grad:"linear-gradient(160deg,#ffe9a8,#e0a52e 50%,#7a5a10)",icon:"⚙️",svg:'<svg viewBox="0 0 48 48" fill="none"><circle cx="24" cy="24" r="9" fill="url(#gg8)"/><circle cx="24" cy="24" r="3.4" fill="#7a5a10"/><path d="M24 8v6M24 34v6M8 24h6M34 24h6M14 14l4 4M30 30l4 4M34 14l-4 4M18 30l-4 4" stroke="#8a6b14" stroke-width="4" stroke-linecap="round"/><defs><radialGradient id="gg8" cx=".4" cy=".35" r=".7"><stop stop-color="#fff3c4"/><stop offset="1" stop-color="#d9a52e"/></radialGradient></defs></svg>'}
+  {id:"crystal",name:"Хрустальный шар",rarity:"rare",price:20000,qty:10,grad:"radial-gradient(circle at 35% 30%,#cfeaff,#6db7ff 45%,#1f4f8f)",icon:"🔮",svg:'<svg viewBox="0 0 48 48" fill="none"><ellipse cx="24" cy="26" rx="15" ry="17" fill="url(#gg1)"/><ellipse cx="24" cy="26" rx="15" ry="17" stroke="#fff" stroke-width="1.6" stroke-opacity=".6"/><path d="M16 44h16M24 9V3M18 13l-3-4M30 13l3-4" stroke="#fff" stroke-width="1.6" stroke-linecap="round" stroke-opacity=".7"/><ellipse cx="24" cy="24" rx="6" ry="7" fill="#fff" fill-opacity=".5"/><defs><radialGradient id="gg1" cx=".35" cy=".3" r="1"><stop stop-color="#eaf6ff"/><stop offset="1" stop-color="#3f8fd6"/></radialGradient></defs></svg>'},
+  {id:"phoenix",name:"Пламя Феникса",rarity:"legendary",price:150000,qty:10,grad:"linear-gradient(160deg,#ffd966,#ff7b2c 45%,#b33422)",icon:"🔥",svg:'<svg viewBox="0 0 48 48" fill="none"><path d="M24 44c0-10 4-15 10-18-2 6-4 9-7 11 6-2 12-8 13-17 0 0 4 12-1 22-1 2-3 3-4 3 9 0 12-9 9-19 4 8 3 19-5 20-4 0-6-1-8-3-9 7-19 2-22-6-2-5 1-8 5-10 8-5 13-11 14-18-7 6-17 15-20 25-1-3-1-12 9-18-3 0-8 4-9 10-2-5 0-10 4-12 8-6 14-9 17-17 5 11-3 22-11 27-3 2-15 7-9 13z" fill="url(#gg2)"/><defs><linearGradient id="gg2" x1="0" y1="0" x2="0" y2="1"><stop stop-color="#fff3c4"/><stop offset="1" stop-color="#ff6a00"/></linearGradient></defs></svg>'},
+  {id:"crown",name:"Императорская корона",rarity:"legendary",price:300000,qty:10,grad:"linear-gradient(160deg,#fff3c4,#f0c044 50%,#8a6b14)",icon:"👑",svg:'<svg viewBox="0 0 48 48" fill="none"><path d="M6 18l9 7 9-11 9 11 9-7-3 20H9z" fill="url(#gg3)" stroke="#fff" stroke-width="1.6" stroke-opacity=".55"/><path d="M24 7v4M24 7l2.5 2.5M24 7l-2.5 2.5M17 11l2 3M31 11l-2 3M24 39l-3 3M24 39l3 3" stroke="#fff" stroke-width="1.6" stroke-linecap="round" stroke-opacity=".7"/><defs><linearGradient id="gg3" x1="0" y1="0" x2="0" y2="1"><stop stop-color="#fff3c4"/><stop offset="1" stop-color="#c9932a"/></linearGradient></defs></svg>'},
+  {id:"lotus",name:"Цветущий лотос",rarity:"rare",price:35000,qty:10,grad:"radial-gradient(circle at 50% 30%,#ffe9f4,#f7a8d0 55%,#a4508a)",icon:"🌸",svg:'<svg viewBox="0 0 48 48" fill="none"><path d="M24 40c0-6-2-11-6-15 0 0-6 12-10 14 4 1 10 1 16 1zM24 40c0-6 2-11 6-15 0 0 6 12 10 14-4 1-10 1-16 1zM24 3c-6 5-6 13 0 18 6-5 6-13 0-18z" fill="url(#gg4)"/><path d="M24 40V12" stroke="#fff" stroke-width="1.4" stroke-opacity=".5"/><defs><radialGradient id="gg4" cx=".5" cy=".3" r="1"><stop stop-color="#fff4fa"/><stop offset="1" stop-color="#e07ab0"/></radialGradient></defs></svg>'},
+  {id:"nova",name:"Звёздная сверхновая",rarity:"legendary",price:220000,qty:10,grad:"radial-gradient(circle at 50% 30%,#ffffff,#c06bff 45%,#3a1f6b)",icon:"⭐",svg:'<svg viewBox="0 0 48 48" fill="none"><path d="M24 3l3.2 7.2 7.8.7-5.9 5.2 1.7 7.6L24 20.5l-6.8 3.2 1.7-7.6-5.9-5.2 7.8-.7z" fill="url(#gg5)"/><path d="M24 3l3.2 7.2 7.8.7-5.9 5.2 1.7 7.6L24 20.5l-6.8 3.2 1.7-7.6-5.9-5.2 7.8-.7z" fill="url(#gg5b)"/><circle cx="24" cy="14" r="2" fill="#fff"/><defs><radialGradient id="gg5" cx=".5" cy=".35" r=".6"><stop stop-color="#fff"/><stop offset="1" stop-color="#a45bff"/></radialGradient><linearGradient id="gg5b" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#fff" stop-opacity=".5"/><stop offset="1" stop-color="#fff" stop-opacity="0"/></linearGradient></defs></svg>'},
+  {id:"amethyst",name:"Аметистовый кристалл",rarity:"rare",price:50000,qty:10,grad:"linear-gradient(160deg,#e6d6ff,#9a6bff 50%,#4a2a8a)",icon:"💎",svg:'<svg viewBox="0 0 48 48" fill="none"><path d="M24 2l16 12-16 32L8 14z" fill="url(#gg6)" stroke="#fff" stroke-width="1.6" stroke-opacity=".55"/><path d="M8 14h32M24 2L12 14l12 32 12-32z" stroke="#fff" stroke-width="1" stroke-opacity=".35"/><path d="M17 14l7-8M25 14l7-8" stroke="#fff" stroke-width="1.4" stroke-opacity=".5"/><defs><linearGradient id="gg6" x1="0" y1="0" x2="0" y2="1"><stop stop-color="#efe0ff"/><stop offset="1" stop-color="#7a44c9"/></linearGradient></defs></svg>'},
+  {id:"cherry",name:"Сакура в цвету",rarity:"common",price:8000,qty:10,grad:"linear-gradient(165deg,#ffe6ee,#ff9db8 50%,#c75a80)",icon:"🌸",svg:'<svg viewBox="0 0 48 48" fill="none"><path d="M24 44c0-6-2-10-5-13 3 2 5 3 5 7-2-6 0-10 0-10s2 4 0 10c0-4 2-5 5-7-3 3-5 7-5 13z" fill="url(#gg7)"/><path d="M24 31l3-8 8 2-6 6zM24 31l-3-8-8 2 6 6z" fill="url(#gg7)" stroke="#fff" stroke-width="1" stroke-opacity=".5"/><path d="M24 44V24" stroke="#8a4a6a" stroke-width="2"/><defs><radialGradient id="gg7" cx=".5" cy=".4" r=".7"><stop stop-color="#fff4f8"/><stop offset="1" stop-color="#ef7fae"/></radialGradient></defs></svg>'},
+  {id:"engine",name:"Золотой двигатель",rarity:"common",price:15000,qty:10,grad:"linear-gradient(160deg,#ffe9a8,#e0a52e 50%,#7a5a10)",icon:"⚙️",svg:'<svg viewBox="0 0 48 48" fill="none"><circle cx="24" cy="24" r="9" fill="url(#gg8)"/><circle cx="24" cy="24" r="3.4" fill="#7a5a10"/><path d="M24 8v6M24 34v6M8 24h6M34 24h6M14 14l4 4M30 30l4 4M34 14l-4 4M18 30l-4 4" stroke="#8a6b14" stroke-width="4" stroke-linecap="round"/><defs><radialGradient id="gg8" cx=".4" cy=".35" r=".7"><stop stop-color="#fff3c4"/><stop offset="1" stop-color="#d9a52e"/></radialGradient></defs></svg>'}
 ];
 function giftById(id){ return GIFT_CATALOG.find(g=>g.id===id); }
 function giftCardHtml(g){
   const r=GIFT_RARITY[g.rarity]||GIFT_RARITY.common;
   return '<div class="gift-card" data-r="'+g.rarity+'" data-gid="'+g.id+'" style="background:'+g.grad+'">'+
+    '<div class="gift-card-qty">'+(g.qty?('× '+g.qty):'')+'</div>'+
     '<div class="gift-ic">'+(g.svg||esc(g.icon||"🎁"))+'</div>'+
     '<div class="gift-meta"><div class="gift-name">'+esc(g.name)+'</div>'+
     '<div class="gift-sub"><span style="color:'+r.color+'">'+r.label+'</span> · '+g.price.toLocaleString("ru-RU")+' ⭐</div></div>'+
@@ -1111,19 +1113,44 @@ function giftCardHtml(g){
 function openGiftView(g){
   if(!g) return;
   try{
-    const ov=document.createElement("div"); ov.className="overlay"; ov.style.cssText="z-index:80";
+    const ov=document.createElement("div"); ov.className="overlay open"; ov.style.cssText="z-index:80";
     const box=document.createElement("div"); box.className="modal"; box.style.cssText="max-width:320px;padding:18px;text-align:center";
     const r=GIFT_RARITY[g.rarity]||GIFT_RARITY.common;
     box.innerHTML='<div class="gift-card" style="background:'+g.grad+';min-height:160px;margin-bottom:12px;pointer-events:none"><div class="gift-ic" style="font-size:70px">'+g.icon+'</div></div>'+
       '<div style="font-weight:800;font-size:17px">'+esc(g.name)+'</div>'+
       '<div style="margin-top:4px"><span style="color:'+r.color+';font-weight:700">'+r.label+'</span></div>'+
       '<div style="margin-top:6px;color:var(--ink-dim);font-size:13px">Ценность: '+g.price.toLocaleString("ru-RU")+' ⭐</div>'+
-      '<button class="btn" id="gvOk" style="margin-top:14px;width:100%">Закрыть</button>';
+      '<button class="btn" id="gvOk" style="margin-top:14px;width:100%">Закрыть</button>'+
+      '<button class="btn ghost" id="gvColor" style="margin-top:8px;width:100%;color:#5db9ff;border-color:var(--line)">🎨 Поставить цвет профиля</button>';
     ov.appendChild(box);
     box.querySelector("#gvOk").addEventListener("click",()=>ov.remove());
+    const gColor=$("#gvColor")||box.querySelector("#gvColor");
+    if(gColor) gColor.addEventListener("click",()=>{
+      // only allow if the user owns this gift
+      const owns=me.gifts||{};
+      const has=Object.values(owns).some(v=>v&&v.id===g.id);
+      if(!has){ toast("Сначала нужно получить этот подарок","err"); return; }
+      applyGiftColor(g);
+      ov.remove();
+    });
     ov.addEventListener("click",e=>{ if(e.target===ov) ov.remove(); });
     document.body.appendChild(ov);
   }catch(e){}
+}
+function applyGiftColor(g){
+  try{
+    if(!g) return;
+    me.profileGift=g.id;
+    saveSession();
+    try{ FB.db.ref("users/"+me.handle.slice(1)).update({profileGift:g.id}).catch(()=>{}); }catch(e){}
+    fetch("https://pennie-chat-default-rtdb.firebaseio.com/users/"+me.handle.slice(1)+"/profileGift.json",{method:"PUT",headers:{"Content-Type":"application/json"},body:JSON.stringify(g.id)}).catch(()=>{});
+    // apply gradient as profile hero background + theme accent
+    const hero=document.querySelector("#vProfile .profile-hero");
+    if(hero){ hero.style.background=g.grad; hero.setAttribute("data-pbg","gift"); }
+    const peerhero=document.querySelector("#peerOverlay .peer-hero");
+    if(peerhero && String(openChatPeer)==String(me.handle.slice(1))){ peerhero.style.background=g.grad; }
+    toast("Цвет профиля установлен: "+g.name,"ok");
+  }catch(e){ toast("Ошибка установки цвета","err"); }
 }
 function isLincoln(){ return String(me&&me.handle||"").toLowerCase().replace(/^@+/,"")==="lincoln"; }
 function giveStars(targetKey,amount){
@@ -1142,19 +1169,40 @@ function giveStars(targetKey,amount){
     }).catch(()=>{ toast("Ошибка выдачи звёзд","err"); });
   }catch(e){ toast("Выдавать звёзды может только основатель","err"); }
 }
+function giftIssuedCount(gid){
+  // count how many copies of a gift were given out server-wide (max = g.qty)
+  try{
+    const list=Object.values(_issuedCache||{})||[];
+    return list.filter(e=>e&&e.gid===gid).length;
+  }catch(e){ return 0; }
+}
+let _issuedCache={};
+function loadIssued(){
+  try{ _issuedCache=JSON.parse(localStorage.getItem("pennie_issued_gifts"))||{}; }catch(e){ _issuedCache={}; }
+  if(!_issuedCache || typeof _issuedCache!=="object") _issuedCache={};
+}
+function saveIssued(){ try{ localStorage.setItem("pennie_issued_gifts",JSON.stringify(_issuedCache||{})); }catch(e){} }
 function giveGiftToUser(targetKey,gid){
   try{
     if(!isLincoln()) throw new Error("Нет прав");
     const g=giftById(gid); if(!g){ toast("Подарок не найден","err"); return; }
+    const limit=(g.qty||10);
+    loadIssued();
+    const raw=Object.values(_issuedCache||{}).filter(e=>e&&e.gid===gid);
+    const already=raw.length;
+    if(already>=limit){ toast("Тираж исчерпан — выдано уже "+limit+"/"+limit+" шт","err"); return; }
     const k=String(targetKey).replace(/^@+/,"").toLowerCase();
     FB.db.ref("users/"+k+"/gifts").once("value",snap=>{
       const gifts=snap.val()||{};
-      const uid="g"+Date.now();
-      const entry={id:gid,name:g.name,rarity:g.rarity,price:g.price,icon:g.icon,grad:g.grad,at:Date.now(),from:me.handle};
+      const uid="g"+gid+"_"+Date.now();
+      const entry={id:gid,name:g.name,rarity:g.rarity,price:g.price,icon:g.icon,grad:g.grad,qty:g.qty,at:Date.now(),from:me.handle};
       gifts[uid]=entry;
       try{ FB.db.ref("users/"+k+"/gifts").set(gifts).catch(()=>{}); }catch(e){}
       fetch("https://pennie-chat-default-rtdb.firebaseio.com/users/"+k+"/gifts.json",{method:"PUT",headers:{"Content-Type":"application/json"},body:JSON.stringify(gifts)}).catch(()=>{});
-      toast("Подарок \""+g.name+"\" выдан @"+k+" 🎁","ok");
+      // record issuance locally so the 10-copy limit is enforced in this admin session
+      _issuedCache["i"+Date.now()]={gid:gid,at:Date.now()};
+      saveIssued();
+      toast("Подарок \""+g.name+"\" выдан @"+k+" ("+(already+1)+"/"+limit+") 🎁","ok");
     }).catch(()=>{ toast("Ошибка выдачи подарка","err"); });
   }catch(e){ toast("Выдавать подарки может только основатель","err"); }
 }
@@ -1918,7 +1966,7 @@ async function openAttachments(){
       if(m.kind==="photo"||m.kind==="audio") list.push({key:k,msg:m});
     });
     list.sort((a,b)=>(b.msg.t||0)-(a.msg.t||0));
-    const ov=document.createElement("div"); ov.className="overlay"; ov.style.cssText="z-index:75";
+    const ov=document.createElement("div"); ov.className="overlay open"; ov.style.cssText="z-index:75";
     const modal=document.createElement("div"); modal.className="modal";
     modal.style.cssText="max-width:520px;padding:16px;max-height:80vh;display:flex;flex-direction:column";
     modal.innerHTML='<div class="m-head"><div class="m-title">Вложения · '+openChatPeer+'</div><button class="x-btn" id="attX">✕</button></div>';
@@ -1947,7 +1995,7 @@ async function openAttachments(){
 }
 function openFullImg(src){
   try{
-    const ov=document.createElement("div"); ov.className="overlay"; ov.style.cssText="z-index:90;background:rgba(0,0,0,.9)";
+    const ov=document.createElement("div"); ov.className="overlay open"; ov.style.cssText="z-index:90;background:rgba(0,0,0,.9)";
     ov.innerHTML='<img src="'+esc(src)+'" style="max-width:94vw;max-height:92vh;border-radius:12px;object-fit:contain"/>';
     ov.addEventListener("click",()=>ov.remove());
     document.body.appendChild(ov);
@@ -2765,7 +2813,7 @@ let _fwdOverlay=null;
 function showForwardPicker(fromPeer,key,m){
   try{
     if(_fwdOverlay) _fwdOverlay.remove();
-    const ov=document.createElement("div"); ov.className="overlay"; ov.id="_fwdOverlay";
+    const ov=document.createElement("div"); ov.className="overlay open"; ov.id="_fwdOverlay";
     ov.style.cssText="z-index:70";
     const opts=Object.keys(dialogs||{}).filter(d=>String(d).toLowerCase().replace(/^@+/,"")!==String(me.handle).toLowerCase().replace(/^@+/,""));
     const modal=document.createElement("div"); modal.className="modal";
@@ -2986,7 +3034,7 @@ function confirmPhotoPick(f){
 function showPhotoPreview(url){
   try{
     if(_pPreview){ _pPreview.remove(); _pPreview=null; }
-    const ov=document.createElement("div"); ov.id="_photoPreview"; ov.className="overlay"; ov.style.cssText="z-index:80;background:rgba(5,8,10,.8)";
+    const ov=document.createElement("div"); ov.id="_photoPreview"; ov.className="overlay open"; ov.style.cssText="z-index:80;background:rgba(5,8,10,.8)";
     const box=document.createElement("div");
     box.style.cssText="background:var(--panel);border:1px solid rgba(255,255,255,.1);border-radius:18px;max-width:420px;width:100%;padding:14px;box-shadow:0 18px 50px rgba(0,0,0,.6)";
     box.innerHTML='<div style="display:flex;align-items:center;margin-bottom:12px"><div style="flex:1;font-weight:700;font-size:15px">Отправить фото?</div><button class="icon-btn x-btn" id="pvClose" title="Отмена">✕</button></div>'+
@@ -3145,7 +3193,7 @@ $("sRowMarket")&&$("sRowMarket").addEventListener("click",openGiftMarket);
 function openGiftMarket(){
   try{
     if(document.getElementById("__giftMarket")) return;
-    const ov=document.createElement("div"); ov.className="overlay"; ov.id="__giftMarket"; ov.style.cssText="z-index:85";
+    const ov=document.createElement("div"); ov.className="overlay open"; ov.id="__giftMarket"; ov.style.cssText="z-index:85";
     const modal=document.createElement("div"); modal.className="modal";
     modal.style.cssText="max-width:560px;padding:18px;max-height:82vh;display:flex;flex-direction:column";
     modal.innerHTML='<div class="m-head"><div class="m-title">🎁 Рынок подарков</div><button class="x-btn" id="gmX">✕</button></div>'+
@@ -4358,7 +4406,10 @@ function updateChatsBadge(){
 function renderProfile(){
   const hero=document.querySelector("#vProfile .profile-hero");
   const isLincoln=(String(me.handle||"").toLowerCase().replace(/^@+/,"")==="lincoln");
-  if(hero) hero.setAttribute("data-pbg", isLincoln ? "cosmic" : (me.theme||"dark"));
+  // if the user picked a gift color, apply it to the profile hero
+  const pf=me.profileGift?giftById(me.profileGift):null;
+  if(hero && pf){ hero.style.background=pf.grad; hero.setAttribute("data-pbg","gift"); }
+  else if(hero) hero.setAttribute("data-pbg", isLincoln ? "cosmic" : (me.theme||"dark"));
   $("pBigAva").innerHTML=avaHtml(me.ava,me.name);
   $("pName").innerHTML=esc(me.name||me.handle.slice(1));
   $("pHandle").innerHTML=esc(me.handle);
