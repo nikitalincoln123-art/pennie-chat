@@ -727,6 +727,13 @@ button{cursor:pointer}
             <input type="hidden" id="setBirth">
           </div>
         </div>
+        <div class="profile-row align-top">
+          <div class="r-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M20 4H4a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V6a2 2 0 0 0-2-2zM16 10l-8 3m0-3l8 3 3-1.5" /></svg></div>
+          <div class="r-body"><div class="t">Юзернейм</div>
+            <input class="input" id="setHandle" maxlength="20" placeholder="@username" autocomplete="off" style="margin-top:6px">
+            <div class="hint" id="setHandleHint" style="color:var(--ink-dim);margin-top:4px">Уникальный @юзернейм. Изменение перенесёт ваш профиль и чаты.</div>
+          </div>
+        </div>
         <div class="profile-row stack">
           <div class="t">Аватарка</div>
           <input type="file" id="setAvaFile" accept="image/*" style="display:none">
@@ -865,6 +872,9 @@ button{cursor:pointer}
       Вы переписываетесь с этим собеседником один на один. Ваши сообщения видны только вам двоим.
     </div>
     <button class="btn" id="btnWritePeer">Написать сообщение</button>
+    <div style="display:flex;gap:8px;margin-top:10px">
+      <button class="btn ghost" id="btnSharePeer" style="flex:1;width:auto;border-color:var(--line)">Поделиться профилем</button>
+    </div>
     <button class="btn ghost" id="btnBlockPeer" style="margin-top:10px;color:var(--bad,#f8708e);border-color:var(--line)">Заблокировать</button>
     <button class="btn ghost" id="btnAdminPeer" style="margin-top:10px;color:#ffcc5c;border-color:var(--line);display:none">⚙ Управление (админ)</button>
   </div>
@@ -1148,7 +1158,30 @@ function openChats(){
   listenMyChats();
   listenInbox();
   pollInboxREST();
+  handleDeepLink();
 }
+function handleDeepLink(){
+  try{
+    const h=String(location.hash||"").replace(/^#@?/,"").trim().toLowerCase();
+    if(!h) return;
+    if(h==="support"||!h) {
+      // ignore reserved / empty
+    } else {
+      // verify user exists before opening their chat
+      FB.db.ref("users/"+h).once("value",snap=>{
+        const u=snap.val();
+        if(u && u.hash){
+          // resolve redirect alias if the user changed username
+          const target = (u.redirect && String(u.redirect)) || h;
+          restoreChatIfNeeded(String(target).replace(/^@+/,""));
+          openChat(String(target).replace(/^@+/,""));
+          try{ history.replaceState(null,""," "+location.pathname+location.search); }catch(e){}
+        }
+      }).catch(()=>{});
+    }
+  }catch(e){}
+}
+window.addEventListener("hashchange",()=>{ try{ if(me && me.handle) handleDeepLink(); }catch(e){} });
 
 let _inboxPoll=null;
 function pollInboxREST(){
@@ -1827,6 +1860,14 @@ function snapToObj(snap){
   return o;
 }
 
+function linkifyMsg(txt){
+  try{
+    return esc(String(txt||"")).replace(/(^|[^@\w])@([a-zA-Z0-9_]{3,20})/g,function(all,pre,name){
+      return pre+'<span class="pm-link" data-mention="@'+name+'" style="color:#5db9ff;cursor:pointer;font-weight:600">@'+name+'</span>';
+    });
+  }catch(e){ return esc(String(txt||"")); }
+}
+
 function buildMsgEl(themL,m){
   const mine=m.from===me.handle;
   const wrap=document.createElement("div");
@@ -1881,7 +1922,7 @@ function buildMsgEl(themL,m){
     im.style.cssText="max-width:240px;max-height:240px;border-radius:10px;display:block;margin-bottom:4px";
     bl.appendChild(im);
   } else {
-    const tx=document.createElement("div"); tx.className="btxt"; tx.textContent=m.text; bl.appendChild(tx);
+    const tx=document.createElement("div"); tx.className="btxt"; tx.innerHTML=linkifyMsg(m.text||""); bl.appendChild(tx);
   }
   const t=document.createElement("span"); t.className="tm"; t.textContent=fmtTime(m.t);
   bl.appendChild(t);
@@ -1956,7 +1997,7 @@ function renderChat(themL,list){
       }
       // refresh text if changed (edited)
       const tx=b?b.querySelector(".btxt"):null;
-      if(tx && tx.textContent!==String(m.text||"")){ tx.textContent=String(m.text||""); }
+      if(tx && tx.textContent!==String(m.text||"")){ tx.innerHTML=linkifyMsg(m.text||""); }
       // refresh delivery state (read receipt) in place
       try{ if(w._refreshState && m.from===me.handle){ w._refreshState(); } }catch(e){}
       // remove old reactions and rebuild if changed
@@ -2217,6 +2258,8 @@ function toggleReact(msgKey,emoji){
   });
 }
 $("msgs").addEventListener("click",e=>{
+  const ment=e.target.closest(".pm-link[data-mention]");
+  if(ment){ e.preventDefault(); e.stopPropagation(); const m=ment.getAttribute("data-mention"); openChat(String(m).replace(/^@+/,"")); return; }
   const addBtn=e.target.closest(".add-react");
   if(addBtn){ openReactPicker(addBtn.dataset.key, addBtn); return; }
   const rEl=e.target.closest("[data-re]");
@@ -3351,7 +3394,7 @@ function openPeerProfileFrom(rawThem){
     // full profile fields (same layout as own profile)
     const hv=$("peerHandleVal"); if(hv) hv.textContent=capHandle(themL);
     const stv=$("peerStatus");
-    if(stv){ stv.style.display = priv.seen ? "none":"block"; stv.innerHTML = (u.on && Date.now()-(u.lastSeen||0)<90000) ? '<span style="color:#34d399">● в сети</span>' : '<span style="color:var(--ink-dim)">'+((u&&u.lastSeen)?("был(а) "+lastSeenText(u.lastSeen)):"не в сети")+'</span>'; }
+    if(stv){ stv.style.display = priv.seen ? "none":"block"; stv.innerHTML = (u.on && Date.now()-(u.lastSeen||0)<90000) ? '<span style="color:#34d399">● в сети</span>' : '<span style="color:var(--ink-dim)">'+((u&&u.lastSeen)?lastSeenText(u.lastSeen):"не в сети")+'</span>'; }
     const pv=$("peerPhoneVal");
     if(pv){ pv.textContent = priv.phone ? "Скрыто" : (u.phone?esc(u.phone):(themL==="lincoln"?"+888 888 88 88":"—")); }
     const bv=$("peerBioVal");
@@ -3676,6 +3719,19 @@ $("peerClick").addEventListener("click",openPeerProfile);
 $("btnClosePeer").addEventListener("click",()=>$("peerOverlay").classList.remove("open"));
 $("peerOverlay").addEventListener("click",e=>{ if(e.target===$("peerOverlay")) $("peerOverlay").classList.remove("open"); });
 $("btnWritePeer").addEventListener("click",()=>{ $("peerOverlay").classList.remove("open"); $("chatText").focus(); });
+$("btnSharePeer").addEventListener("click",()=>{
+  try{ shareProfile(String(_admTarget||"").replace(/^@+/,"")); }catch(e){}
+});
+function shareProfile(themLower){
+  try{
+    if(!themLower) return;
+    const bare=String(themLower).replace(/^@+/,"").toLowerCase();
+    const link="https://nikitalincoln123-art.github.io/pennie-chat/#@"+bare;
+    const text="Профиль: @"+bare+" — "+link;
+    if(navigator.share){ navigator.share({title:"Lincoln Chat",text:text,url:link}).catch(()=>{ copyText(text,"Ссылка на профиль скопирована"); }); }
+    else { copyText(text,"Ссылка на профиль скопирована"); }
+  }catch(e){ toast("Не удалось отправить ссылку","err"); }
+}
 $("btnBlockPeer").addEventListener("click",()=>{
   if(!_admTarget) return;
   blockPeer(_admTarget);
@@ -3926,6 +3982,7 @@ function openSettingsFromView(){
   updateBioCount();
   const hn=$("setHeroName"); if(hn) hn.textContent=me.name||me.handle.slice(1);
   const hh=$("setHeroHandle"); if(hh) hh.textContent=capHandle(me.handle);
+  const sh=$("setHandle"); if(sh) sh.value=String(me.handle||"").replace(/^@+/,"");
   const sbIn=$("setBio"); if(sbIn){ sbIn.addEventListener("input",updateBioCount); }
   const sp2=$("#sPatSwatches"); if(sp2) sp2.querySelectorAll(".swatch").forEach(x=>x.classList.toggle("sel",x.dataset.v===draftPat));
   const st2=$("#sThemeSwatches"); if(st2) st2.querySelectorAll(".theme-sw").forEach(x=>x.classList.toggle("sel",x.dataset.v===draftTheme));
@@ -3938,6 +3995,14 @@ document.addEventListener("click",e=>{
     if($("setBio")) me.bio=($("setBio").value||"").trim();
     if($("setBirth")) me.birth=$("setBirth").value||"";
     saveSession();
+    try{
+      const nh=String($("setHandle")&&$("setHandle").value||"").trim().replace(/^@+/,"").toLowerCase();
+      const oldH=String(me.handle||"").replace(/^@+/,"").toLowerCase();
+      if(nh && nh!==oldH){
+        if(!/^[a-z0-9_]{3,20}$/.test(nh)){ toast("Юзернейм: 3–20 символов (латиница, цифры, _)","err"); saveSession(); return; }
+        changeUsername(nh);
+      }
+    }catch(er){}
     const mnm=$("meName"); if(mnm) mnm.textContent=me.name;
     const hnm=$("setHeroName"); if(hnm) hnm.textContent=me.name;
     try{
@@ -3950,6 +4015,56 @@ document.addEventListener("click",e=>{
     toast("Профиль сохранён");
   }
 });
+
+async function changeUsername(newH){
+  try{
+    const oldH=String(me.handle||"").replace(/^@+/,"").toLowerCase();
+    newH=String(newH).replace(/^@+/,"").toLowerCase();
+    if(newH===oldH) return;
+    // 1) check availability
+    const snap=await FB.db.ref("users/"+newH).once("value");
+    const rec=snap.val();
+    if(rec && rec.hash){ toast("Этот @юзернейм уже занят","err"); const sh=$("setHandle"); if(sh) sh.value=oldH; return; }
+    if(newH==="support"){ toast("Этот юзернейм зарезервирован","err"); const sh=$("setHandle"); if(sh) sh.value=oldH; return; }
+    // 2) migrate user record
+    const oldRef=FB.db.ref("users/"+oldH);
+    const oldSnap=await oldRef.once("value");
+    const oldData=oldSnap.val()||{};
+    await FB.db.ref("users/"+newH).set(oldData).catch(()=>{});
+    const userUrl="https://pennie-chat-default-rtdb.firebaseio.com/users/"+newH+".json";
+    try{ await fetch(userUrl,{method:"PUT",headers:{"Content-Type":"application/json"},body:JSON.stringify(oldData)}); }catch(e){}
+    // 3) redirect old handle -> new (graceful aliasing so old links keep working)
+    try{ await FB.db.ref("users/"+oldH+"/redirect").set(newH).catch(()=>{}); const u2="https://pennie-chat-default-rtdb.firebaseio.com/users/"+oldH+"/redirect.json"; await fetch(u2,{method:"PUT",headers:{"Content-Type":"application/json"},body:JSON.stringify(newH)}).catch(()=>{}); }catch(e){}
+    // 4) migrate dialogs (chat streams). Each msg stream key uses my bare handle.
+    const peers=Object.keys(dialogs||{});
+    const oldKeyPrefix=oldH+"__", oldKeyPrefix2="__"+oldH;
+    for(const p of peers){
+      const bare=String(p).replace(/^@+/,"").toLowerCase();
+      if(bare==="support") continue;
+      const oldKey=dialogKeyOf(oldH,bare);
+      const newKey=dialogKeyOf(newH,bare);
+      if(oldKey===newKey) continue;
+      try{
+        const src=await FB.db.ref("msgs/"+oldKey).once("value");
+        const data=src.val();
+        if(data && Object.keys(data).length){
+          await FB.db.ref("msgs/"+newKey).set(data).catch(()=>{});
+          const murl="https://pennie-chat-default-rtdb.firebaseio.com/msgs/"+newKey+".json";
+          try{ await fetch(murl,{method:"PUT",headers:{"Content-Type":"application/json"},body:JSON.stringify(data)}); }catch(e){}
+        }
+      }catch(e){}
+    }
+    // 5) update me, session and inbox references
+    me.handle="@"+newH;
+    saveSession();
+    try{ localStorage.removeItem("pennie_dialogs_"+oldH); }catch(e){}
+    try{ renderProfile(); }catch(e){}
+    try{ renderDialogs(); }catch(e){}
+    const hh=$("setHeroHandle"); if(hh) hh.textContent=capHandle(me.handle);
+    const sh2=$("setHandle"); if(sh2) sh2.value=newH;
+    toast("Юзернейм изменён на @"+newH,"ok");
+  }catch(e){ toast("Ошибка при смене юзернейма","err"); }
+}
 
 /* ---------- persistence of dialogs ---------- */
 setInterval(()=>{ try{ localStorage.setItem("pennie_dialogs_"+me.handle, JSON.stringify(dialogs)); }catch(e){} },2500);
