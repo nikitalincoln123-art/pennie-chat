@@ -586,6 +586,7 @@ button{cursor:pointer}
       <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7" /><path d="M21 21l-4.3-4.3" /></svg>
     </button>
     <span id="verBadge" style="font-size:12px;font-weight:800;color:#fff;letter-spacing:.3px;padding:0 4px;flex:0 0 auto">Lincoln-Chat</span>
+    <span id="connBadge" style="display:none;font-size:11px;font-weight:800;padding:3px 8px;border-radius:8px;background:rgba(248,113,113,.15);border:1px solid rgba(248,113,113,.4);flex:0 0 auto">Нет соединения</span>
   </div>
   <div class="desk-nav" id="deskNavi">
     <button class="dn sel" data-tab="chats"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M21 11.5a8.4 8.4 0 0 1-9 8.4 8.6 8.6 0 0 1-3.6-.7L3 21l1.8-5.2A8.4 8.4 0 1 1 21 11.5z" /></svg><span>Чаты</span></button>
@@ -1514,6 +1515,32 @@ let openChatPeer=null, chatMsgsEl=null, myListenRef=null, myListenFn=null;
 let _statusTO=null, _histR={};
 let _readPointers={};
 let _readSent={};
+/* ---------- chat history virtualization / lazy-load older messages ---------- */
+const DEFAULT_MSG_LIMIT=60;
+const _msgLimit={};
+let _chatsScrollInited=false;
+function ensureChatScroll(){
+  const el=$("msgs"); if(!el || _chatsScrollInited) return;
+  _chatsScrollInited=true;
+  el.addEventListener("scroll",()=>{
+    try{
+      if(!openChatPeer || !el) return;
+      const L=_msgLimit[String(openChatPeer)]||DEFAULT_MSG_LIMIT;
+      if(el.scrollTop < 80){
+        _msgLimit[String(openChatPeer)]=L+DEFAULT_MSG_LIMIT;
+        // re-render to reveal older messages
+        const key=dialogKeyOf(me.handle,openChatPeer);
+        const ref=FB.db.ref("msgs/"+key);
+        ref.once("value",snap=>{
+          if(openChatPeer) renderChat(openChatPeer,snapToObj(snap));
+        }).catch(()=>{});
+        const prevScroll=el.scrollHeight;
+        setTimeout(()=>{ try{ el.scrollTop=el.scrollHeight-prevScroll; }catch(e){} },60);
+      }
+    }catch(e){}
+  });
+}
+function resetMsgLimitSeq(){ /* placeholder */ }
 function manageReadMark(themL,snap){
   try{
     const myK=_myKey();
@@ -1902,6 +1929,7 @@ function openChat(themL){
   renderScheduledBar();
   applyChatFX();
   attachTypingListener();
+  ensureChatScroll();
   // load profile for avatar/name
   try{
     FB.db.ref("users/"+themL).once("value").then(snap=>{
@@ -1945,6 +1973,8 @@ function loadChatHistoryREST(themL,key){
   const msgs=$("msgs");
   _histR[tag]=(_histR[tag]||0)+1;
   const myRun=_histR[tag];
+  // show cached history immediately if offline (no network)
+  if(!navigator.onLine){ try{ const obj=getChatCache(themL); if(obj && Object.keys(obj).length){ renderChat(themL,cacheToClean(obj)); } }catch(e){} }
   const url="https://pennie-chat-default-rtdb.firebaseio.com/msgs/"+key+".json?ts="+Date.now();
   fetch(url,{cache:"no-store"}).then(r=>r.json()).then(obj=>{
     if(myRun!==_histR[tag]) return; // stale (user switched chat)
@@ -1956,7 +1986,36 @@ function loadChatHistoryREST(themL,key){
     keys.forEach(k=>{ if(String(k).indexOf("_")===0) return; const v=obj[k]||{}; if(v["_self_"+myK]) return; v.__key=k; clean[v.__key]=v; });
     if(typeof renderChat==="function"){ renderChat(themL,clean); }
     else if(msgs){ msgs.innerHTML=""; }
-  }).catch(()=>{});
+    // write to offline cache
+    try{ saveChatCache(themL,obj); }catch(e){}
+  }).catch(()=>{
+    // offline: fall back to cached history (already shown above); mark
+  });
+}
+function chatCacheStore(){ return "pennie_msgcache_"+_myKey(); }
+function saveChatCache(themL,obj){
+  try{
+    let store={}; try{ store=JSON.parse(localStorage.getItem(chatCacheStore()))||{}; }catch(e){ store={}; }
+    const bare=String(themL).replace(/^@+/,"").toLowerCase();
+    store[bare]={saved:Date.now(), data:obj};
+    try{ localStorage.setItem(chatCacheStore(),JSON.stringify(store)); }catch(e){}
+  }catch(e){}
+}
+function getChatCache(themL){
+  try{
+    let store={}; try{ store=JSON.parse(localStorage.getItem(chatCacheStore()))||{}; }catch(e){ store={}; }
+    const bare=String(themL).replace(/^@+/,"").toLowerCase();
+    return store[bare]?store[bare].data:null;
+  }catch(e){ return null; }
+}
+function cacheToClean(obj){
+  const clean={}; const myK=_myKey();
+  Object.keys(obj||{}).forEach(k=>{
+    if(String(k).indexOf("_")===0) return;
+    const v=obj[k]||{}; if(v["_self_"+myK]) return;
+    v.__key=k; clean[k]=v;
+  });
+  return clean;
 }
 
 function startStatusPoll(themL){
@@ -2096,18 +2155,22 @@ function renderChat(themL,list){
   const el=$("msgs");
   const isBlockedSender = (me.blocked && me.blocked[themL]);
   const items=Object.values(list).sort((a,b)=>(a.t||0)-(b.t||0));
+  // virtualization: only render the most recent N, expand on scroll-up
+  const _L=(_msgLimit[String(themL)]||DEFAULT_MSG_LIMIT);
+  const from=Math.max(0,items.length-_L);
+  const visible=items.slice(from);
   const existing=el.querySelectorAll(".msg-row[data-key]");
   const gotKeys={};
   existing.forEach(n=>{ gotKeys[n.dataset.key]=n; });
   // track if we rebuilt everything (needed only on fresh open / chat switch)
   let anyMissing=false;
   const known=Object.keys(gotKeys).length;
-  items.forEach((m,idx)=>{
+  visible.forEach((m,idx)=>{
     const mine=m.from===me.handle;
     if(!mine && isBlockedSender) return;
     const key=m.__key;
     const mk=new Date(m.t).getDate();
-    const prevDate=items[idx-1]?new Date(items[idx-1].t).getDate():-1;
+    const prevDate=visible[idx-1]?new Date(visible[idx-1].t).getDate():-1;
     if(gotKeys[key]){
       // message already rendered — just refresh its content in place (cheap, no re-render)
       const w=gotKeys[key];
@@ -2159,7 +2222,7 @@ function renderChat(themL,list){
     }
     anyMissing=true;
     // new message — append (and ensure a day chip if the boundary changed)
-    if(mk!==(items[idx-1]?new Date(items[idx-1].t).getDate():-1) && idx>0){
+    if(mk!==(visible[idx-1]?new Date(visible[idx-1].t).getDate():-1) && idx>0){
       // day boundary: insert a chip before
       const chip=document.createElement("div");
       chip.className="day-chip";
@@ -2282,6 +2345,67 @@ function editMessage(themL,key,oldText){
   }).catch(()=>{ toast("Не удалось изменить"); });
 }
 function _myKey(){ return String(me&&me.handle||"").replace(/^@+/,"").toLowerCase(); }
+/* ---------- connectivity indicator ---------- */
+function showConn(el,label,color){
+  try{ const b=$("connBadge"); if(b){ b.style.display="flex"; b.textContent=label; b.style.color=color; } }catch(e){}
+}
+function connHide(){ try{ const b=$("connBadge"); if(b){ b.style.display="none"; } }catch(e){} }
+function initConnectivity(){
+  try{
+    const on=()=>{ connHide(); try{ if(_pendingQ&&_pendingQ.length){ toast("Связь восстановлена — отправляю…","info"); } else { toast("Связь восстановлена","ok",1800); } }catch(e){} };
+    const off=()=>{ showConn(null,"Нет соединения","#f87171"); toast("Нет соединения","err",2600); };
+    window.addEventListener("online",on);
+    window.addEventListener("offline",off);
+    if(!navigator.onLine){ showConn(null,"Нет соединения","#f87171"); }
+  }catch(e){}
+}
+/* ---------- offline send queue (auto-retry) ---------- */
+let _pendingQ=null;
+function pendingStore(){ return "pennie_pending_"+_myKey(); }
+function loadPending(){ try{ _pendingQ=JSON.parse(localStorage.getItem(pendingStore()))||[]; }catch(e){ _pendingQ=[]; } if(!Array.isArray(_pendingQ)) _pendingQ=[]; }
+function savePending(){ try{ localStorage.setItem(pendingStore(),JSON.stringify(_pendingQ||[])); }catch(e){} }
+function queuePendingMsg(themL,key,pushKey,msg){
+  try{
+    loadPending();
+    _pendingQ.push({them:themL,key:key,pushKey:pushKey,msg:msg,at:Date.now(),tryCount:0});
+    savePending();
+  }catch(e){}
+}
+function retryPending(){
+  try{
+    if(!navigator.onLine){ return; }
+    loadPending();
+    if(!_pendingQ.length) return;
+    let sentCount=0;
+    const keep=[];
+    const finished=[];
+    _pendingQ.forEach(item=>{
+      const url="https://pennie-chat-default-rtdb.firebaseio.com/msgs/"+item.key+"/"+item.pushKey+".json";
+      const done=(ok)=>{
+        if(ok){ sentCount++; return; }
+        item.tryCount=(item.tryCount||0)+1;
+        if((item.tryCount||0)>=40){ return; } // drop after ~4min
+        keep.push(item);
+      };
+      try{
+        fetch(url,{method:"PUT",headers:{"Content-Type":"application/json"},body:JSON.stringify(item.msg)})
+          .then(r=>done(r.ok))
+          .catch(()=>done(false));
+      }catch(e){ done(false); }
+    });
+    setTimeout(()=>{
+      loadPending();
+      // reconcile: keep only items that are not in this batch's `keep` (i.e. still failing) OR untouched
+      const byKey={}; keep.forEach(k=>byKey[k.pushKey]=true);
+      _pendingQ=_pendingQ.filter(it=> byKey[it.pushKey]);
+      savePending();
+      if(sentCount>0 && !queueReconciling){ queueReconciling=true; setTimeout(()=>{ queueReconciling=false; loadPending(); if(!_pendingQ.length){ toast("Сообщения отправлены","ok"); } },400); }
+    },1400);
+  }catch(e){}
+}
+let queueReconciling=false;
+setInterval(()=>{ try{ retryPending(); }catch(e){} },6000);
+loadPending();
 function _delKeyFor(themL,key){ return "msgs/"+dialogKeyOf(me.handle,themL)+"/"+key; }
 /* delete message only for me: tag the message with a per-user hidden marker */
 function deleteMsgForSelf(themL,key){
@@ -3004,13 +3128,14 @@ function sendNow(){
   const url="https://pennie-chat-default-rtdb.firebaseio.com/msgs/"+key+"/"+pushKey+".json";
   let tim=setTimeout(()=>{ clearTimeout(tim); failSend(); },12000);
   function failSend(){
-    if(el && t && !el.value){ el.value=t; }
-    toast("Не удалось отправить. Проверьте интернет.");
+    // queue the message for auto-retry instead of dropping it
+    try{ queuePendingMsg(themL,key,pushKey,msg); }catch(e){}
+    toast("Нет связи — сообщение будет отправлено автоматически","info",3000);
   }
   try{
     fetch(url,{method:"PUT",headers:{"Content-Type":"application/json"},body:JSON.stringify(msg)})
       .then(r=>{ clearTimeout(tim); if(!r.ok) throw new Error("http"+r.status); })
-      .catch(failSend);
+      .catch(e=>{ clearTimeout(tim); failSend(); });
   }catch(e){ failSend(); }
   // notify recipient via their inbox (so a brand-new sender shows up with a badge)
   try{
@@ -4273,6 +4398,7 @@ function makeDust(){
   if(!FB.ok){ alert("Не удалось подключиться к серверу. Попробуйте позже."); return; }
   makeDust();
   buildSettingsChrome();
+  initConnectivity();
   loadSession();
   if(me && me.handle){
     // normalize handle in stored session too
