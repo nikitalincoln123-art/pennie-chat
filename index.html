@@ -1250,6 +1250,41 @@ function loadMarketLots(cb){
     }).catch(()=>cb([]));
   }catch(e){ cb([]); }
 }
+function buyGiftFromSystem(g){
+  try{
+    if(!g || !g.price) return;
+    const myKey=_myKey();
+    const price=Number(g.price||0);
+    // global mintage counter per gift id (issued copies, system-wide)
+    FB.db.ref("issued/"+g.id+"/n").once("value",snap=>{
+      const issued=Number(snap.val()||0);
+      const limit=Number(g.qty||10);
+      if(issued>=limit){ toast("Тираж исчерпан — осталось 0 из "+limit,"err"); return; }
+      FB.db.ref("users/"+myKey+"/stars").once("value",s1=>{
+        const myStars=Number(s1.val()||me.stars||0);
+        if(myStars<price){ toast("Недостаточно звёзд — нужно "+price.toLocaleString("ru-RU")+" ⭐","err"); return; }
+        if(!confirm("Купить «"+g.name+"» за "+price.toLocaleString("ru-RU")+" ⭐?")) return;
+        // deduct stars
+        const nStars=myStars-price;
+        FB.db.ref("users/"+myKey).update({stars:nStars}).catch(()=>{});
+        fetch("https://pennie-chat-default-rtdb.firebaseio.com/users/"+myKey+"/stars.json",{method:"PUT",headers:{"Content-Type":"application/json"},body:JSON.stringify(nStars)}).catch(()=>{});
+        // increment mintage (server-side counter)
+        FB.db.ref("issued/"+g.id).transaction(cur=>{ const n=(cur&&cur.n?cur.n:0)+1; return n; }).catch(()=>{});
+        // add gift to collection
+        FB.db.ref("users/"+myKey+"/gifts").once("value",s3=>{
+          const gifts=s3.val()||{};
+          const nid="s"+g.id+"_"+(Math.floor(Math.random()*1e6))+Date.now();
+          gifts[nid]={id:g.id,name:g.name,rarity:g.rarity,price:g.price,icon:g.icon,grad:g.grad,qty:g.qty,svg:g.svg,at:Date.now(),from:"system",edition:issued+1};
+          FB.db.ref("users/"+myKey+"/gifts").set(gifts).catch(()=>{});
+          fetch("https://pennie-chat-default-rtdb.firebaseio.com/users/"+myKey+"/gifts.json",{method:"PUT",headers:{"Content-Type":"application/json"},body:JSON.stringify(gifts)}).catch(()=>{});
+          me.gifts=gifts; me.stars=nStars; saveSession();
+        }).catch(()=>{});
+        toast("Покупка успешна: «"+g.name+"» (тираж "+(issued+1)+"/"+limit+") добавлен вам","ok");
+        if(typeof renderProfile==="function"){ try{ renderProfile(); }catch(e){} }
+      }).catch(()=>{ toast("Ошибка покупки","err"); });
+    }).catch(()=>{ toast("Ошибка покупки","err"); });
+  }catch(e){ toast("Ошибка покупки","err"); }
+}
 function buyGiftLot(lotId){
   try{
     if(!lotId) return;
@@ -3720,15 +3755,21 @@ function openGiftMarket(){
         });
       }
     });
-    // section: base catalog
-    const catHead=document.createElement("div"); catHead.className="sec-title"; catHead.textContent="Каталог подарков";
+    // section: base catalog (buy from system for stars)
+    const catHead=document.createElement("div"); catHead.className="sec-title"; catHead.textContent="Магазин подарков (у системы за ⭐)";
     scroll.appendChild(catHead);
     const grid=document.createElement("div"); grid.className="gift-grid";
     GIFT_CATALOG.forEach(g=>{
       const cell=document.createElement("div"); cell.innerHTML=giftCardHtml(g);
-      cell.querySelector(".gift-card").style.cssText+=";margin-bottom:4px";
+      const card=cell.querySelector(".gift-card");
+      card.style.cssText+=";margin-bottom:4px";
       const gv=giftById(g.id)||g;
-      cell.querySelector(".gift-card").addEventListener("click",()=>openGiftView(gv));
+      const buyBtn=document.createElement("button"); buyBtn.type="button"; buyBtn.className="btn";
+      buyBtn.style.cssText="margin-top:6px;padding:7px;font-size:12px;width:100%";
+      buyBtn.textContent="Купить за "+Number(g.price||0).toLocaleString("ru-RU")+" ⭐";
+      buyBtn.addEventListener("click",e=>{ e.stopPropagation(); buyGiftFromSystem(g); });
+      cell.appendChild(buyBtn);
+      card.addEventListener("click",()=>openGiftView(gv));
       grid.appendChild(cell);
     });
     scroll.appendChild(grid);
