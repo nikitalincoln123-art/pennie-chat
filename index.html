@@ -262,6 +262,10 @@ html{overflow:hidden!important}
 .bubble .btxt{flex:1 1 auto;min-width:0}
 .bubble .bline{display:flex;align-items:flex-end;gap:8px;justify-content:space-between}
 .bubble .tm{flex:0 0 auto;font-size:11px;opacity:.7;margin-top:0;white-space:nowrap;padding-left:10px;align-self:flex-end}
+.bubble .msg-state{flex:0 0 auto;display:inline-flex;align-items:center;margin-left:3px;opacity:.85;color:#5db9ff;position:relative;top:-1px}
+.fwd-label{display:flex;align-items:center;gap:4px;font-size:11px;font-weight:700;color:#e6b93c;margin-bottom:3px;line-height:1.2}
+.bubble.m[data-pat="2"] .msg-state{color:#1a7f37}
+.bubble .msg-state svg{width:14px;height:14px}
 .dev-badge{display:inline-block;margin-left:6px;font-size:10px;font-weight:700;color:#fff;background:#e6b93c;border-radius:6px;padding:1px 6px;vertical-align:middle;letter-spacing:.3px;white-space:nowrap}
 .role-badge{display:inline-flex;align-items:center;gap:5px;margin-left:4px;font-size:10px;font-weight:800;letter-spacing:.4px;text-transform:uppercase;border-radius:8px;padding:3px 9px 3px 5px;vertical-align:middle;white-space:nowrap;position:relative}
 .role-badge svg{width:13px;height:13px;flex:0 0 auto}
@@ -550,6 +554,9 @@ button{cursor:pointer}
   <div class="searchbar" id="userSearchBar" style="display:none">
     <input class="search-input" id="searchUser" placeholder="Введите @user" autocomplete="off" spellcheck="false">
   </div>
+  <div class="searchbar" id="msgSearchBar" style="display:none">
+    <input class="search-input" id="searchMsgs" placeholder="Поиск сообщений по всем чатам…" autocomplete="off" spellcheck="false">
+  </div>
   <div id="searchResult"></div>
   <div class="list" id="dialogs"><div class="list-empty" id="dialogsEmpty">Пока нет чатов.<br>Найдите собеседника по @юзернейму сверху.</div></div>
 </div>
@@ -566,6 +573,9 @@ button{cursor:pointer}
     </button>
     <button class="icon-btn" id="btnSearchChat" title="Поиск по чату">
       <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7" /><path d="M21 21l-4.3-4.3" /></svg>
+    </button>
+    <button class="icon-btn" id="btnExportChat" title="Экспорт истории">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v12m0 0l-4-4m4 4l4-4" /><path d="M4 17v2a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-2" /></svg>
     </button>
     <button class="icon-btn" id="btnDeleteChat" title="Удалить чат">
       <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6M10 11v6M14 11v6" /></svg>
@@ -1378,6 +1388,31 @@ function isSupportPeer(){
 /* admin opens an existing support thread (reply as @support, no personal login needed) */
 let openChatPeer=null, chatMsgsEl=null, myListenRef=null, myListenFn=null;
 let _statusTO=null, _histR={};
+let _readPointers={};
+function manageReadMark(themL,snap){
+  try{
+    const myK=_myKey();
+    if(!openChatPeer || String(openChatPeer)!=String(themL)) return;
+    // mark all my own messages as read up to the newest one the peer has sent
+    let newestPeerT=0, newestKey=null;
+    let myNewestT=0, myNewestKey=null;
+    snap.forEach(ch=>{
+      if(String(ch.key).indexOf("_")===0) return;
+      const v=ch.val()||{};
+      if(v.from===me.handle){
+        if((v.t||0)>=myNewestT){ myNewestT=v.t||0; myNewestKey=ch.key; }
+      } else {
+        if((v.t||0)>=newestPeerT){ newestPeerT=v.t||0; newestKey=ch.key; }
+      }
+    });
+    if(newestKey){
+      // read the peer's msg: record pointer under a per-user key the peer reads back
+      FB.db.ref("msgs/"+dialogKeyOf(me.handle,themL)+"/_read_"+myK).set(newestPeerT).catch(()=>{});
+    } else if(myNewestKey){
+      _readPointers[themL]=myNewestKey;
+    }
+  }catch(e){}
+}
 let _supportAdminThread=null;
 function openSupportAdminThread(userKey){
   const myKey=String(userKey||"").replace(/^@+/,"").toLowerCase();
@@ -1558,6 +1593,41 @@ $("btnSearchChat").addEventListener("click",()=>{
 $("chatSearchClose").addEventListener("click",()=>toggleChatSearch(false));
 $("chatSearchInput").addEventListener("input",searchInChat);
 $("btnBack").addEventListener("click",()=>{ toggleChatSearch(false); });
+$("btnExportChat").addEventListener("click",exportChatTxt);
+async function exportChatTxt(){
+  if(!openChatPeer) return;
+  const them=String(openChatPeer).toLowerCase().replace(/^@+/,"");
+  toast("Подготовка экспорта…","info",1800);
+  try{
+    const key=dialogKeyOf(me.handle,openChatPeer);
+    const snap=await FB.db.ref("msgs/"+key).once("value");
+    const obj=snap.val()||{};
+    const myK=_myKey();
+    const lines=[];
+    const sorted=Object.keys(obj).filter(k=>String(k).indexOf("_")!==0).map(k=>obj[k]).filter(v=>v&&v.t).sort((a,b)=>(a.t||0)-(b.t||0));
+    sorted.forEach(m=>{
+      if(m["_self_"+myK]) return;
+      const who=m.from===me.handle?("Я ("+me.handle+")"):(m.from||"Собеседник");
+      const dt=new Date(m.t).toLocaleString("ru-RU",{day:"2-digit",month:"2-digit",year:"numeric",hour:"2-digit",minute:"2-digit"});
+      let body="";
+      if(m.kind==="photo"&&m.img){ body="[Фото] "+m.img; }
+      else { body=m.text||""; }
+      lines.push("["+dt+"] "+who+": "+body+(m.edited?" (изменено)":""));
+    });
+    const title=them==="support"?"Чат с поддержкой":"Чат с @"+them;
+    const header="# "+title+"\n# Экспорт: "+new Date().toLocaleString("ru-RU")+"\n# Всего сообщений: "+sorted.length+"\n\n";
+    const blob=new Blob([header+lines.join("\n")],{type:"text/plain;charset=utf-8"});
+    const a=document.createElement("a");
+    a.href=URL.createObjectURL(blob);
+    a.download="chat_@"+them+"_"+Date.now()+".txt";
+    document.body.appendChild(a);
+    a.click();
+    setTimeout(()=>{ URL.revokeObjectURL(a.href); a.remove(); },100);
+    toast("История сохранена в .txt","ok");
+  }catch(e){
+    toast("Не удалось экспортировать. Проверьте интернет.","err");
+  }
+}
 
 let _pins={};
 try{ _pins=JSON.parse(localStorage.getItem("pennie_pins_"+String(me&&me.handle||"").toLowerCase().replace(/^@+/,"")))||{}; }catch(e){ _pins={}; }
@@ -1647,6 +1717,7 @@ function openChat(themL){
   loadDraftFor(themL);
   renderPinnedBar();
   applyChatFX();
+  attachTypingListener();
   // load profile for avatar/name
   try{
     FB.db.ref("users/"+themL).once("value").then(snap=>{
@@ -1668,7 +1739,13 @@ function openChat(themL){
   const key=dialogKeyOf(me.handle,themL);
   const ref=FB.db.ref("msgs/"+key);
   if(myListenRef){ try{ myListenRef.off("value",myListenFn); }catch(e){} }
-  myListenFn=snap=>renderChat(themL,snapToObj(snap));
+  myListenFn=snap=>{
+    const list=snapToObj(snap);
+    const peerK=String(themL).toLowerCase().replace(/^@+/,"");
+    _readPointers[themL]=Number(snap.child("_read_"+peerK).val()||0);
+    manageReadMark(themL,snap);
+    renderChat(themL,list);
+  };
   myListenRef=ref;
   ref.on("value",myListenFn);
   // reset unread/preview cleanup not needed
@@ -1738,6 +1815,12 @@ function buildMsgEl(themL,m){
     q.innerHTML='<span class="quote-src">'+(m.reply.from===me.handle?"Вы":capHandle(m.reply.from))+'</span> '+esc(String(m.reply.text||""));
     bl.appendChild(q);
   }
+  if(m.fwdFrom){
+    const f=document.createElement("div");
+    f.className="fwd-label";
+    f.innerHTML='<svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12h14"/><path d="M12 6l6 6-6 6"/></svg> <span>Переслано от '+(m.fwdFrom===me.handle?"Вас":capHandle(m.fwdFrom))+'</span>';
+    bl.appendChild(f);
+  }
   if(m.kind==="photo" && m.img){
     const im=document.createElement("img");
     im.src=m.img; im.alt="Фото";
@@ -1748,8 +1831,19 @@ function buildMsgEl(themL,m){
   }
   const t=document.createElement("span"); t.className="tm"; t.textContent=fmtTime(m.t);
   bl.appendChild(t);
+  if(mine){
+    const isRead = ((_readPointers&&_readPointers[String(themL)])||0) >= (m.t||0);
+    const stc=document.createElement("span"); stc.className="msg-state";
+    stc.dataset.state=isRead?"read":"sent";
+    stc.title=isRead?"Прочитано":"Доставлено";
+    stc.innerHTML=isRead
+      ? '<svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12.5l5 5L20 6.5"/><path d="M9.5 13.5l2 2L20 7.5"/></svg>'
+      : '<svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12.5l5 5L20 6.5"/></svg>';
+    bl.appendChild(stc);
+  }
   b.appendChild(bl);
   wrap.appendChild(b);
+  if(mine){ (function(w,key,mt){ w._refreshState=function(){ const w2=w; const stc2=w2.querySelector(".msg-state"); if(!stc2) return; const rd=((_readPointers&&_readPointers[String(themL)])||0) >= (mt||0); stc2.dataset.state=rd?"read":"sent"; stc2.title=rd?"Прочитано":"Доставлено"; stc2.innerHTML=rd?'<svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12.5l5 5L20 6.5"/><path d="M9.5 13.5l2 2L20 7.5"/></svg>':'<svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12.5l5 5L20 6.5"/></svg>'; }; })(wrap,m.__key,m.t); }
   // reactions
   const rr=m.reacts||{};
   const rk=Object.keys(rr);
@@ -1809,6 +1903,8 @@ function renderChat(themL,list){
       // refresh text if changed (edited)
       const tx=b?b.querySelector(".btxt"):null;
       if(tx && tx.textContent!==String(m.text||"")){ tx.textContent=String(m.text||""); }
+      // refresh delivery state (read receipt) in place
+      try{ if(w._refreshState && m.from===me.handle){ w._refreshState(); } }catch(e){}
       // remove old reactions and rebuild if changed
       const oldReacts=w.querySelector(".reacts");
       const rr=m.reacts||{};
@@ -2105,6 +2201,7 @@ $("msgs").addEventListener("contextmenu",e=>{
     reply:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M9 14l-4-4 4-4"/><path d="M5 10h11a4 4 0 0 1 4 4v4"/></svg>',
     copy:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="12" height="12" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>',
     edit:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M17 3a2.8 2.8 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5z"/></svg>',
+    forward:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12h14"/><path d="M12 6l6 6-6 6"/></svg>',
     pin:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 17v5M6 3h12l-2 8 4 3H4l4-3-2-8z"/></svg>',
     unpin:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 17v5M6 3h12l-2 8 4 3H4l4-3-2-8z"/><path d="M3 3l18 18"/></svg>',
     trash:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6M10 11v6M14 11v6"/></svg>'
@@ -2128,6 +2225,7 @@ if(mine){
       const isDel=!!m.deleted;
       setupReplyItem(m);
       add("copy","Копировать",()=>copyText(m.text||m.img||""));
+      add("forward","Переслать",()=>showForwardPicker(openChatPeer,key,m));
       if(m.kind!=="photo" && !isDel){ add("edit","Изменить",()=>editMessage(openChatPeer,key,m.text||"")); }
       const pinned=getPin(openChatPeer);
       if(pinned && pinned.key===key){ add("unpin","Снять закрепление",()=>unsetPin(openChatPeer)); }
@@ -2140,6 +2238,7 @@ if(mine){
       const isDel=!!m.deleted;
       setupReplyItem(m);
       add("copy","Копировать",()=>copyText(m.text||m.img||""));
+      add("forward","Переслать",()=>showForwardPicker(openChatPeer,key,m));
       const pinned=getPin(openChatPeer);
       if(pinned && pinned.key===key){ add("unpin","Снять закрепление",()=>unsetPin(openChatPeer)); }
       else { add("pin","Закрепить",()=>setPin(openChatPeer,key,m.text||"",m.from||openChatPeer,m.kind==="photo")); }
@@ -2154,21 +2253,149 @@ if(mine){
   setTimeout(()=>{ document.addEventListener("click",function h(){ closeMsgMenu(); document.removeEventListener("click",h); }); },0);
 });
 
+/* ---------- forward ---------- */
+let _fwdOverlay=null;
+function showForwardPicker(fromPeer,key,m){
+  try{
+    if(_fwdOverlay) _fwdOverlay.remove();
+    const ov=document.createElement("div"); ov.className="overlay"; ov.id="_fwdOverlay";
+    ov.style.cssText="z-index:70";
+    const opts=Object.keys(dialogs||{}).filter(d=>String(d).toLowerCase().replace(/^@+/,"")!==String(me.handle).toLowerCase().replace(/^@+/,""));
+    const modal=document.createElement("div"); modal.className="modal";
+    modal.style.cssText="max-width:340px;padding:18px;max-height:70vh;display:flex;flex-direction:column";
+    const head=document.createElement("div"); head.className="m-head"; head.innerHTML='<div class="m-title">Переслать</div>';
+    const x=document.createElement("button"); x.className="x-btn"; x.textContent="✕"; x.addEventListener("click",()=>ov.remove());
+    head.appendChild(x); modal.appendChild(head);
+    const list=document.createElement("div"); list.style.cssText="overflow-y:auto;flex:1;display:flex;flex-direction:column;gap:6px;margin-top:4px";
+    if(!opts.length){ list.innerHTML='<div style="color:var(--ink-dim);font-size:14px;text-align:center;padding:16px 0">Нет чатов для пересылки</div>'; }
+    else {
+      opts.forEach(d=>{
+        const di=dialogs[d]||{};
+        const row=document.createElement("button");
+        row.type="button";
+        row.style.cssText="display:flex;align-items:center;gap:11px;padding:9px 10px;border-radius:12px;background:var(--panel2);border:1px solid var(--line);cursor:pointer;text-align:left;transition:background .15s";
+        row.innerHTML='<div class="av" style="width:38px;height:38px;font-size:18px;flex:0 0 auto;display:flex;align-items:center;justify-content:center;border-radius:50%;background:#1a1a1a;border:1px solid rgba(255,255,255,.1)">'+avaHtml(di.ava,di.name)+'</div><div style="flex:1;min-width:0"><div style="font-weight:700;font-size:14px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">'+esc(capHandle(d))+'</div></div>';
+        row.addEventListener("mouseenter",()=>row.style.background="#2b323a");
+        row.addEventListener("mouseleave",()=>row.style.background="var(--panel2)");
+        row.addEventListener("click",()=>{ ov.remove(); doForward(fromPeer,key,m,d); });
+        list.appendChild(row);
+      });
+    }
+    modal.appendChild(list);
+    ov.appendChild(modal);
+    ov.addEventListener("click",e=>{ if(e.target===ov) ov.remove(); });
+    document.body.appendChild(ov);
+    _fwdOverlay=ov;
+  }catch(e){}
+}
+function doForward(fromPeer,sourceKey,m,targetPeer){
+  try{
+    const t=String(targetPeer).toLowerCase().replace(/^@+/,"");
+    if(String(fromPeer).toLowerCase().replace(/^@+/,"")===t){ toast("Нельзя переслать в этот же чат"); return; }
+    const msg={
+      from:me.handle, text:m.text||"", fwdFrom:m.from||null,
+      kind:m.kind||null, img:m.img||null,
+      t:Date.now(), pat:(me.pat!=null?me.pat:"0"),
+      glow:glowOn?true:undefined
+    };
+    const targetKey=dialogKeyOf(me.handle,t);
+    const pushKey=fbPushKey();
+    const url="https://pennie-chat-default-rtdb.firebaseio.com/msgs/"+targetKey+"/"+pushKey+".json";
+    let done=false;
+    try{
+      fetch(url,{method:"PUT",headers:{"Content-Type":"application/json"},body:JSON.stringify(msg)}).then(r=>{ if(!r.ok) throw new Error("http"+r.status); }).catch(()=>{ if(!done){ done=true; toast("Не удалось переслать","err"); } });
+    }catch(e){ toast("Не удалось переслать","err"); return; }
+    try{
+      const inbox={from:me.handle, name:me.name||me.handle.slice(1), ava:me.ava||"", text:(m.fwdFrom?"Пересланное сообщение":m.text)||"", t:msg.t};
+      fetch("https://pennie-chat-default-rtdb.firebaseio.com/inbox/"+t+"/"+String(me.handle).toLowerCase().replace(/^@+/,"")+".json",{method:"PUT",headers:{"Content-Type":"application/json"},body:JSON.stringify(inbox)}).catch(()=>{});
+    }catch(e){}
+    updateDialogFromMessages("@"+t,{x:{from:me.handle,text:msg.text,t:msg.t}});
+    toast("Сообщение переслано","ok");
+    if(openChatPeer && String(openChatPeer).toLowerCase().replace(/^@+/,"")===t){
+      loadChatHistoryREST(t, dialogKeyOf(me.handle,t));
+    }
+  }catch(e){ toast("Ошибка пересылки","err"); }
+}
+
 /* ---------- search ---------- */
 let searchTO=null;
 function toggleUserSearch(force){
   const bar=$("userSearchBar");
   if(!bar) return;
   const show = (force!==undefined) ? !!force : (bar.style.display!=="block");
+  const mbar=$("msgSearchBar");
+  if(show && mbar) mbar.style.display="none";
   bar.style.display = show ? "block":"none";
   if(show){ $("searchUser").focus(); }
   else { $("searchUser").value=""; $("searchResult").innerHTML=""; }
 }
-$("btnSearchUser").addEventListener("click",()=>toggleUserSearch());
+function toggleMsgSearch(){
+  const mbar=$("msgSearchBar"); if(!mbar) return;
+  const show = (mbar.style.display!=="block");
+  const ubar=$("userSearchBar"); if(ubar && show) ubar.style.display="none";
+  mbar.style.display = show ? "block":"none";
+  if(show){ $("searchMsgs").focus(); }
+  else { $("searchMsgs").value=""; $("searchResult").innerHTML=""; }
+}
+$("btnSearchUser").addEventListener("click",toggleMsgSearch);
 $("searchUser").addEventListener("input",()=>{
   clearTimeout(searchTO);
   searchTO=setTimeout(doSearch,250);
 });
+$("msgSearchBar").addEventListener("input",()=>{
+  clearTimeout(searchTO);
+  searchTO=setTimeout(doGlobalSearch,250);
+});
+async function doGlobalSearch(){
+  const box=$("searchResult"); if(!box) return;
+  const q=($("searchMsgs").value||"").trim().toLowerCase();
+  box.innerHTML="";
+  if(!q){ return; }
+  if(q.indexOf("@")===0){ toggleUserSearch(true); $("searchUser").value=q.slice(1); doSearch(); return; }
+  const peers=Object.keys(dialogs||{}).filter(p=>String(p).toLowerCase()!=="support");
+  let results=[];
+  const myK=_myKey();
+  for(const p of peers){
+    const key=dialogKeyOf(me.handle,p);
+    try{
+      const url="https://pennie-chat-default-rtdb.firebaseio.com/msgs/"+key+".json?ts="+Date.now();
+      const r=await fetch(url,{cache:"no-store"});
+      if(!r.ok) continue;
+      const obj=await r.json()||{};
+      Object.keys(obj).forEach(k=>{
+        if(String(k).indexOf("_")===0) return;
+        const m=obj[k]||{};
+        if(m["_self_"+myK]) return;
+        const txt=String(m.text||"");
+        if(txt.toLowerCase().indexOf(q)>=0){
+          results.push({peer:p,key:k,msg:m});
+        }
+      });
+    }catch(e){}
+  }
+  if(!results.length){ box.innerHTML='<div class="list-empty">Сообщения не найдены</div>'; return; }
+  const total=results.length;
+  results.sort((a,b)=>(b.msg.t||0)-(a.msg.t||0));
+  results=results.slice(0,30);
+  box.innerHTML='<div style="padding:8px 14px;font-size:12px;color:var(--ink-dim)">Найдено: '+total+'</div>';
+  results.forEach(r=>{
+    const d=dialogs[r.peer]||{handle:"@"+r.peer,name:capHandle(r.peer),ava:"👤"};
+    const card=document.createElement("button");
+    card.type="button";
+    card.className="result-card";
+    card.style.cssText="display:flex;align-items:center;gap:11px;width:100%;text-align:left;cursor:pointer;flex-direction:row;padding:10px 12px";
+    card.innerHTML='<div class="av" style="width:40px;height:40px;font-size:19px;flex:0 0 auto;display:flex;align-items:center;justify-content:center;border-radius:50%;background:#1a1a1a;border:1px solid rgba(255,255,255,.1)">'+avaHtml(d.ava,d.name)+'</div>'+
+      '<div style="flex:1;min-width:0"><div style="font-weight:700;font-size:13.5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">'+esc(d.name||capHandle(r.peer))+'</div>'+
+      '<div style="font-size:12.5px;color:var(--ink-dim);white-space:nowrap;overflow:hidden;text-overflow:ellipsis">'+esc(r.msg.text||"")+'</div></div>'+
+      '<div style="font-size:11px;color:var(--ink-dim);flex:0 0 auto">'+fmtTime(r.msg.t)+'</div>';
+    card.addEventListener("click",()=>{ toggleUserSearch(false); openChat(r.peer); setTimeout(()=>{ try{ highlightInChat(q,r.key); }catch(e){} },700); });
+    box.appendChild(card);
+  });
+}
+function highlightInChat(q,key){
+  const el=document.querySelector('.msg-row[data-key="'+key+'"]');
+  if(el){ const b=el.querySelector(".bubble"); if(b){ b.style.outline="2px solid rgba(230,185,60,.9)"; b.style.outlineOffset="2px"; setTimeout(()=>{ b.style.outline="none"; },2500); } }
+}
 async function doSearch(){
   const h=normHandle($("searchUser").value);
   const box=$("searchResult"); box.innerHTML="";
@@ -2442,6 +2669,63 @@ function clearDraft(peerName){
   try{ localStorage.setItem("pennie_drafts_"+k, JSON.stringify(_drafts)); }catch(e){}
 }
 $("chatText").addEventListener("input",saveDraft);
+/* ---------- typing indicator ---------- */
+let _typingTO=null, _typingRef=null, _typingFn=null;
+function sendTypingSignal(){
+  try{
+    if(!openChatPeer) return;
+    const them=String(openChatPeer).toLowerCase().replace(/^@+/,"");
+    const myKey=String(me.handle).toLowerCase().replace(/^@+/,"");
+    if(them==="support" || them===myKey) return;
+    const dbKey=dialogKeyOf(me.handle,openChatPeer);
+    const ref=FB.db.ref("msgs/"+dbKey+"/_typing");
+    ref.set({who:me.handle,t:Date.now()}).catch(()=>{});
+    try{ ref.onDisconnect().remove(); }catch(e){}
+  }catch(e){}
+}
+$("chatText").addEventListener("input",()=>{
+  if(!openChatPeer) return;
+  clearTimeout(_typingTO);
+  _typingTO=setTimeout(sendTypingSignal,250);
+});
+function attachTypingListener(){
+  try{ if(_typingRef){ _typingRef.off("value",_typingFn); } }catch(e){}
+  if(!openChatPeer || String(openChatPeer).toLowerCase().replace(/^@+/,"")==="support"){ setTypingUI(null); _typingRef=null; return; }
+  const myKey=String(me.handle).toLowerCase().replace(/^@+/,"");
+  const dbKey=dialogKeyOf(me.handle,openChatPeer);
+  _typingRef=FB.db.ref("msgs/"+dbKey+"/_typing");
+  _typingFn=snap=>{
+    const myKey2=String(me.handle).toLowerCase().replace(/^@+/,"");
+    const v=snap.val();
+    const who=v&&v.who?String(v.who).toLowerCase().replace(/^@+/,""):null;
+    const fresh=v&&v.t&&Date.now()-v.t<6000;
+    if(who && who!==myKey2 && fresh){ setTypingUI(openChatPeer); }
+    else { setTypingUI(null); }
+  };
+  _typingRef.on("value",_typingFn);
+  // keep the status honest: clear when nobody has typed for a while
+  if(_typingTOClear) clearInterval(_typingTOClear);
+  _typingTOClear=setInterval(()=>{
+    const el=$("typingDots");
+    if(!el||!el.dataset.who) return;
+    const who=el.dataset.who;
+    FB.db.ref("msgs/"+dialogKeyOf(me.handle,openChatPeer)+"/_typing").once("value",s=>{
+      const v=s.val();
+      if(!v||!v.t||Date.now()-v.t>=6000){ setTypingUI(null); }
+    }).catch(()=>{});
+  },4000);
+}
+let _typingTOClear=null;
+function setTypingUI(peerName){
+  const s=$("peerStatusLine"); if(!s) return;
+  const el=$("typingDots");
+  if(peerName){
+    if(!el){ const d=document.createElement("span"); d.id="typingDots"; d.dataset.who=String(peerName).toLowerCase().replace(/^@+/,""); d.style.cssText="color:#6cc3ff;font-style:italic"; d.innerHTML="..."; s.insertBefore(d,s.firstChild); }
+    else{ el.dataset.who=String(peerName).toLowerCase().replace(/^@+/,""); }
+  } else if(el){ el.remove(); }
+}
+function clearTypingUI(){ setTypingUI(null); }
+$("peerOverlay").addEventListener("click",clearTypingUI);
 
 /* ---------- settings / profile ---------- */
 const PATTERNS=[
@@ -3169,6 +3453,9 @@ function closeChatIfOpen(){
   if(openChatPeer){
     try{ if(myListenRef) myListenRef.off("value",myListenFn); }catch(e){}
     if(supportListenRef){ try{ supportListenRef.off("value",supportListenFn); supportListenRef=null; }catch(e){} }
+    try{ if(_typingRef){ _typingRef.off("value",_typingFn); _typingRef=null; } }catch(e){}
+    if(_typingTOClear){ clearInterval(_typingTOClear); _typingTOClear=null; }
+    setTypingUI(null);
     openChatPeer=null;
     _supportAdminThread=null;
   }
