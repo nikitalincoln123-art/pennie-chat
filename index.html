@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+<!DOCTYPE html>﻿
 <html lang="ru">
 <head>
 <script>
@@ -540,6 +540,10 @@ button{cursor:pointer}
 }
 .tabbar .tab{transition:color .2s ease,transform .14s ease}
 .tabbar .tab.sel span{text-shadow:0 0 12px rgba(255,255,255,.4)}
+.input:focus,textarea:focus{box-shadow:0 0 0 3px rgba(46,166,255,.15)}
+.modal::-webkit-scrollbar{width:8px}
+.modal::-webkit-scrollbar-thumb{background:rgba(255,255,255,.18);border-radius:4px;border:2px solid transparent;background-clip:padding-box}
+@media(prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
 </style>
 <style>
 /* ============ Lincoln Gifts (original NFT-style cards) ============ */
@@ -552,14 +556,8 @@ button{cursor:pointer}
 .gift-name{font-weight:800;font-size:12.5px;color:#fff;text-shadow:0 1px 3px rgba(0,0,0,.5)}
 .gift-sub{font-size:10.5px;font-weight:600;margin-top:2px;color:rgba(255,255,255,.9)}
 .gift-empty{color:var(--ink-dim);font-size:13.5px;text-align:center;padding:14px 0}
-/* gift admin picker */
 .gift-pick{display:grid;grid-template-columns:repeat(auto-fill,minmax(120px,1fr));gap:8px;max-height:300px;overflow-y:auto;margin-top:10px}
 </style>
-
-.input:focus,textarea:focus{box-shadow:0 0 0 3px rgba(46,166,255,.15)}
-.modal::-webkit-scrollbar{width:8px}
-.modal::-webkit-scrollbar-thumb{background:rgba(255,255,255,.18);border-radius:4px;border:2px solid transparent;background-clip:padding-box}
-@media(prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
 
 <style>
 /* ===== desktop: 2-column layout ===== */
@@ -763,7 +761,7 @@ button{cursor:pointer}
         <div class="profile-row"><div class="r-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M4 6h16M4 12h16M4 18h10" /></svg></div><div class="r-body"><div class="t">О себе</div><div class="v" id="pBio" style="white-space:pre-wrap">—</div></div></div>
         <div class="profile-row"><div class="r-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" /><path d="M8 2v4M16 2v4M3 10h18" /></svg></div><div class="r-body"><div class="t">День рождения</div><div class="v" id="pBirth">—</div></div></div>
         <div class="profile-row"><div class="r-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10" /><path d="M12 6v6l4 2" /></svg></div><div class="r-body"><div class="t">Регистрация</div><div class="v" id="pCreated">—</div></div></div>
-      <div class="profile-row" style="cursor:default"><div class="r-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2l2.6 5.6 6.1.7-4.6 4.1 1.3 6-5.4-3-5.4 3 1.3-6L3.3 8.3l6.1-.7z" /></svg></div><div class="r-body"><div class="t">Мои звёзды</div><div class="v" id="pStars">0 ⭐</div></div></div>
+        <div class="profile-row" style="cursor:default"><div class="r-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2l2.6 5.6 6.1.7-4.6 4.1 1.3 6-5.4-3-5.4 3 1.3-6L3.3 8.3l6.1-.7z" /></svg></div><div class="r-body"><div class="t">Мои звёзды</div><div class="v" id="pStars">0 ⭐</div></div></div>
       </div>
       <div class="profile-section">
         <div class="sec-title">Мои подарки</div>
@@ -1023,9 +1021,9 @@ button{cursor:pointer}
     <div class="field"><label>Причина предупреждения</label><input class="input" id="admWarnReason" maxlength="180" placeholder="например: спам, оскорбления" autocomplete="off"></div>
     <button class="btn ghost" id="admResetAva" style="margin-bottom:8px;color:#8ab4ff;border-color:var(--line)">Сбросить аватар (убрать фото)</button>
     <button class="btn ghost" id="admSetName" style="margin-bottom:8px;color:#5ff0b4;border-color:var(--line)">Сменить @юзернейм</button>
-    <div class="field"><label>Баланс звёзд</label><div style="display:flex;gap:8px;align-items:center"><input class="input" id="admStars" type="number" min="0" step="100" placeholder="кол-во" style="flex:1;min-width:0"><button class="btn ghost" id="admGiveStars" style="padding:10px">Выдать ⭐</button></div></div>
-    <div class="field"><label>Выдать NFT-подарок</label><div id="admGiftPick" class="gift-pick"></div><button class="btn ghost" id="admGiftApply" style="margin-top:8px;color:#ffd35e;border-color:var(--line)">Выдать выбранный подарок</button></div>
     <button class="btn" id="admSave" style="margin-bottom:8px">Сохранить изменения</button>
+    <div class="field"><label>Выдать звёзды</label><div style="display:flex;gap:8px;align-items:center"><input class="input" id="admStars" type="number" min="0" step="100" placeholder="кол-во ⭐" style="flex:1;min-width:0"><button class="btn ghost" id="admGiveStars" style="padding:10px">Выдать ⭐</button></div></div>
+    <div class="field"><label>Выдать NFT-подарок</label><div id="admGiftPick" class="gift-pick"></div><button class="btn ghost" id="admGiftApply" style="margin-top:8px;color:#ffd35e;border-color:var(--line)">Выдать выбранный подарок</button></div>
     <button class="btn ghost" id="admWarn" style="margin-bottom:8px;color:#ffcc5c;border-color:var(--line)">⚠ Выдать предупреждение</button>
     <button class="btn ghost" id="admUnwarn" style="margin-bottom:8px;color:#7d8c99;border-color:var(--line)">Снять предупреждение</button>
     <button class="btn ghost" id="admBlock" style="margin-bottom:8px;color:#ff8f5c;border-color:var(--line)">Заблокировать / Разблокировать</button>
@@ -1079,7 +1077,6 @@ function roleBadge(u, handleOb){
   return '<span class="role-badge '+key+'">'+(ROLE_ICONS[key]||'')+'<span>'+(ROLE_TYPES[key]||String(u.status)).toUpperCase()+'</span></span>';
 }
 /* ============ Lincoln Gifts (original NFT-style gifts catalog) ============ */
-// Gift visuals are original CSS/gradient designs created for this chat — not Telegram assets.
 const GIFT_RARITY={common:{label:"Обычный",color:"#8e9aa6"},rare:{label:"Раритет",color:"#5db9ff"},legendary:{label:"Легендарный",color:"#ffd35e"}};
 const GIFT_CATALOG=[
   {id:"crystal",name:"Хрустальный шар",rarity:"rare",price:2000,grad:"radial-gradient(circle at 35% 30%,#cfeaff,#6db7ff 45%,#1f4f8f)",icon:"🔮"},
@@ -1092,7 +1089,7 @@ const GIFT_CATALOG=[
   {id:"engine",name:"Золотой двигатель",rarity:"common",price:1200,grad:"linear-gradient(160deg,#ffe9a8,#e0a52e 50%,#7a5a10)",icon:"⚙️"}
 ];
 function giftById(id){ return GIFT_CATALOG.find(g=>g.id===id); }
-function giftCardHtml(g,owned){
+function giftCardHtml(g){
   const r=GIFT_RARITY[g.rarity]||GIFT_RARITY.common;
   return '<div class="gift-card" data-gid="'+g.id+'" style="background:'+g.grad+'">'+
     '<div class="gift-ic">'+g.icon+'</div>'+
@@ -1120,7 +1117,7 @@ function openGiftView(g){
 function isLincoln(){ return String(me&&me.handle||"").toLowerCase().replace(/^@+/,"")==="lincoln"; }
 function giveStars(targetKey,amount){
   try{
-    if(!isLincoln()) throw new Error("Недостаточно прав");
+    if(!isLincoln()) throw new Error("Нет прав");
     const k=String(targetKey).replace(/^@+/,"").toLowerCase();
     if(!k||!amount) return;
     FB.db.ref("users/"+k).once("value",snap=>{
@@ -1141,15 +1138,12 @@ function giveGiftToUser(targetKey,gid){
     const k=String(targetKey).replace(/^@+/,"").toLowerCase();
     FB.db.ref("users/"+k+"/gifts").once("value",snap=>{
       const gifts=snap.val()||{};
-      // avoid duplicates: same gift id re-issued
-      let newId="gift_"+gid+"_"+(gifts[gid]?Date.now():1);
-      const uid=Object.keys(gifts).length>0 ? "g"+(Date.now()) : "g1";
+      const uid="g"+Date.now();
       const entry={id:gid,name:g.name,rarity:g.rarity,price:g.price,icon:g.icon,grad:g.grad,at:Date.now(),from:me.handle};
       gifts[uid]=entry;
       try{ FB.db.ref("users/"+k+"/gifts").set(gifts).catch(()=>{}); }catch(e){}
       fetch("https://pennie-chat-default-rtdb.firebaseio.com/users/"+k+"/gifts.json",{method:"PUT",headers:{"Content-Type":"application/json"},body:JSON.stringify(gifts)}).catch(()=>{});
       toast("Подарок \""+g.name+"\" выдан @"+k+" 🎁","ok");
-      _admGiftSel=null; const box=$("admGiftPick"); if(box) box.querySelectorAll("button").forEach(b=>b.style.outline="none");
     }).catch(()=>{ toast("Ошибка выдачи подарка","err"); });
   }catch(e){ toast("Выдавать подарки может только основатель","err"); }
 }
@@ -3206,6 +3200,652 @@ async function registerDevice(){
     }catch(e){}
   }catch(e){}
 }
+let devicesModalEl=null;
+function openDevices(){
+  if(devicesModalEl) devicesModalEl.remove();
+  devicesModalEl=document.createElement("div");
+  devicesModalEl.className="overlay open";
+  devicesModalEl.style.zIndex="120";
+  devicesModalEl.innerHTML='<div class="modal" style="max-width:440px"><div class="m-head"><div class="m-title">Устройства</div><button class="x-btn" id="devX">✕</button></div><div id="devList" style="font-size:14px;color:var(--ink-dim)">Загрузка…</div></div>';
+  document.body.appendChild(devicesModalEl);
+  devicesModalEl.addEventListener("click",e=>{ if(e.target===devicesModalEl) closeDevices(); });
+  devicesModalEl.querySelector("#devX").addEventListener("click",closeDevices);
+  loadDevicesList();
+}
+function closeDevices(){ if(devicesModalEl){ devicesModalEl.remove(); devicesModalEl=null; } }
+async function loadDevicesList(){
+  const box=devicesModalEl&&devicesModalEl.querySelector("#devList"); if(!box) return;
+  const key=me.handle.toLowerCase().replace(/^@+/,"");
+  let data=null;
+  try{
+    data=await new Promise((res,rej)=>{
+      let done=false;
+      try{ FB.db.ref("users/"+key+"/devices").once("value",s=>{ done=true; res(s.val()||{}); }); }catch(e){}
+      setTimeout(()=>{ if(!done){ done=true; res(null); } },3500);
+    });
+  }catch(e){ data=null; }
+  if(data===null){
+    try{ const r=await fetch("https://pennie-chat-default-rtdb.firebaseio.com/users/"+key+"/devices.json",{cache:"no-store"}); data=await r.json()||{}; }catch(e){ data={}; }
+  }
+  const myId=deviceId();
+  const list=Object.values(data||{}).sort((a,b)=>(b.lastSeen||0)-(a.lastSeen||0));
+  if(!list.length){ box.innerHTML='<div style="padding:8px 0">Нет данных об устройствах.</div>'; return; }
+  box.innerHTML=list.map(d=>{
+    const cur=String(d.id)===myId;
+    const when=d.lastSeen?new Date(d.lastSeen).toLocaleString("ru-RU",{day:"numeric",month:"short",hour:"2-digit",minute:"2-digit"}):"—";
+    return '<div style="display:flex;gap:12px;align-items:flex-start;padding:12px 0;border-top:1px solid rgba(255,255,255,.07)">'+
+      '<div style="width:38px;height:38px;border-radius:11px;background:#232c35;display:flex;align-items:center;justify-content:center;flex:0 0 auto;font-size:18px">'+(d.type==="Телефон"?"📱":"💻")+'</div>'+
+      '<div style="flex:1;min-width:0">'+
+        '<div style="color:var(--ink);font-weight:600;font-size:14px">'+esc(d.model||d.os||"Устройство")+(cur?' <span class="dev-badge" style="background:#34d399">Это устройство</span>':'')+'</div>'+
+        '<div style="font-size:12.5px;margin-top:2px">'+esc((d.os||"")+(d.browser?" · "+d.browser:""))+'</div>'+
+        '<div style="font-size:12.5px;margin-top:2px">IP: <b style="color:var(--ink)">'+esc(d.ip||"—")+'</b></div>'+
+        '<div style="font-size:11.5px;margin-top:2px;opacity:.8">Активность: '+esc(when)+'</div>'+
+      '</div></div>';
+  }).join("");
+}
+$("sRowDevices").addEventListener("click",openDevices);
+
+function fbPushKey(){
+  // Firebase-style push key (20 random chars, base64-url alphabet), generated locally so
+  // sending never depends on the (often broken in RU networks) SDK websocket.
+  let id="";
+  const chars="-0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ_abcdefghijklmnopqrstuvwxyz";
+  const arr=new Uint8Array(20);
+  if(window.crypto&&crypto.getRandomValues){ crypto.getRandomValues(arr); } else { for(let i=0;i<20;i++) arr[i]=Math.floor(Math.random()*256); }
+  for(let i=0;i<arr.length;i++) id+=chars[arr[i]&63];
+  return id;
+}
+function sendNow(){
+  const el=$("chatText");
+  const t=el.value.trim();
+  if(!t || !openChatPeer) return;
+  if(String(openChatPeer).toLowerCase()==="support"){ el.value=""; sendSupportMsg(t); return; }
+  const peer=String(openChatPeer).toLowerCase().replace(/^@+/,"");
+  const myKey=me.handle.toLowerCase().replace(/^@+/,"");
+  if(peer===myKey){ toast("Нельзя писать самому себе"); return; }
+  if(me.blocked && me.blocked[peer]){ toast("Нельзя отправлять заблокированному пользователю"); return; }
+  const key=dialogKeyOf(me.handle,openChatPeer);
+  const rp=_replyRef?{from:_replyRef.from,text:_replyRef.text}:null;
+  const msg={from:me.handle,text:t,t:Date.now(),pat:(me.pat!=null?me.pat:"0"),glow:glowOn?true:undefined,reply:rp||undefined};
+  if(_sdReady>0){ msg.selfDestruct=_sdReady; msg.sdStart=Date.now(); toast("⏳ Сообщение исчезнет через "+(_sdReady>60000?Math.round(_sdReady/60000)+" мин":Math.round(_sdReady/1000)+" сек")); }
+  el.value="";
+  cancelReply();
+  _sdReady=0; updateSdBtn();
+  const pushKey=fbPushKey();
+  const url="https://pennie-chat-default-rtdb.firebaseio.com/msgs/"+key+"/"+pushKey+".json";
+  let tim=setTimeout(()=>{ clearTimeout(tim); failSend(); },12000);
+  function failSend(){
+    // queue the message for auto-retry instead of dropping it
+    try{ queuePendingMsg(themL,key,pushKey,msg); }catch(e){}
+    toast("Нет связи — сообщение будет отправлено автоматически","info",3000);
+  }
+  try{
+    fetch(url,{method:"PUT",headers:{"Content-Type":"application/json"},body:JSON.stringify(msg)})
+      .then(r=>{ clearTimeout(tim); if(!r.ok) throw new Error("http"+r.status); })
+      .catch(e=>{ clearTimeout(tim); failSend(); });
+  }catch(e){ failSend(); }
+  // notify recipient via their inbox (so a brand-new sender shows up with a badge)
+  try{
+    const inbox={from:me.handle, name:me.name||me.handle.slice(1), ava:me.ava||"", text:t, t:msg.t};
+    fetch("https://pennie-chat-default-rtdb.firebaseio.com/inbox/"+peer+"/"+myKey+".json",{method:"PUT",headers:{"Content-Type":"application/json"},body:JSON.stringify(inbox)}).catch(()=>{});
+    playSound("send");
+  }catch(e){}
+  updateDialogFromMessages(openChatPeer,{x:{from:me.handle,text:t,t:msg.t}});
+  clearDraft(openChatPeer);
+  const msgsEl=$("msgs"); if(msgsEl){ try{ msgsEl.scrollTo({top:msgsEl.scrollHeight,behavior:"smooth"}); }catch(e){ try{ msgsEl.scrollTop=msgsEl.scrollHeight; }catch(e2){} } }
+}
+$("btnSend").addEventListener("click",sendNow);
+$("chatText").addEventListener("keydown",e=>{ if(e.key==="Enter"&&!e.shiftKey){ e.preventDefault(); sendNow(); } });
+/* ---------- scheduled (delayed) sending ---------- */
+let _delayed=[];
+const DELAY_OPTS=[{ms:60000,label:"1 мин"},{ms:300000,label:"5 мин"},{ms:600000,label:"10 мин"},{ms:1800000,label:"30 мин"}];
+let _delayIdx=0;
+function loadDelayed(){ try{ _delayed=JSON.parse(localStorage.getItem("pennie_delayed_"+_myKey()))||[]; }catch(e){ _delayed=[]; } }
+function saveDelayed(){ try{ localStorage.setItem("pennie_delayed_"+_myKey(),JSON.stringify(_delayed)); }catch(e){} }
+function renderScheduledBar(){
+  const bar=$("scheduledBar"); if(!bar) return;
+  const items=_delayed.filter(s=>s.peer===openChatPeer);
+  if(!items.length){ bar.style.display="none"; return; }
+  bar.style.display="block";
+  bar.innerHTML="";
+  items.forEach(s=>{
+    const row=document.createElement("div"); row.style.cssText="display:flex;align-items:center;gap:8px;padding:6px 2px";
+    const left=Math.max(0,s.at-Date.now());
+    const lbl=left>0?("⏰ "+( (s.at?new Date(s.at):new Date()).toLocaleTimeString("ru-RU",{hour:"2-digit",minute:"2-digit"}) )):"отправляется…";
+    row.innerHTML='<span style="font-size:12.5px;color:var(--ink-dim);flex:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">⏰ '+esc(lbl)+' · '+esc(String(s.text||"").slice(0,30))+'</span>';
+    const del=document.createElement("button"); del.className="icon-btn"; del.textContent="✕"; del.style.cssText="width:24px;height:24px;font-size:12px;color:#f87171";
+    del.addEventListener("click",()=>{ _delayed=_delayed.filter(x=>x.id!==s.id); saveDelayed(); renderScheduledBar(); toast("Отложенное сообщение отменено"); });
+    row.appendChild(del);
+    bar.appendChild(row);
+  });
+}
+function doDelayedSendRaw(s){
+  try{
+    const key=dialogKeyOf(me.handle,s.peer);
+    const msg={from:me.handle,text:s.text,t:Date.now(),pat:(me.pat!=null?me.pat:"0"),glow:glowOn?true:undefined};
+    if(s.selfDestruct){ msg.selfDestruct=s.selfDestruct; msg.sdStart=Date.now(); }
+    const pushKey=fbPushKey();
+    const url="https://pennie-chat-default-rtdb.firebaseio.com/msgs/"+key+"/"+pushKey+".json";
+    fetch(url,{method:"PUT",headers:{"Content-Type":"application/json"},body:JSON.stringify(msg)}).then(r=>{ if(!r.ok) throw 0; }).catch(()=>{});
+    try{
+      const inbox={from:me.handle,name:me.name||me.handle.slice(1),ava:me.ava||"",text:s.text,t:Date.now()};
+      fetch("https://pennie-chat-default-rtdb.firebaseio.com/inbox/"+String(s.peer).toLowerCase().replace(/^@+/,"")+"/"+_myKey()+".json",{method:"PUT",headers:{"Content-Type":"application/json"},body:JSON.stringify(inbox)}).catch(()=>{});
+    }catch(e){}
+    if(openChatPeer && String(openChatPeer).toLowerCase().replace(/^@+/,"")===String(s.peer).toLowerCase().replace(/^@+/,"")){
+      try{ loadChatHistoryREST(s.peer,key); }catch(e){}
+    }
+  }catch(e){}
+}
+function scheduleTick(){
+  try{
+    if(!me || !me.handle) return;
+    const now=Date.now();
+    let changed=false;
+    _delayed=_delayed.filter(s=>{
+      if(s.at<=now){ try{ doDelayedSendRaw(s); }catch(e){} changed=true; return false; }
+      return true;
+    });
+    if(changed){ saveDelayed(); renderScheduledBar(); if(!_delayed.length) toast("Отложенное сообщение отправлено","ok"); }
+  }catch(e){}
+}
+$("btnTimer").addEventListener("click",()=>{
+  const t=($("chatText").value||"").trim();
+  if(!t){ toast("Сначала напишите сообщение","err"); return; }
+  const o=DELAY_OPTS[_delayIdx%DELAY_OPTS.length]; _delayIdx++;
+  _delayed.push({id:"d"+Date.now()+Math.random().toString(36).slice(2),peer:openChatPeer,text:t,at:Date.now()+o.ms,selfDestruct:_sdReady||0});
+  saveDelayed();
+  $("chatText").value=""; loadDraftFor(openChatPeer); clearDraft(openChatPeer);
+  renderScheduledBar();
+  toast("⏰ Отправлю через "+o.label);
+});
+loadDelayed();
+setInterval(scheduleTick,5000);
+scheduleTick();
+/* ---------- self-destruct messages ---------- */
+let _sdReady=0;
+const SD_OPTS=[{ms:30000,label:"30 сек"},{ms:60000,label:"1 мин"},{ms:3600000,label:"1 час"}];
+function updateSdBtn(){
+  const b=$("btnSd"); if(!b) return;
+  if(_sdReady>0){
+    b.style.color="#e6b93c";
+    b.style.boxShadow="0 0 0 2px rgba(230,185,60,.6)";
+  } else {
+    b.style.color="";
+    b.style.boxShadow="";
+  }
+}
+$("btnSd").addEventListener("click",()=>{
+  if(_sdReady>0){ _sdReady=0; updateSdBtn(); toast("Самоуничтожение выключено"); return; }
+  _sdIdx=(_sdIdx||0)%SD_OPTS.length;
+  const o=SD_OPTS[_sdIdx++];
+  _sdReady=o.ms;
+  updateSdBtn();
+  toast("⏳ Сообщение исчезнет через "+o.label);
+});
+function runSelfDestructSweep(){
+  try{
+    if(!me || !me.handle) return;
+    const myK=_myKey();
+    const now=Date.now();
+    const peers=Object.keys(dialogs||{}).filter(p=>String(p).toLowerCase()!=="support");
+    peers.forEach(p=>{
+      const key=dialogKeyOf(me.handle,p);
+      try{
+        FB.db.ref("msgs/"+key).once("value",snap=>{
+          const obj=snap.val()||{};
+          Object.keys(obj).forEach(k=>{
+            if(String(k).indexOf("_")===0) return;
+            const m=obj[k]||{};
+            if(m.selfDestruct && m.sdStart && now>(m.sdStart+m.selfDestruct)){
+              // expired — remove for everyone
+              try{ FB.db.ref("msgs/"+key+"/"+k).remove().catch(()=>{}); }catch(e){}
+              const url="https://pennie-chat-default-rtdb.firebaseio.com/msgs/"+key+"/"+k+".json";
+              fetch(url,{method:"DELETE"}).catch(()=>{});
+              if(openChatPeer && String(openChatPeer).toLowerCase().replace(/^@+/,"")===String(p).toLowerCase().replace(/^@+/,"")){
+                const w=document.querySelector('.msg-row[data-key="'+k+'"]');
+                if(w) w.remove();
+              }
+            }
+          });
+        }).catch(()=>{});
+      }catch(e){}
+    });
+  }catch(e){}
+}
+setInterval(runSelfDestructSweep,5000);
+runSelfDestructSweep();
+// draft: keep unsent text per peer
+let _drafts={};
+try{ _drafts=JSON.parse(localStorage.getItem("pennie_drafts_"+String(me&&me.handle||"").toLowerCase().replace(/^@+/,"")))||{}; }catch(e){ _drafts={}; }
+function saveDraft(){
+  if(!openChatPeer) return;
+  const k=_myKey();
+  const t=$("chatText").value;
+  _drafts[openChatPeer]=t;
+  try{ localStorage.setItem("pennie_drafts_"+k, JSON.stringify(_drafts)); }catch(e){}
+}
+function loadDraftFor(peerName){
+  const v=_drafts[peerName]||"";
+  $("chatText").value=v;
+}
+function clearDraft(peerName){
+  if(peerName && _drafts[peerName]!=null){ delete _drafts[peerName]; }
+  const k=_myKey();
+  try{ localStorage.setItem("pennie_drafts_"+k, JSON.stringify(_drafts)); }catch(e){}
+}
+$("chatText").addEventListener("input",saveDraft);
+/* ---------- typing indicator ---------- */
+let _typingTO=null, _typingRef=null, _typingFn=null;
+function sendTypingSignal(){
+  try{
+    if(!openChatPeer) return;
+    const them=String(openChatPeer).toLowerCase().replace(/^@+/,"");
+    const myKey=String(me.handle).toLowerCase().replace(/^@+/,"");
+    if(them==="support" || them===myKey) return;
+    const dbKey=dialogKeyOf(me.handle,openChatPeer);
+    const ref=FB.db.ref("msgs/"+dbKey+"/_typing");
+    ref.set({who:me.handle,t:Date.now()}).catch(()=>{});
+    try{ ref.onDisconnect().remove(); }catch(e){}
+  }catch(e){}
+}
+$("chatText").addEventListener("input",()=>{
+  if(!openChatPeer) return;
+  clearTimeout(_typingTO);
+  _typingTO=setTimeout(sendTypingSignal,250);
+});
+function attachTypingListener(){
+  try{ if(_typingRef){ _typingRef.off("value",_typingFn); } }catch(e){}
+  if(!openChatPeer || String(openChatPeer).toLowerCase().replace(/^@+/,"")==="support"){ setTypingUI(null); _typingRef=null; return; }
+  const myKey=String(me.handle).toLowerCase().replace(/^@+/,"");
+  const dbKey=dialogKeyOf(me.handle,openChatPeer);
+  _typingRef=FB.db.ref("msgs/"+dbKey+"/_typing");
+  _typingFn=snap=>{
+    const myKey2=String(me.handle).toLowerCase().replace(/^@+/,"");
+    const v=snap.val();
+    const who=v&&v.who?String(v.who).toLowerCase().replace(/^@+/,""):null;
+    const fresh=v&&v.t&&Date.now()-v.t<6000;
+    if(who && who!==myKey2 && fresh){ setTypingUI(openChatPeer); }
+    else { setTypingUI(null); }
+  };
+  _typingRef.on("value",_typingFn);
+  // keep the status honest: clear when nobody has typed for a while
+  if(_typingTOClear) clearInterval(_typingTOClear);
+  _typingTOClear=setInterval(()=>{
+    const el=$("typingDots");
+    if(!el||!el.dataset.who) return;
+    const who=el.dataset.who;
+    FB.db.ref("msgs/"+dialogKeyOf(me.handle,openChatPeer)+"/_typing").once("value",s=>{
+      const v=s.val();
+      if(!v||!v.t||Date.now()-v.t>=6000){ setTypingUI(null); }
+    }).catch(()=>{});
+  },4000);
+}
+let _typingTOClear=null;
+function setTypingUI(peerName){
+  const s=$("peerStatusLine"); if(!s) return;
+  const el=$("typingDots");
+  if(peerName){
+    if(!el){ const d=document.createElement("span"); d.id="typingDots"; d.dataset.who=String(peerName).toLowerCase().replace(/^@+/,""); d.style.cssText="color:#6cc3ff;font-style:italic"; d.innerHTML="..."; s.insertBefore(d,s.firstChild); }
+    else{ el.dataset.who=String(peerName).toLowerCase().replace(/^@+/,""); }
+  } else if(el){ el.remove(); }
+}
+function clearTypingUI(){ setTypingUI(null); }
+$("peerOverlay").addEventListener("click",clearTypingUI);
+
+/* ---------- settings / profile ---------- */
+const PATTERNS=[
+  {css:"0", bg:"linear-gradient(135deg,#191c1f,#3a3f44)", label:"Чёрно-серый"},
+  {css:"1", bg:"rgba(200,50,60,.55)", label:"Красно-прозрачный"},
+  {css:"2", bg:"linear-gradient(135deg,#f2f2f2,#c9ced3)", label:"Бело-чёрный"},
+  {css:"3", bg:"#1a1d20", label:"Угольный"},
+  {css:"4", bg:"linear-gradient(135deg,#7a1f27,#c8323c)", label:"Красный"}
+];
+const THEMES=[
+  {id:"black",label:"Чисто чёрный",g:"#000"},
+  {id:"pattb",label:"Чёрный → узор",g:"#0a0a0a"},
+  {id:"white",label:"Светлый",g:"#f0f2f5"},
+  {id:"gold",label:"Золотой",g:"#2a2310"},
+  {id:"marsh",label:"Мятный",g:"#101609"},
+  {id:"sky",label:"Небесный",g:"#0a1826"},
+  {id:"violet",label:"Фиолетовый",g:"#170e28"}
+];
+let draftPat="0", draftTheme="dark", draftAva=null;
+
+function buildSettingsChrome(){
+  const pat=$("patSwatches"); if(pat){ pat.innerHTML="";
+  PATTERNS.forEach(p=>{
+    const b=document.createElement("button"); b.type="button"; b.className="swatch"; b.dataset.v=p.css;
+    b.style.background=p.bg; b.setAttribute("aria-label","Узор сообщений "+p.css);
+    b.addEventListener("click",()=>{ pat.querySelectorAll(".swatch").forEach(x=>x.classList.remove("sel")); b.classList.add("sel"); draftPat=p.css; me.pat=p.css; previewPat(); saveSession(); savePatToServer(p.css); if(typeof renderChatPreviewPat==="function") renderChatPreviewPat(p.css); });
+    pat.appendChild(b);
+  }); }
+  const th=$("themeSwatches"); if(th){ th.innerHTML="";
+  THEMES.forEach(t=>{
+    const b=document.createElement("button"); b.type="button"; b.className="theme-sw"; b.dataset.v=t.id; b.title=t.label;
+    b.style.background=t.g; b.style.color="#fff"; b.innerHTML="<span>"+esc(t.label)+"</span>";
+    b.addEventListener("click",()=>{ th.querySelectorAll(".theme-sw").forEach(x=>x.classList.remove("sel")); b.classList.add("sel"); draftTheme=t.id; });
+    th.appendChild(b);
+  }); }
+  // settings VIEW swatches
+const sp=$("sPatSwatches"); if(sp){ sp.innerHTML="";
+    PATTERNS.forEach(p=>{
+    const b=document.createElement("button"); b.type="button"; b.className="swatch"; b.dataset.v=p.css;
+    b.style.background=p.bg; b.setAttribute("aria-label","Цвет сообщений "+p.label);
+    b.addEventListener("click",()=>{ sp.querySelectorAll(".swatch").forEach(x=>x.classList.remove("sel")); b.classList.add("sel"); draftPat=p.css; me.pat=p.css; applyMyStyle(); saveSession(); savePatToServer(p.css); renderChatPreviewPat(p.css); toast("Цвет сообщений: "+p.label); });
+    sp.appendChild(b);
+  }); }
+function savePatToServer(pat){
+  const k=me&&me.handle?me.handle.slice(1):"";
+  if(!k) return;
+  try{ FB.db.ref("users/"+k).update({pat:String(pat)}).catch(()=>{}); }catch(e){}
+  fetch("https://pennie-chat-default-rtdb.firebaseio.com/users/"+k+"/pat.json",{method:"PUT",headers:{"Content-Type":"application/json"},body:JSON.stringify(String(pat))}).catch(()=>{});
+}
+function renderChatPreviewPat(pat){
+  if(!openChatPeer) return;
+  const key=dialogKeyOf(me.handle,openChatPeer);
+  FB.db.ref("msgs/"+key).once("value",snap=>{
+    const list=snap.val()||{};
+    Object.keys(list).forEach(mk=>{
+      const m=list[mk];
+      if(m && (m.from===me.handle || !m.pat)){ m.pat=String(pat); try{ FB.db.ref("msgs/"+key+"/"+mk+"/pat").set(String(pat)).catch(()=>{}); }catch(e){} }
+    });
+    if(typeof renderChat==="function") renderChat(openChatPeer,snapToObj(snap));
+  }).catch(()=>{});
+}
+  const sth=$("sThemeSwatches"); if(sth){ sth.innerHTML="";
+  THEMES.forEach(t=>{
+    const b=document.createElement("button"); b.type="button"; b.className="theme-sw"; b.dataset.v=t.id; b.title=t.label;
+    b.style.background=t.g; b.style.color="#fff"; b.innerHTML="<span>"+esc(t.label)+"</span>";
+    b.addEventListener("click",()=>{ sth.querySelectorAll(".theme-sw").forEach(x=>x.classList.remove("sel")); b.classList.add("sel"); draftTheme=t.id; });
+    sth.appendChild(b);
+  }); }
+  buildChatFx();
+}
+const CHAT_FX=[
+  {id:"none",label:"Обычный (узор)"}
+];
+function buildChatFx(){
+  const box=$("sChatFx"); if(!box) return;
+  box.innerHTML="";
+  CHAT_FX.forEach(f=>{
+    const b=document.createElement("button"); b.type="button"; b.className="chf"; b.dataset.v=f.id;
+    b.style.cssText="background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.14);border-radius:999px;padding:7px 13px;font-size:12.5px;font-weight:600;color:var(--ink);cursor:pointer;transition:all .15s";
+    b.textContent=f.label;
+    b.addEventListener("click",()=>{
+      box.querySelectorAll(".chf").forEach(x=>{ x.style.background="rgba(255,255,255,.07)"; x.style.color="var(--ink)"; });
+      b.style.background="var(--accent)"; b.style.color="#000";
+      me.chatfx=f.id; me.theme=f.id; saveSession();
+      try{ FB.db.ref("users/"+me.handle.slice(1)).update({chatfx:f.id, theme:f.id}).catch(()=>{}); }catch(e){}
+      try{ fetch("https://pennie-chat-default-rtdb.firebaseio.com/users/"+me.handle.slice(1)+".json",{method:"PATCH",headers:{"Content-Type":"application/json"},body:JSON.stringify({chatfx:f.id, theme:f.id})}).catch(()=>{}); }catch(e){}
+      if(typeof applyChatFX==="function") applyChatFX();
+      if(typeof renderProfile==="function"){ try{ renderProfile(); }catch(e){} }
+      toast("Фон: "+f.label);
+    });
+    box.appendChild(b);
+  });
+  const cur=(me&&me.chatfx)||"none";
+  box.querySelectorAll(".chf").forEach(x=>{
+    if(x.dataset.v===cur){ x.style.background="var(--accent)"; x.style.color="#000"; }
+  });
+}
+function previewPat(){
+  // show the chosen pattern live on the current message area (if a chat is open)
+  const b=document.querySelector(".bubble.m");
+  if(b) b.setAttribute("data-pat",draftPat);
+}
+function openSettings(){
+  draftPat=String(me.pat!=null?me.pat:"0");
+  draftTheme=me.theme||"dark";
+  draftAva=me.ava||null;
+  $("editFirst").value=me.first||"";
+  $("editLast").value=me.last||"";
+  const ebio=$("editBio"); if(ebio) ebio.value=me.bio||"";
+  const ebirth=$("editBirth"); if(ebirth) ebirth.value=me.birth||"";
+  // mark selections
+  const psw=$("#patSwatches"); if(psw) psw.querySelectorAll(".swatch").forEach(x=>x.classList.toggle("sel",x.dataset.v===draftPat));
+  renderAvaPreview();
+  $("#settingsOverlay").classList.add("open");
+  const rmA=$("btnRemoveAva"); if(rmA) rmA.style.display = (me.ava && me.ava.length) ? "block":"none";
+}
+function renderAvaPreview(){
+  const el=$("avaPreview");
+  if(el) el.innerHTML = draftAva && draftAva.length ? `<img src="${draftAva}" alt="">` : "👤";
+  const sp=$("setAvaPrev");
+  if(sp) sp.innerHTML = draftAva && draftAva.length ? `<img src="${draftAva}" alt="" style="width:100%;height:100%;object-fit:cover">` : "👤";
+  const rm=$("btnRemoveAva"); if(rm) rm.style.display = (draftAva && draftAva.length) ? "block":"none";
+}
+function readAvaFile(file,immediate){
+  if(!file) return;
+  if(!/^image\//.test(file.type)){ toast("Выберите изображение"); return; }
+  const rd=new FileReader();
+  rd.onload=e=>{
+    const img=new Image();
+    img.onload=()=>{
+      const S=180, cv=document.createElement("canvas");
+      const side=Math.min(img.width,img.height);
+      cv.width=S; cv.height=S;
+      const ctx=cv.getContext("2d");
+      const sx=(img.width-side)/2, sy=(img.height-side)/2;
+      try{ ctx.drawImage(img,sx,sy,side,side,0,0,S,S); }catch(err){
+        // some browsers need different draw args
+        ctx.drawImage(img,0,0,S,S); }
+      let url;
+      try{ url=cv.toDataURL("image/jpeg",0.82); }catch(e){ url=e.target.result; }
+      draftAva=url; renderAvaPreview();
+      if(immediate) applyAvaNow(); else toast("Фото выбрано");
+    };
+    img.onerror=()=>toast("Не удалось прочитать изображение");
+    img.src=e.target.result;
+  };
+  rd.readAsDataURL(file);
+}
+function closeSettings(){ $("#settingsOverlay").classList.remove("open"); }
+
+// save settings
+$("btnSaveSettings").addEventListener("click",()=>{
+  me.first=($("editFirst").value||"").trim();
+  me.last=($("editLast").value||"").trim();
+  me.name=[me.first,me.last].filter(Boolean).join(" ")||me.handle.slice(1);
+  me.bio=($("editBio").value||"").trim();
+  me.birth=$("editBirth").value||"";
+  me.pat=draftPat; me.theme=draftTheme; me.ava=draftAva;
+  applyMyStyle();
+  const mav=$("meAva"); if(mav) mav.innerHTML=avaHtml(me.ava,me.name);
+  const mnm=$("meName"); if(mnm) mnm.textContent=me.name;
+  // persist profile to Firebase user record
+  try{
+    FB.db.ref("users/"+me.handle.slice(1)).update({ pat:me.pat, theme:me.theme, ava:me.ava||"" , name:me.name, first:me.first, last:me.last, bio:me.bio, birth:me.birth||"" }).then(()=>{ saveSession(); }).catch(()=>{ saveSession(); });
+  }catch(e){}
+  closeSettings();
+  renderDialogs();
+  toast("Сохранено");
+});
+$("btnCloseSettings").addEventListener("click",closeSettings);
+$("settingsOverlay").addEventListener("click",e=>{ if(e.target===$("settingsOverlay")) closeSettings(); });
+$("btnUploadAva").addEventListener("click",()=>$("avaFile").click());
+$("avaFile").addEventListener("change",e=>{ const f=e.target.files&&e.target.files[0]; if(f) readAvaFile(f,true); e.target.value=""; });
+$("btnRemoveAva").addEventListener("click",()=>{ draftAva=null; renderAvaPreview(); applyAvaNow(); });
+// avatar upload from Settings view
+const _sab=$("setAvaBtn"), _saf=$("setAvaFile");
+if(_sab&&_saf){
+  _sab.addEventListener("click",()=>_saf.click());
+  _saf.addEventListener("change",e=>{ const f=e.target.files&&e.target.files[0]; if(f) readAvaFile(f,true); e.target.value=""; });
+}
+// emoji avatar picker
+const _emojiSet=["😀","😂","😎","🤖","👾","👻","💀","😺","🐶","🦊","🐼","🐸","🦁","🌸","🔥","⭐","🌈","🍀","⚡","🪐","🎮","🎧"];
+const _sae=$("setAvaEmoji");
+if(_sae){
+  _sae.addEventListener("click",()=>{
+    const pick=document.createElement("div");
+    pick.className="overlay open"; pick.style.zIndex="130";
+    pick.innerHTML='<div class="modal" style="max-width:330px"><div class="m-head"><div class="m-title">Выбор эмодзи</div><button class="x-btn" id="emojiX">✕</button></div><div style="display:grid;grid-template-columns:repeat(5,1fr);gap:8px" id="emojiGrid"></div></div>';
+    document.body.appendChild(pick);
+    const grid=pick.querySelector("#emojiGrid");
+    _emojiSet.forEach(em=>{
+      const b=document.createElement("button"); b.type="button"; b.style.cssText="width:48px;height:48px;font-size:26px;border-radius:12px;background:var(--panel2);border:1px solid var(--line);cursor:pointer";
+      b.textContent=em;
+      b.addEventListener("click",()=>{
+        me.ava=em; saveSession();
+        try{ FB.db.ref("users/"+me.handle.slice(1)).update({ava:em}).catch(()=>{}); }catch(e){}
+        try{ fetch("https://pennie-chat-default-rtdb.firebaseio.com/users/"+me.handle.slice(1)+".json",{method:"PATCH",headers:{"Content-Type":"application/json"},body:JSON.stringify({ava:em})}).catch(()=>{}); }catch(e){}
+        renderAvaPreview();
+        const a=$("meAva"); if(a) a.innerHTML=avaHtml(me.ava,me.name);
+        if(typeof renderProfile==="function"){ try{ renderProfile(); }catch(e){} }
+        pick.remove();
+        toast("Эмодзи-аватар установлен");
+      });
+      grid.appendChild(b);
+    });
+    pick.querySelector("#emojiX").addEventListener("click",()=>pick.remove());
+    pick.addEventListener("click",e=>{ if(e.target===pick) pick.remove(); });
+  });
+}
+function applyAvaNow(){
+  me.ava=draftAva||"";
+  try{ FB.db.ref("users/"+me.handle.slice(1)).update({ava:me.ava}).then(()=>saveSession()).catch(()=>saveSession()); }catch(e){}
+  if(typeof renderProfile==="function") renderProfile();
+  const av=$("pBigAva"); if(av) av.innerHTML=avaHtml(me.ava,me.name);
+  toast(me.ava?"Аватар обновлён":"Фото убрано");
+}
+
+function applyMyStyle(){
+  // global app theme stays dark/light from a separate pref (me.appTheme); personal me.theme only shows in profile hero
+  document.body.dataset.theme = me.appTheme||"dark";
+  document.body.dataset.density = me.density==="compact" ? "compact":"cozy";
+  document.body.dataset.msgsize = (me.msgsize||"md")==="lg"?"lg":((me.msgsize||"md")==="sm"?"sm":"md");
+}
+/* app theme toggle (dark / pure black) */
+function renderAppThemeVal(){
+  const el=$("appThemeVal");
+  if(el) el.textContent = (me.appTheme==="black") ? "Чисто чёрная" : (me.appTheme==="light" ? "Светлая" : "Тёмная");
+}
+$("sRowAppTheme").addEventListener("click",()=>{
+  // cycle: dark -> black -> light -> dark
+  const order=["dark","black","light"];
+  const curIdx=order.indexOf(me.appTheme);
+  me.appTheme = order[(curIdx+1)%order.length] || "dark";
+  applyMyStyle();
+  renderAppThemeVal();
+  try{ FB.db.ref("users/"+me.handle.slice(1)).update({ appTheme:me.appTheme }).catch(()=>{}); }catch(e){}
+  saveSession();
+  const label = me.appTheme==="black" ? "Чисто чёрная тема" : (me.appTheme==="light" ? "Светлая тема" : "Тёмная тема");
+  toast(label);
+});
+function toast(m){
+  let el=document.getElementById("toastBox");
+  if(!el){ el=document.createElement("div"); el.id="toastBox"; el.style.cssText="position:fixed;left:50%;bottom:24px;transform:translateX(-50%);background:rgba(20,27,35,.9);color:#fff;padding:11px 18px;border-radius:12px;font-size:14px;z-index:99;transition:opacity .3s"; document.body.appendChild(el); }
+  el.textContent=m; el.style.opacity="1";
+  clearTimeout(el.__t); el.__t=setTimeout(()=>{ el.style.opacity="0"; },2200);
+}
+
+/* settings access via bottom nav */
+window.openSettings=openSettings;
+
+/* peer profile modal */
+function openPeerProfileFrom(rawThem){
+  if(!rawThem) return;
+  const themL=String(rawThem).replace(/^@+/,"").toLowerCase();
+  const d=dialogs[themL]||{handle:themL,name:themL,ava:"👤",theme:"dark"};
+  _admTarget=themL;
+  showAdminFor(themL);
+  // hide "block"/"pin" buttons when viewing your own profile
+  const isSelf = (themL===String(me.handle).toLowerCase().replace(/^@+/,""));
+  const blkBtn=$("btnBlockPeer");
+  if(blkBtn){ blkBtn.style.display = isSelf ? "none":"block"; }
+  // show current block state
+  const blkBtn2=$("btnBlockPeer");
+  if(blkBtn2 && !isSelf){
+    const isBlocked = me.blocked && me.blocked[themL];
+    blkBtn2.textContent = isBlocked ? "Разблокировать" : "Заблокировать";
+  }
+  const hero=document.querySelector("#peerOverlay .peer-hero");
+  if(hero){
+    hero.setAttribute("data-pbg",d.theme||"dark");
+  }
+  $("peerBigAva").innerHTML=avaHtml(d.ava,d.name);
+  $("peerBigName").textContent=d.name||"@"+themL;
+  $("peerBigHandle").textContent=capHandle(themL);
+  const _pb2=$("btnPinPeer"); if(_pb2){ _pb2.style.display = isSelf ? "none":"block"; _pb2.textContent = isChatPinned(themL) ? "Открепить":"Закрепить"; }
+  $("peerBigHandle").setAttribute("data-copy",String(themL).replace(/^@+/,""));
+  $("peerBigHandle").style.cursor="pointer";
+  $("peerBigHandle").title="Нажмите, чтобы скопировать юзернейм";
+  // also apply peer theme on the contacts/profile hero if it's the same user
+  if(themL===String(me.handle).toLowerCase().replace(/^@+/,"")){
+    const shero=document.querySelector("#vProfile .profile-hero");
+    if(shero) shero.setAttribute("data-pbg",me.theme||"dark");
+  }
+  // fetch fresh peer data (ava, name, theme, bio, privacy) to keep visible to all
+  FB.db.ref("users/"+themL).once("value").then(s=>{
+    const u=s.val(); if(!u) return;
+    const priv=u.privacy||{seen:false,ava:false,phone:false};
+    dialogs[themL]=dialogs[themL]||{};
+    dialogs[themL].ava=u.ava||"";
+    dialogs[themL].name=u.name||"@"+themL;
+    dialogs[themL].theme=u.theme||"dark";
+    dialogs[themL].bio=u.bio||"";
+    if(hero){ hero.setAttribute("data-pbg",(u.theme&&u.theme!=="none")?u.theme:"dark"); applyFxTo(hero,u.theme||"dark"); }
+    // privacy: hide avatar if peer disabled it
+    $("peerBigAva").innerHTML = priv.ava ? "🙂" : avaHtml(u.ava,u.name);
+    if(themL==="lincoln"){
+      if(hero){ hero.setAttribute("data-pbg","cosmic"); applyFxTo(hero,"cosmic"); }
+    }
+    $("peerBigAva").innerHTML=avaHtml(u.ava,u.name);
+    $("peerBigName").innerHTML=esc(u.name||"@"+themL)+roleBadge(u,themL);
+    // full profile fields (same layout as own profile)
+    const hv=$("peerHandleVal"); if(hv) hv.textContent=capHandle(themL);
+    const stv=$("peerStatus");
+    if(stv){ stv.style.display = priv.seen ? "none":"block"; stv.innerHTML = (u.on && Date.now()-(u.lastSeen||0)<90000) ? '<span style="color:#34d399">● в сети</span>' : '<span style="color:var(--ink-dim)">'+((u&&u.lastSeen)?lastSeenText(u.lastSeen):"не в сети")+'</span>'; }
+    const pv=$("peerPhoneVal");
+    if(pv){ pv.textContent = priv.phone ? "Скрыто" : (u.phone?esc(u.phone):(themL==="lincoln"?"+888 888 88 88":"—")); }
+    const bv=$("peerBioVal");
+    if(bv){
+      if(u.bio && !(priv&&priv.bio)) bv.textContent=u.bio;
+      else if(priv&&priv.bio) bv.textContent="Скрыто";
+      else bv.textContent="—";
+    }
+    const btv=$("peerBirthVal");
+    if(btv){
+      if(priv&&priv.birth) btv.textContent="Скрыто";
+      else btv.textContent=u.birth?new Date(u.birth).toLocaleDateString("ru-RU",{day:"numeric",month:"long",year:"numeric"}):"—";
+    }
+    const rv=$("peerRegVal");
+    if(rv){ rv.textContent=u.created?new Date(u.created).toLocaleDateString("ru-RU",{day:"numeric",month:"long",year:"numeric"}):"—"; }
+    const _ps2=$("peerStars"); if(_ps2) _ps2.textContent=(Number(u.stars||0)).toLocaleString("ru-RU")+" ⭐";
+    const _pg2=$("peerGifts");
+    if(_pg2){
+      const owns=u.gifts||{};
+      const list=Object.values(owns).filter(v=>v&&v.id);
+      _pg2.innerHTML=list.length ? list.map(v=>giftCardHtml(giftById(v.id)||{id:v.id,name:v.id,rarity:"common",price:0,grad:"linear-gradient(135deg,#333,#222)",icon:"🎁"})).join("") : '<div class="gift-empty">Пока нет подарков.</div>';
+      _pg2.querySelectorAll(".gift-card").forEach(c=>{ c.addEventListener("click",()=>openGiftView(giftById(c.dataset.gid)||null)); });
+    }
+    const bio=$("peerBio");
+    if(bio){
+      const showBio = u.bio && !(priv&&priv.bio);
+      bio.style.display = showBio ? "block":"none";
+      bio.textContent = showBio ? (u.bio||"") : (priv&&priv.bio?"Скрыто":"");
+    }
+    const pm=$("peerMeta");
+    if(pm){
+      let txt="";
+      if(u.created) txt+="Регистрация: "+new Date(u.created).toLocaleDateString("ru-RU",{day:"numeric",month:"long",year:"numeric"})+"\n";
+      if(u.birth){
+        if(priv&&priv.birth) txt+="День рождения: скрыто\n";
+        else txt+="День рождения: "+new Date(u.birth).toLocaleDateString("ru-RU",{day:"numeric",month:"long"})+"\n";
+      }
+      if(!priv.seen && u.lastSeen) txt+="Последний раз в сети: "+lastSeenText(u.lastSeen);
+      if(priv.seen) txt+="Онлайн-статус скрыт";
+      pm.style.whiteSpace="pre-wrap";
+      pm.textContent=txt;
+    }
+  }).catch(()=>{});
+  $("peerOverlay").classList.add("open");
+}
+function openPeerProfile(){
+  if(!openChatPeer) return;
+  openPeerProfileFrom(openChatPeer);
+}
+function openPeerFromList(themL){ openPeerProfileFrom(String(themL).toLowerCase()); }
+let _admTarget=null;
 function showAdminFor(handleLower){
   const btn=$("btnAdminPeer");
   const isLincoln = String(me&&me.handle||"").toLowerCase().replace(/^@+/,"")==="lincoln";
@@ -3215,18 +3855,39 @@ function openAdminPanel(){
   if(!_admTarget) return;
   const box=$("adminOverlay"); if(!box) return;
   $("adminTarget").textContent="@"+_admTarget;
-  $("admPhone").value=""; $("admStatus").value=""; $("admBio").value=""; $("admPass").value=""; $("admHandle").value=""; $("admWarnReason").value="";
+  $("admPhone").value=""; $("admStatus").value=""; $("admBio").value=""; $("admPass").value="";
   const l=$("admLogsBox"); if(l) l.innerHTML="";
   FB.db.ref("users/"+_admTarget.replace(/^@+/,"").toLowerCase()).once("value").then(s=>{
     const u=s.val()||{};
     if(u.phone) $("admPhone").value=u.phone;
     if(u.status) $("admStatus").value=u.status;
     if(u.bio) $("admBio").value=u.bio;
-    const ps=$("admStars"); if(ps) ps.value=u.stars||"";
   }).catch(()=>{});
   buildGiftPicker();
+  const ps=$("admStars"); if(ps) ps.value=(u&&u.stars)||"";
   box.classList.add("open");
 }
+let _admGiftSel=null;
+function buildGiftPicker(){
+  const box=$("admGiftPick"); if(!box || box.dataset.built) return; box.dataset.built="1";
+  GIFT_CATALOG.forEach(g=>{
+    const r=GIFT_RARITY[g.rarity]||GIFT_RARITY.common;
+    const c=document.createElement("button"); c.type="button";
+    c.style.cssText="position:relative;border-radius:12px;padding:10px;min-height:84px;display:flex;flex-direction:column;justify-content:space-between;background:"+g.grad+";border:1px solid rgba(255,255,255,.2);cursor:pointer;overflow:hidden";
+    c.innerHTML='<span style="font-size:30px;z-index:1">'+g.icon+'</span><span style="z-index:1;font-size:10px;font-weight:800;color:#fff;text-shadow:0 1px 2px rgba(0,0,0,.5)">'+esc(g.name)+'<br><span style="color:'+r.color+'">'+r.label+'</span></span>';
+    c.addEventListener("click",()=>{ box.querySelectorAll("button").forEach(b=>b.style.outline="none"); c.style.outline="2px solid #ffd35e"; c.style.outlineOffset="2px"; _admGiftSel=g.id; });
+    box.appendChild(c);
+  });
+}
+const _admGive=$("admGiveStars"); if(_admGive) _admGive.addEventListener("click",()=>{
+  const amt=Number(($("admStars")&&$("admStars").value)||0);
+  if(amt<=0){ toast("Введите количество ⭐","err"); return; }
+  giveStars(admKey(),amt);
+});
+const _admGiftApply=$("admGiftApply"); if(_admGiftApply) _admGiftApply.addEventListener("click",()=>{
+  if(!_admGiftSel){ toast("Выберите подарок","err"); return; }
+  giveGiftToUser(admKey(),_admGiftSel);
+});
 function closeAdminPanel(){ const box=$("adminOverlay"); if(box) box.classList.remove("open"); _admTarget=null; }
 $("btnAdminPeer").addEventListener("click",openAdminPanel);
 $("btnCloseAdmin").addEventListener("click",closeAdminPanel);
@@ -3268,30 +3929,6 @@ document.querySelectorAll("[data-setstatus]").forEach(btn=>{
     const di=$("admStatus"); if(di) di.value=st;
     toast(st?("Статус установлен: "+ROLE_TYPES[st]||st):"Статус снят");
   });
-});
-let _admGiftSel=null;
-function buildGiftPicker(){
-  const box=$("admGiftPick"); if(!box) return;
-  if(box.dataset.built) return; box.dataset.built="1";
-  GIFT_CATALOG.forEach(g=>{
-    const r=GIFT_RARITY[g.rarity]||GIFT_RARITY.common;
-    const c=document.createElement("button"); c.type="button";
-    c.style.cssText="position:relative;border-radius:12px;padding:10px;min-height:84px;display:flex;flex-direction:column;justify-content:space-between;background:"+g.grad+";border:1px solid rgba(255,255,255,.2);cursor:pointer;overflow:hidden";
-    c.innerHTML='<span style="font-size:30px;z-index:1">'+g.icon+'</span><span style="z-index:1;font-size:10px;font-weight:800;color:#fff;text-shadow:0 1px 2px rgba(0,0,0,.5)">'+esc(g.name)+'<br><span style="color:'+r.color+'">'+r.label+'</span></span>';
-    c.addEventListener("click",()=>{ box.querySelectorAll("button").forEach(b=>b.style.outline="none"); c.style.outline="2px solid #ffd35e"; c.style.outlineOffset="2px"; _admGiftSel=g.id; });
-    box.appendChild(c);
-  });
-}
-$("admGiveStars").addEventListener("click",()=>{
-  const amt=Number(($("admStars")&&$("admStars").value)||0);
-  if(amt<=0){ toast("Введите количество ⭐","err"); return; }
-  if(!isLincoln()){ toast("Доступно только основателю","err"); return; }
-  giveStars(admKey(),amt);
-});
-$("admGiftApply").addEventListener("click",()=>{
-  if(!isLincoln()){ toast("Доступно только основателю","err"); return; }
-  if(!_admGiftSel){ toast("Выберите подарок","err"); return; }
-  giveGiftToUser(admKey(),_admGiftSel);
 });
 $("admSave").addEventListener("click",async ()=>{
   const k=admKey();
@@ -3508,42 +4145,8 @@ $("admLogs").addEventListener("click",async ()=>{
   if(!rows.length){ box.innerHTML="Логов не найдено."; return; }
   box.innerHTML=rows.join("<br>");
 });
-$("btnPeer")&&$("btnPeer").addEventListener("click",function(){ if(openChatPeer) openPeerProfileFrom(String(openChatPeer).replace(/^@+/,"")); });
-function openPeerProfileFrom(rawThem){
-  try{
-    const themL=String(rawThem||"").replace(/^@+/,"").toLowerCase();
-    if(!themL) return;
-    _admTarget=themL;
-    showAdminFor(themL);
-    $("peerBigAva").innerHTML=avaHtml("",themL);
-    $("peerBigName").textContent=capHandle(themL);
-    $("peerBigHandle").textContent="@"+themL;
-    const pin=$("btnPinPeer"); if(pin){ pin.style.display = (themL===String(me.handle).toLowerCase().replace(/^@+/,"")) ? "none":"block"; pin.textContent=isChatPinned(themL)?"Открепить":"Закрепить"; }
-    const blk=$("btnBlockPeer"); if(blk) blk.style.display = (themL===String(me.handle).toLowerCase().replace(/^@+/,"")) ? "none":"block";
-    FB.db.ref("users/"+themL).once("value",snap=>{
-      const u=snap.val()||{};
-      const isSelf=(themL===String(me.handle).toLowerCase().replace(/^@+/,""));
-      $("peerBigAva").innerHTML=avaHtml(u.ava,u.name);
-      $("peerBigName").innerHTML=esc(u.name||"@"+themL)+roleBadge(u,themL);
-      const _hv=$("peerHandleVal"); if(_hv) _hv.textContent=capHandle(themL);
-      const _pv=$("peerPhoneVal"); if(_pv) _pv.textContent=(u.privacy&&u.privacy.phone)?"Скрыто":(u.phone?esc(u.phone):"—");
-      const _bv=$("peerBioVal"); if(_bv) _bv.textContent=(u.bio&&!(u.privacy&&u.privacy.bio))?u.bio:((u.privacy&&u.privacy.bio)?"Скрыто":"—");
-      const _btv=$("peerBirthVal"); if(_btv) _btv.textContent=(u.privacy&&u.privacy.birth)?"Скрыто":(u.birth?new Date(u.birth).toLocaleDateString("ru-RU",{day:"numeric",month:"long",year:"numeric"}):"—");
-      const _rv=$("peerRegVal"); if(_rv) _rv.textContent=u.created?new Date(u.created).toLocaleDateString("ru-RU",{day:"numeric",month:"long",year:"numeric"}):"—";
-      // stars + gifts
-      const _ps=$("peerStars"); if(_ps) _ps.textContent=(Number(u.stars||0)).toLocaleString("ru-RU")+" ⭐";
-      const _pg=$("peerGifts");
-      if(_pg){
-        const owns=u.gifts||{};
-        const list=Object.values(owns).filter(v=>v&&v.id);
-        _pg.innerHTML=list.length ? list.map(v=>giftCardHtml(giftById(v.id)||{id:v.id,name:v.id,rarity:"common",price:0,grad:"linear-gradient(135deg,#333,#222)",icon:"🎁"})).join("") : '<div class="gift-empty">Пока нет подарков.</div>';
-        _pg.querySelectorAll(".gift-card").forEach(c=>{ c.addEventListener("click",()=>openGiftView(giftById(c.dataset.gid)||null)); });
-      }
-      $("peerOverlay").classList.add("open");
-    }).catch(()=>{ $("peerOverlay").classList.add("open"); });
-  }catch(e){}
-}
-$("peerClick").addEventListener("click",function(){ if(openChatPeer) openPeerProfileFrom(String(openChatPeer).replace(/^@+/,"")); });
+$("btnPeer")&&$("btnPeer").addEventListener("click",openPeerProfile);
+$("peerClick").addEventListener("click",openPeerProfile);
 $("btnClosePeer").addEventListener("click",()=>$("peerOverlay").classList.remove("open"));
 $("peerOverlay").addEventListener("click",e=>{ if(e.target===$("peerOverlay")) $("peerOverlay").classList.remove("open"); });
 $("btnWritePeer").addEventListener("click",()=>{ $("peerOverlay").classList.remove("open"); $("chatText").focus(); });
@@ -3739,7 +4342,6 @@ function renderProfile(){
     if(me.privacy && me.privacy.seen) ps.textContent="● в сети (скрыт)";
     else ps.textContent="● в сети";
   }
-  if(typeof applyProfileFX==="function") applyProfileFX(me.chatfx||"none");
   const _ps=$("pStars"); if(_ps) _ps.textContent=(Number(me.stars||0)).toLocaleString("ru-RU")+" ⭐";
   const _pg=$("pGifts");
   if(_pg){
@@ -3748,11 +4350,10 @@ function renderProfile(){
     if(!list.length){ _pg.innerHTML='<div class="gift-empty">Пока нет подарков.</div>'; }
     else {
       _pg.innerHTML=list.map(v=>giftCardHtml(giftById(v.id)||{id:v.id,name:v.id,rarity:"common",price:0,grad:"linear-gradient(135deg,#333,#222)",icon:"🎁"})).join("");
-      _pg.querySelectorAll(".gift-card").forEach(c=>{
-        c.addEventListener("click",()=>openGiftView(giftById(c.dataset.gid)||null));
-      });
+      _pg.querySelectorAll(".gift-card").forEach(c=>{ c.addEventListener("click",()=>openGiftView(giftById(c.dataset.gid)||null)); });
     }
   }
+  if(typeof applyProfileFX==="function") applyProfileFX(me.chatfx||"none");
 }
 $("pActPhoto").addEventListener("click",()=>$("pAvaFile").click());
 $("pBigAva").addEventListener("click",()=>$("pAvaFile").click());
