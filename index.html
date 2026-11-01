@@ -1304,6 +1304,8 @@ function giveStars(targetKey,amount){
       const payload={stars:nv};
       FB.db.ref("users/"+k).update(payload).catch(()=>{});
       fetch("https://pennie-chat-default-rtdb.firebaseio.com/users/"+k+".json",{method:"PATCH",headers:{"Content-Type":"application/json"},body:JSON.stringify(payload)}).catch(()=>{});
+      // if issuing to yourself, update the local `me` so the profile reflects it immediately
+      if(k===_myKey()){ me.stars=nv; saveSession(); try{ if(typeof renderProfile==="function") renderProfile(); }catch(e){} }
       toast("Выдано "+amount+" ⭐ пользователю @"+k,"ok");
     }).catch(()=>{ toast("Ошибка выдачи звёзд","err"); });
   }catch(e){ toast("Выдавать звёзды может только основатель","err"); }
@@ -1341,6 +1343,9 @@ function giveGiftToUser(targetKey,gid){
       // record issuance locally so the 10-copy limit is enforced in this admin session
       _issuedCache["i"+Date.now()]={gid:gid,at:Date.now()};
       saveIssued();
+      // if issuing to yourself, update the local `me` so the profile reflects it immediately
+      if(k===_myKey()){ me.gifts=gifts; saveSession(); }
+      try{ if(typeof renderProfile==="function") renderProfile(); }catch(e){}
       toast("Подарок \""+g.name+"\" выдан @"+k+" ("+(already+1)+"/"+limit+") 🎁","ok");
     }).catch(()=>{ toast("Ошибка выдачи подарка","err"); });
   }catch(e){ toast("Выдавать подарки может только основатель","err"); }
@@ -1495,7 +1500,7 @@ async function onNext2(){
         try{ FB.db.ref("users/"+key).update({created:Date.now()}).catch(()=>{}); }catch(e){}
         try{ fetch("https://pennie-chat-default-rtdb.firebaseio.com/users/"+key+".json",{method:"PATCH",headers:{"Content-Type":"application/json"},body:JSON.stringify({created:Date.now()})}).catch(()=>{}); }catch(e){}
       }
-      me={handle:pendingUser, name:(rec.name||pendingUser.slice(1)), ava:(rec.ava||""), pat:(rec.pat!=null?rec.pat:"0"), theme:(rec.theme||"black"), appTheme:(rec.appTheme||"dark"), blocked:(rec.blocked||{}), bio:(rec.bio||""), created:(rec.created||Date.now()), birth:(rec.birth||"")};
+      me={handle:pendingUser, name:(rec.name||pendingUser.slice(1)), ava:(rec.ava||""), pat:(rec.pat!=null?rec.pat:"0"), theme:(rec.theme||"black"), appTheme:(rec.appTheme||"dark"), blocked:(rec.blocked||{}), bio:(rec.bio||""), created:(rec.created||Date.now()), birth:(rec.birth||""), stars:(rec.stars||0), gifts:(rec.gifts||{}), profileGift:(rec.profileGift||""), mineColor:(rec.mineColor||""), theirColor:(rec.theirColor||""), bubbleRadius:(rec.bubbleRadius!=null?rec.bubbleRadius:16), wall:(rec.wall||null), time12:!!rec.time12, cleanMode:!!rec.cleanMode, msgsize:(rec.msgsize||"md"), density:(rec.density||"cozy"), sound:(rec.sound!=null?rec.sound:true)};
       // blocked account cannot enter the chat
       if(rec.blocked && rec.blocked.blockedAt){
         if(rec.blocked.frozenUntil && rec.blocked.frozenUntil>Date.now()){
@@ -5398,6 +5403,24 @@ function makeDust(){
   if(me && me.handle){
     // normalize handle in stored session too
     me.handle=normHandle(me.handle)||me.handle;
+    // pull fresh stars/gifts/profile prefs on boot (so local `me` never serves stale data)
+    try{
+      FB.db.ref("users/"+me.handle.replace(/^@+/,"")).once("value").then(sa=>{
+        const u=sa.val();
+        if(!u) return;
+        me.stars=u.stars||0;
+        me.gifts=u.gifts||{};
+        me.profileGift=u.profileGift||me.profileGift||"";
+        if(u.mineColor!=null) me.mineColor=u.mineColor;
+        if(u.theirColor!=null) me.theirColor=u.theirColor;
+        if(u.bubbleRadius!=null) me.bubbleRadius=u.bubbleRadius;
+        if(u.wall) me.wall=u.wall;
+        if(u.time12!=null) me.time12=u.time12;
+        if(u.cleanMode!=null) me.cleanMode=u.cleanMode;
+        saveSession();
+        try{ applyMyStyle(); if(typeof renderProfile==="function") renderProfile(); }catch(e){}
+      }).catch(()=>{});
+    }catch(e){}
     applyMyStyle();
     ensureOnlineHeartbeat();
     registerDevice();
