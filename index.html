@@ -3862,9 +3862,9 @@ function openAdminPanel(){
     if(u.phone) $("admPhone").value=u.phone;
     if(u.status) $("admStatus").value=u.status;
     if(u.bio) $("admBio").value=u.bio;
+    const ps=$("admStars"); if(ps) ps.value=(u.stars==null?"":u.stars);
   }).catch(()=>{});
   buildGiftPicker();
-  const ps=$("admStars"); if(ps) ps.value=(u&&u.stars)||"";
   box.classList.add("open");
 }
 let _admGiftSel=null;
