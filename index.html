@@ -2006,6 +2006,7 @@ function loadDialogs(){
 }
 
 let _pinnedChats=null;
+let _starredChats=null;
 function pinnedChats(){
   try{ if(_pinnedChats) return _pinnedChats; _pinnedChats=JSON.parse(localStorage.getItem("pennie_dpin_"+_myKey()))||null; }catch(e){ _pinnedChats=null; }
   if(!_pinnedChats){ _pinnedChats={}; try{ localStorage.setItem("pennie_dpin_"+_myKey(),"{}"); }catch(e){} }
