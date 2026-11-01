@@ -1125,16 +1125,24 @@ function openGiftView(g){
       '<div style="margin-top:4px"><span style="color:'+r.color+';font-weight:700">'+r.label+'</span></div>'+
       '<div style="margin-top:6px;color:var(--ink-dim);font-size:13px">Ценность: '+g.price.toLocaleString("ru-RU")+' ⭐</div>'+
       '<button class="btn" id="gvOk" style="margin-top:14px;width:100%">Закрыть</button>'+
-      '<button class="btn ghost" id="gvColor" style="margin-top:8px;width:100%;color:#5db9ff;border-color:var(--line)">🎨 Поставить цвет профиля</button>';
+      '<button class="btn ghost" id="gvColor" style="margin-top:8px;width:100%;color:#5db9ff;border-color:var(--line)">🎨 Поставить цвет профиля</button>'+
+      '<button class="btn ghost" id="gvSell" style="margin-top:8px;width:100%;color:#ffd35e;border-color:var(--line)">💰 Выставить на продажу</button>';
     ov.appendChild(box);
     box.querySelector("#gvOk").addEventListener("click",()=>ov.remove());
     const gColor=$("#gvColor")||box.querySelector("#gvColor");
     if(gColor) gColor.addEventListener("click",()=>{
-      // only allow if the user owns this gift
       const owns=me.gifts||{};
       const has=Object.values(owns).some(v=>v&&v.id===g.id);
       if(!has){ toast("Сначала нужно получить этот подарок","err"); return; }
       applyGiftColor(g);
+      ov.remove();
+    });
+    const gSell=box.querySelector("#gvSell");
+    if(gSell) gSell.addEventListener("click",()=>{
+      const owns=me.gifts||{};
+      const has=Object.values(owns).some(v=>v&&v.id===g.id);
+      if(!has){ toast("Сначала нужно получить этот подарок","err"); return; }
+      sellOwnedGift(g);
       ov.remove();
     });
     ov.addEventListener("click",e=>{ if(e.target===ov) ov.remove(); });
@@ -1155,6 +1163,86 @@ function applyGiftColor(g){
     if(peerhero && String(openChatPeer)==String(me.handle.slice(1))){ peerhero.style.background=g.grad; }
     toast("Цвет профиля установлен: "+g.name,"ok");
   }catch(e){ toast("Ошибка установки цвета","err"); }
+}
+/* ---------- gift marketplace ---------- */
+function sellOwnedGift(g){
+  try{
+    if(!g) return;
+    const myKey=_myKey();
+    const owns=me.gifts||{};
+    // find a gift of this id owned by the user
+    let uid=null, entry=null;
+    Object.keys(owns).forEach(k=>{ if(!uid && owns[k] && owns[k].id===g.id){ uid=k; entry=owns[k]; } });
+    if(!uid || !entry){ toast("Подарок не найден у вас","err"); return; }
+    const price=prompt("Цена продажи в ⭐ (минимум 1):", "1000");
+    const p=Math.floor(Number(price));
+    if(!(p>=1)){ toast("Некорректная цена","err"); return; }
+    if(!confirm("Выставить на продажу «"+g.name+"» за "+p.toLocaleString("ru-RU")+" ⭐?")) return;
+    const lotId="m"+Date.now();
+    const lot={gid:g.id,name:g.name,rarity:g.rarity,price:p,icon:g.icon,grad:g.grad,svg:g.svg,qty:g.qty,seller:me.handle,sellerName:me.name||me.handle,uid:uid,at:Date.now()};
+    // remove the gift from seller
+    delete owns[uid];
+    me.gifts=owns; saveSession();
+    const k=myKey;
+    try{ FB.db.ref("users/"+k+"/gifts").set(owns).catch(()=>{}); }catch(e){}
+    fetch("https://pennie-chat-default-rtdb.firebaseio.com/users/"+k+"/gifts.json",{method:"PUT",headers:{"Content-Type":"application/json"},body:JSON.stringify(owns)}).catch(()=>{});
+    // create market lot
+    try{ FB.db.ref("market/"+lotId).set(lot).catch(()=>{}); }catch(e){}
+    fetch("https://pennie-chat-default-rtdb.firebaseio.com/market/"+lotId+".json",{method:"PUT",headers:{"Content-Type":"application/json"},body:JSON.stringify(lot)}).catch(()=>{});
+    if(typeof renderProfile==="function"){ try{ renderProfile(); }catch(e){} }
+    toast("Подарок выставлен на продажу за "+p.toLocaleString("ru-RU")+" ⭐","ok");
+  }catch(e){ toast("Ошибка выставления на продажу","err"); }
+}
+function loadMarketLots(cb){
+  try{
+    FB.db.ref("market").once("value",snap=>{
+      const all=snap.val()||{};
+      const lots=Object.keys(all).map(k=>Object.assign({lotId:k},all[k])).filter(l=>l&&l.seller);
+      lots.sort((a,b)=>(b.at||0)-(a.at||0));
+      cb(lots);
+    }).catch(()=>cb([]));
+  }catch(e){ cb([]); }
+}
+function buyGiftLot(lotId){
+  try{
+    if(!lotId) return;
+    const myKey=_myKey();
+    FB.db.ref("market/"+lotId).once("value",snap=>{
+      const lot=snap.val(); if(!lot || !lot.seller){ toast("Лот уже куплен","err"); return; }
+      if(String(lot.seller).toLowerCase().replace(/^@+/,"")===myKey){ toast("Нельзя купить свой лот","err"); return; }
+      const price=Number(lot.price||0);
+      if(price<=0){ toast("Некорректная цена","err"); return; }
+      FB.db.ref("users/"+myKey+"/stars").once("value",s1=>{
+        const myStars=Number(s1.val()||0);
+        if(myStars<price){ toast("Недостаточно звёзд — нужно "+price.toLocaleString("ru-RU")+" ⭐","err"); return; }
+        // buyer: deduct stars
+        FB.db.ref("users/"+myKey).update({stars:myStars-price}).catch(()=>{});
+        fetch("https://pennie-chat-default-rtdb.firebaseio.com/users/"+myKey+"/stars.json",{method:"PUT",headers:{"Content-Type":"application/json"},body:JSON.stringify(myStars-price)}).catch(()=>{});
+        me.stars=myStars-price; saveSession();
+        // seller: add stars
+        FB.db.ref("users/"+String(lot.seller).replace(/^@+/,"").toLowerCase()+"/stars").once("value",s2=>{
+          const sellStars=Number(s2.val()||0);
+          FB.db.ref("users/"+lot.seller.replace(/^@+/,"").toLowerCase()).update({stars:sellStars+price}).catch(()=>{});
+          fetch("https://pennie-chat-default-rtdb.firebaseio.com/users/"+lot.seller.replace(/^@+/,"").toLowerCase()+"/stars.json",{method:"PUT",headers:{"Content-Type":"application/json"},body:JSON.stringify(sellStars+price)}).catch(()=>{});
+        }).catch(()=>{});
+        // buyer: add gift to their collection
+        FB.db.ref("users/"+myKey+"/gifts").once("value",s3=>{
+          const gifts=s3.val()||{};
+          const nid="g"+lot.gid+"_"+Date.now();
+          gifts[nid]={id:lot.gid,name:lot.name,rarity:lot.rarity,price:lot.price,icon:lot.icon,grad:lot.grad,qty:lot.qty,svg:lot.svg,at:Date.now(),from:lot.seller};
+          FB.db.ref("users/"+myKey+"/gifts").set(gifts).catch(()=>{});
+          fetch("https://pennie-chat-default-rtdb.firebaseio.com/users/"+myKey+"/gifts.json",{method:"PUT",headers:{"Content-Type":"application/json"},body:JSON.stringify(gifts)}).catch(()=>{});
+          me.gifts=gifts; saveSession();
+        }).catch(()=>{});
+        // remove lot
+        FB.db.ref("market/"+lotId).remove().catch(()=>{});
+        fetch("https://pennie-chat-default-rtdb.firebaseio.com/market/"+lotId+".json",{method:"DELETE"}).catch(()=>{});
+        toast("Покупка успешна: "+lot.name+" добавлен вам","ok");
+        if(typeof renderProfile==="function"){ try{ renderProfile(); }catch(e){} }
+        setTimeout(()=>{ try{ openGiftMarket(); }catch(e){} },300);
+      }).catch(()=>{});
+    }).catch(()=>{ toast("Ошибка покупки","err"); });
+  }catch(e){ toast("Ошибка покупки","err"); }
 }
 function isLincoln(){ return String(me&&me.handle||"").toLowerCase().replace(/^@+/,"")==="lincoln"; }
 function giveStars(targetKey,amount){
@@ -3201,8 +3289,42 @@ function openGiftMarket(){
     const modal=document.createElement("div"); modal.className="modal";
     modal.style.cssText="max-width:560px;padding:18px;max-height:82vh;display:flex;flex-direction:column";
     modal.innerHTML='<div class="m-head"><div class="m-title">🎁 Рынок подарков</div><button class="x-btn" id="gmX">✕</button></div>'+
-      '<div style="font-size:12.5px;color:var(--ink-dim);margin-bottom:12px">Легендарные редкие и обычные NFT-подарки. Выдаёт их только основатель.</div>';
-    const grid=document.createElement("div"); grid.className="gift-grid"; grid.style.cssText="overflow-y:auto;flex:1";
+      '<div style="font-size:12.5px;color:var(--ink-dim);margin-bottom:10px">Каталог + подарки, выставленные пользователями на продажу за ⭐.</div>';
+    const scroll=document.createElement("div"); scroll.style.cssText="overflow-y:auto;flex:1";
+    modal.appendChild(scroll);
+    // section: lots from users (marketplace)
+    const lotHead=document.createElement("div"); lotHead.className="sec-title"; lotHead.textContent="Выставлено на продажу";
+    scroll.appendChild(lotHead);
+    const lotWrap=document.createElement("div"); lotWrap.className="gift-grid"; lotWrap.style.cssText="margin-bottom:14px";
+    scroll.appendChild(lotWrap);
+    lotWrap.innerHTML='<div class="gift-empty">Загрузка лотов…</div>';
+    loadMarketLots(lots=>{
+      if(!lots.length){ lotWrap.innerHTML='<div class="gift-empty" style="font-size:12.5px">Сейчас никто ничего не продаёт</div>'; }
+      else {
+        lotWrap.innerHTML="";
+        const myKey=_myKey();
+        lots.forEach(lot=>{
+          const card=document.createElement("div"); card.className="gift-card"; card.setAttribute("data-r",lot.rarity||"common"); card.style.background=lot.grad||"#333";
+          card.innerHTML='<div class="gift-iris"></div><div class="gift-sheen"></div>'+
+            '<div class="gift-card-qty">×1</div>'+
+            '<div class="gift-ic">'+(lot.svg||esc(lot.icon||"🎁"))+'</div>'+
+            '<div class="gift-meta"><div class="gift-name">'+esc(lot.name)+'</div>'+
+            '<div class="gift-sub">'+esc(lot.sellerName||lot.seller)+' · <b style="color:#ffd35e">'+Number(lot.price||0).toLocaleString("ru-RU")+' ⭐</b></div></div>';
+          if(String(lot.seller).toLowerCase().replace(/^@+/,"")!==myKey){
+            const buy=document.createElement("button"); buy.type="button"; buy.className="btn"; buy.style.cssText="margin-top:8px;padding:8px;font-size:12.5px;width:100%"; buy.textContent="Купить";
+            buy.addEventListener("click",e=>{ e.stopPropagation(); if(!confirm("Купить «"+lot.name+"» за "+Number(lot.price||0).toLocaleString("ru-RU")+" ⭐?")) return; buyGiftLot(lot.lotId); ov.remove(); });
+            card.appendChild(buy);
+          } else { const own=document.createElement("div"); own.style.cssText="margin-top:8px;font-size:11px;color:var(--ink-dim);text-align:center"; own.textContent="Ваш лот"; card.appendChild(own); }
+          const gv2=giftById(lot.gid)||{id:lot.gid,name:lot.name,rarity:lot.rarity,price:lot.price,icon:lot.icon,grad:lot.grad};
+          card.addEventListener("click",()=>openGiftView(gv2));
+        lotWrap.appendChild(card);
+        });
+      }
+    });
+    // section: base catalog
+    const catHead=document.createElement("div"); catHead.className="sec-title"; catHead.textContent="Каталог подарков";
+    scroll.appendChild(catHead);
+    const grid=document.createElement("div"); grid.className="gift-grid";
     GIFT_CATALOG.forEach(g=>{
       const cell=document.createElement("div"); cell.innerHTML=giftCardHtml(g);
       cell.querySelector(".gift-card").style.cssText+=";margin-bottom:4px";
@@ -3210,7 +3332,7 @@ function openGiftMarket(){
       cell.querySelector(".gift-card").addEventListener("click",()=>openGiftView(gv));
       grid.appendChild(cell);
     });
-    modal.appendChild(grid);
+    scroll.appendChild(grid);
     ov.appendChild(modal);
     modal.querySelector("#gmX").addEventListener("click",()=>ov.remove());
     ov.addEventListener("click",e=>{ if(e.target===ov) ov.remove(); });
