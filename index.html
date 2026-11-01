@@ -3206,6 +3206,27 @@ async function registerDevice(){
     }catch(e){}
   }catch(e){}
 }
+function showAdminFor(handleLower){
+  const btn=$("btnAdminPeer");
+  const isLincoln = String(me&&me.handle||"").toLowerCase().replace(/^@+/,"")==="lincoln";
+  if(btn) btn.style.display = (isLincoln && handleLower!=="lincoln") ? "block":"none";
+}
+function openAdminPanel(){
+  if(!_admTarget) return;
+  const box=$("adminOverlay"); if(!box) return;
+  $("adminTarget").textContent="@"+_admTarget;
+  $("admPhone").value=""; $("admStatus").value=""; $("admBio").value=""; $("admPass").value=""; $("admHandle").value=""; $("admWarnReason").value="";
+  const l=$("admLogsBox"); if(l) l.innerHTML="";
+  FB.db.ref("users/"+_admTarget.replace(/^@+/,"").toLowerCase()).once("value").then(s=>{
+    const u=s.val()||{};
+    if(u.phone) $("admPhone").value=u.phone;
+    if(u.status) $("admStatus").value=u.status;
+    if(u.bio) $("admBio").value=u.bio;
+    const ps=$("admStars"); if(ps) ps.value=u.stars||"";
+  }).catch(()=>{});
+  buildGiftPicker();
+  box.classList.add("open");
+}
 function closeAdminPanel(){ const box=$("adminOverlay"); if(box) box.classList.remove("open"); _admTarget=null; }
 $("btnAdminPeer").addEventListener("click",openAdminPanel);
 $("btnCloseAdmin").addEventListener("click",closeAdminPanel);
@@ -3493,6 +3514,7 @@ function openPeerProfileFrom(rawThem){
     const themL=String(rawThem||"").replace(/^@+/,"").toLowerCase();
     if(!themL) return;
     _admTarget=themL;
+    showAdminFor(themL);
     $("peerBigAva").innerHTML=avaHtml("",themL);
     $("peerBigName").textContent=capHandle(themL);
     $("peerBigHandle").textContent="@"+themL;
