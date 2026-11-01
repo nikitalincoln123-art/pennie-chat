@@ -2027,7 +2027,7 @@ function updatePeerStatusLine(u){
   if(priv.seen){ s.textContent=""; s.style.color="var(--ink-dim)"; return; }
   if(u&&u.blocked){ s.textContent="⛔ Заблокирован"; s.style.color="#f8708e"; return; }
   if(u&&u.on&&Date.now()-(u.lastSeen||0)<90000){ s.innerHTML='<span style="color:#34d399">● в сети</span>'; return; }
-  s.innerHTML="<span style='color:var(--ink-dim)'>"+(u&&u.lastSeen?("был(а) "+lastSeenText(u.lastSeen)):"не в сети")+"</span>";
+  s.innerHTML="<span style='color:var(--ink-dim)'>"+(u&&u.lastSeen?lastSeenText(u.lastSeen):"не в сети")+"</span>";
 }
 function applyChatFX(){
   // the chat message area always keeps the static doodle pattern — never animated
