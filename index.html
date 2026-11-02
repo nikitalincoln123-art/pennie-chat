@@ -563,27 +563,31 @@ button{cursor:pointer}
 @media(prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
 </style>
 <style>
-/* ============ Lincoln Gifts (original NFT-style cards) ============ */
-.gift-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:10px}
-.gift-card{position:relative;border-radius:18px;padding:14px;min-height:132px;display:flex;flex-direction:column;justify-content:space-between;box-shadow:0 10px 30px rgba(0,0,0,.5),inset 0 1px 0 rgba(255,255,255,.4);border:1px solid rgba(255,255,255,.22);cursor:pointer;transition:transform .18s cubic-bezier(.2,.8,.3,1),box-shadow .25s;overflow:hidden;isolation:isolate}
-.gift-card:hover{transform:translateY(-4px) scale(1.03);box-shadow:0 18px 44px rgba(0,0,0,.55),0 0 24px rgba(255,255,255,.12)}
-.gift-card::before{content:"";position:absolute;inset:-40%;background:radial-gradient(circle at 30% 20%,rgba(255,255,255,.45),transparent 45%);pointer-events:none;z-index:0;transition:opacity .3s}
-.gift-card::after{content:"";position:absolute;inset:0;background:radial-gradient(circle at 50% -15%,rgba(255,255,255,.38),transparent 55%);pointer-events:none;z-index:0}
-.gift-card .gift-sheen{position:absolute;inset:-150%;z-index:1;pointer-events:none;background:linear-gradient(115deg,transparent 30%,rgba(255,255,255,.28) 45%,rgba(180,230,255,.18) 50%,rgba(255,255,255,.28) 55%,transparent 70%);background-size:300% 300%;animation:giftSheen 4.5s ease-in-out infinite;mix-blend-mode:screen}
-.gift-card .gift-iris{position:absolute;inset:-60%;z-index:0;pointer-events:none;background:conic-gradient(from 0deg,rgba(255,255,255,.16),rgba(90,200,255,.12),rgba(255,120,220,.12),rgba(120,255,180,.12),rgba(255,255,255,.16));filter:blur(28px);animation:giftIris 9s linear infinite;opacity:.7}
-@keyframes giftSheen{0%{background-position:0% 50%}50%{background-position:100% 50%}100%{background-position:0% 50%}}
-@keyframes giftIris{to{transform:rotate(360deg)}}
-.gift-card[data-r="legendary"]{box-shadow:0 10px 30px rgba(230,185,60,.35),0 0 0 1px rgba(255,215,94,.35),inset 0 1px 0 rgba(255,255,255,.5)}
-.gift-card[data-r="legendary"]::before{content:"";position:absolute;inset:-60%;background:conic-gradient(from 0deg,#fff3c4,#f0c044,#ff7b2c,#f0c044,#fff3c4);filter:blur(40px);opacity:.45;animation:giftSpin 6s linear infinite;z-index:0;pointer-events:none}
-.gift-card[data-r="rare"]::before{content:"";position:absolute;inset:-60%;background:conic-gradient(from 0deg,#cfeaff,#5db9ff,#2a5aff,#5db9ff,#cfeaff);filter:blur(34px);opacity:.35;animation:giftSpin 8s linear infinite;z-index:0;pointer-events:none}
-@keyframes giftSpin{to{transform:rotate(360deg)}}
-.gift-ic{font-size:46px;line-height:1;filter:drop-shadow(0 6px 12px rgba(0,0,0,.45));position:relative;z-index:1;animation:giftFloat 3.2s ease-in-out infinite;transform-origin:center;display:flex;align-items:center;justify-content:center;height:64px;flex:0 0 64px;margin-top:6px}
-.gift-card-qty{position:absolute;top:8px;right:8px;z-index:3;background:rgba(0,0,0,.45);backdrop-filter:blur(4px);color:#fff;font-size:10.5px;font-weight:800;padding:2px 8px;border-radius:999px;border:1px solid rgba(255,255,255,.25)}
-.gift-ic svg{width:52px;height:52px;filter:drop-shadow(0 4px 10px rgba(0,0,0,.4))}
-@keyframes giftFloat{0%,100%{transform:translateY(0)}50%{transform:translateY(-6px)}}
-.gift-meta{position:relative;z-index:2;background:rgba(10,12,16,.55);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);border-radius:12px;padding:8px 9px;border:1px solid rgba(255,255,255,.14);margin-top:auto;text-align:left;min-height:52px;display:flex;flex-direction:column;justify-content:center}
-.gift-name{font-weight:800;font-size:12.5px;color:#fff;text-shadow:0 1px 4px rgba(0,0,0,.6);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.gift-sub{font-size:10.5px;font-weight:700;margin-top:2px;color:rgba(255,255,255,.95);letter-spacing:.2px}
+/* ============ Telegram-style gift cards ============ */
+.gift-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(148px,1fr));gap:10px}
+.gift-card{position:relative;border-radius:16px;padding:12px 10px 10px;min-height:140px;display:flex;flex-direction:column;justify-content:space-between;background:linear-gradient(160deg,#2b2f38 0%,#1b1f26 60%,#12151a 100%);box-shadow:inset 0 1px 0 rgba(255,255,255,.08),0 6px 18px rgba(0,0,0,.4);border:1px solid rgba(255,255,255,.08);cursor:pointer;transition:transform .16s ease,box-shadow .2s;overflow:hidden;isolation:isolate}
+.gift-card:hover{transform:translateY(-3px);box-shadow:inset 0 1px 0 rgba(255,255,255,.1),0 12px 28px rgba(0,0,0,.5)}
+.gift-card::before{content:"";position:absolute;inset:0;background:radial-gradient(120% 70% at 50% 0%,rgba(255,255,255,.14) 0%,transparent 55%);pointer-events:none;z-index:0}
+.gift-card::after{content:"";position:absolute;left:0;right:0;bottom:0;height:55%;background:linear-gradient(180deg,transparent,rgba(0,0,0,.35));pointer-events:none;z-index:0}
+/* rarity ring (Telegram-like colored glow) */
+.gift-card[data-r="legendary"]{border-color:rgba(255,211,94,.55);box-shadow:inset 0 1px 0 rgba(255,255,255,.14),0 0 0 1px rgba(255,211,94,.28),0 8px 24px rgba(240,192,68,.20)}
+.gift-card[data-r="legendary"]::before{background:radial-gradient(120% 70% at 50% 0%,rgba(255,215,130,.30) 0%,transparent 55%)}
+.gift-card[data-r="rare"]{border-color:rgba(93,185,255,.5);box-shadow:inset 0 1px 0 rgba(255,255,255,.12),0 0 0 1px rgba(93,185,255,.24),0 8px 24px rgba(60,130,255,.16)}
+.gift-card[data-r="rare"]::before{background:radial-gradient(120% 70% at 50% 0%,rgba(150,205,255,.24) 0%,transparent 55%)}
+/* the large glowing gift emoji/icon in the middle (like Telegram's gift) */
+.gift-ic{font-size:52px;line-height:1;position:relative;z-index:1;display:flex;align-items:center;justify-content:center;height:78px;flex:0 0 78px;margin:4px 0 2px;filter:drop-shadow(0 8px 16px rgba(0,0,0,.55)) drop-shadow(0 0 18px rgba(255,215,94,.18))}
+.gift-ic svg{width:60px;height:60px;filter:drop-shadow(0 6px 14px rgba(0,0,0,.5))}
+/* compact price chip in Telegram style (star badge) */
+.gift-card-qty{position:absolute;top:8px;right:8px;z-index:3;background:rgba(0,0,0,.5);color:#fff;font-size:10px;font-weight:800;padding:2px 8px;border-radius:999px;border:1px solid rgba(255,255,255,.18);backdrop-filter:blur(4px)}
+.gift-card .gift-price-chip{position:absolute;left:10px;right:10px;top:auto;bottom:10px;z-index:3;display:flex;align-items:center;justify-content:center;gap:4px;background:rgba(255,255,255,.10);border:1px solid rgba(255,255,255,.16);border-radius:999px;padding:4px 0;font-size:12px;font-weight:800;color:#ffd35e;backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);text-shadow:0 1px 2px rgba(0,0,0,.5)}
+.gift-card .gift-price-chip svg{width:13px;height:13px;flex:0 0 auto}
+.gift-buy-btn{margin-top:6px;width:100%;border:1px solid rgba(46,166,255,.45);background:linear-gradient(180deg,rgba(46,166,255,.16),rgba(46,166,255,.28));color:#8ecbff;font-size:12px;font-weight:800;padding:7px 0;border-radius:999px;cursor:pointer;letter-spacing:.2px;transition:filter .15s,transform .1s}
+.gift-buy-btn:hover{filter:brightness(1.15)}
+.gift-buy-btn:active{transform:scale(.98)}
+/* metadata row; name above the price chip */
+.gift-meta{position:relative;z-index:2;margin:8px 0 26px;text-align:left;min-height:30px;display:flex;flex-direction:column;justify-content:flex-end}
+.gift-name{font-weight:700;font-size:12.5px;color:#fff;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.gift-sub{font-size:10.5px;font-weight:600;margin-top:2px;color:var(--ink-dim);letter-spacing:.2px}
 .gift-empty{color:var(--ink-dim);font-size:13.5px;text-align:center;padding:14px 0}
 .gift-pick{display:grid;grid-template-columns:repeat(auto-fill,minmax(120px,1fr));gap:8px;max-height:300px;overflow-y:auto;margin-top:10px}
 </style>
@@ -1159,12 +1163,12 @@ const GIFT_CATALOG=[
 function giftById(id){ return GIFT_CATALOG.find(g=>g.id===id); }
 function giftCardHtml(g){
   const r=GIFT_RARITY[g.rarity]||GIFT_RARITY.common;
-  return '<div class="gift-card" data-r="'+g.rarity+'" data-gid="'+g.id+'" style="background:'+g.grad+'">'+
-    '<div class="gift-iris"></div><div class="gift-sheen"></div>'+
+  return '<div class="gift-card" data-r="'+g.rarity+'" data-gid="'+g.id+'">'+
     '<div class="gift-card-qty">'+(g.qty?('× '+g.qty):'')+'</div>'+
     '<div class="gift-ic">'+(g.svg||esc(g.icon||"🎁"))+'</div>'+
     '<div class="gift-meta"><div class="gift-name">'+esc(g.name)+'</div>'+
-    '<div class="gift-sub"><span style="color:'+r.color+'">'+r.label+'</span> · '+g.price.toLocaleString("ru-RU")+' ⭐</div></div>'+
+    '<div class="gift-sub">'+r.label+'</div></div>'+
+    '<div class="gift-price-chip"><svg viewBox="0 0 24 24" fill="#ffd35e"><path d="M12 2l2.4 5.6 6 .8-4.4 4.1 1.2 5.9L12 15.6l-5.2 2.8 1.2-5.9L3.6 8.4l6-.8z"/></svg>'+esc(g.price.toLocaleString("ru-RU"))+'</div>'+
     '</div>';
 }
 function openGiftView(g){
@@ -3751,17 +3755,17 @@ function openGiftMarket(){
         lotWrap.innerHTML="";
         const myKey=_myKey();
         lots.forEach(lot=>{
-          const card=document.createElement("div"); card.className="gift-card"; card.setAttribute("data-r",lot.rarity||"common"); card.style.background=lot.grad||"#333";
-          card.innerHTML='<div class="gift-iris"></div><div class="gift-sheen"></div>'+
-            '<div class="gift-card-qty">×1</div>'+
+          const card=document.createElement("div"); card.className="gift-card"; card.setAttribute("data-r",lot.rarity||"common");
+          card.innerHTML='<div class="gift-card-qty">×1</div>'+
             '<div class="gift-ic">'+(lot.svg||esc(lot.icon||"🎁"))+'</div>'+
             '<div class="gift-meta"><div class="gift-name">'+esc(lot.name)+'</div>'+
-            '<div class="gift-sub">'+esc(lot.sellerName||lot.seller)+' · <b style="color:#ffd35e">'+Number(lot.price||0).toLocaleString("ru-RU")+' ⭐</b></div></div>';
+            '<div class="gift-sub">'+esc(lot.sellerName||lot.seller)+'</div></div>'+
+            '<div class="gift-price-chip"><svg viewBox="0 0 24 24" fill="#ffd35e"><path d="M12 2l2.4 5.6 6 .8-4.4 4.1 1.2 5.9L12 15.6l-5.2 2.8 1.2-5.9L3.6 8.4l6-.8z"/></svg>'+esc(Number(lot.price||0).toLocaleString("ru-RU"))+'</div>';
           if(String(lot.seller).toLowerCase().replace(/^@+/,"")!==myKey){
-            const buy=document.createElement("button"); buy.type="button"; buy.className="btn"; buy.style.cssText="margin-top:8px;padding:8px;font-size:12.5px;width:100%"; buy.textContent="Купить";
+            const buy=document.createElement("button"); buy.type="button"; buy.className="gift-buy-btn"; buy.textContent="Купить";
             buy.addEventListener("click",e=>{ e.stopPropagation(); if(!confirm("Купить «"+lot.name+"» за "+Number(lot.price||0).toLocaleString("ru-RU")+" ⭐?")) return; buyGiftLot(lot.lotId); ov.remove(); });
             card.appendChild(buy);
-          } else { const own=document.createElement("div"); own.style.cssText="margin-top:8px;font-size:11px;color:var(--ink-dim);text-align:center"; own.textContent="Ваш лот"; card.appendChild(own); }
+          } else { const own=document.createElement("div"); own.className="gift-buy-btn"; own.style.cssText="pointer-events:none;opacity:.55;text-align:center;color:var(--ink-dim);background:none;border-color:var(--line)"; own.textContent="Ваш лот"; card.appendChild(own); }
           const gv2=giftById(lot.gid)||{id:lot.gid,name:lot.name,rarity:lot.rarity,price:lot.price,icon:lot.icon,grad:lot.grad};
           card.addEventListener("click",()=>openGiftView(gv2));
         lotWrap.appendChild(card);
@@ -3777,9 +3781,8 @@ function openGiftMarket(){
       const card=cell.querySelector(".gift-card");
       card.style.cssText+=";margin-bottom:4px";
       const gv=giftById(g.id)||g;
-      const buyBtn=document.createElement("button"); buyBtn.type="button"; buyBtn.className="btn";
-      buyBtn.style.cssText="margin-top:6px;padding:7px;font-size:12px;width:100%";
-      buyBtn.textContent="Купить за "+Number(g.price||0).toLocaleString("ru-RU")+" ⭐";
+      const buyBtn=document.createElement("button"); buyBtn.type="button"; buyBtn.className="gift-buy-btn";
+      buyBtn.textContent="Купить";
       buyBtn.addEventListener("click",e=>{ e.stopPropagation(); buyGiftFromSystem(g); });
       cell.appendChild(buyBtn);
       card.addEventListener("click",()=>openGiftView(gv));
